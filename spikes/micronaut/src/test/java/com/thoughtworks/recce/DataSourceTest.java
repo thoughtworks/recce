@@ -1,27 +1,36 @@
 package com.thoughtworks.recce;
 
+import io.micronaut.data.jdbc.runtime.JdbcOperations;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.assertj.db.type.Table;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
+import java.sql.ResultSet;
 
-import static org.assertj.db.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
 public class DataSourceTest {
 
-    @Inject @Named("source")
-    DataSource sourceData;
+    @Inject
+    @Named("source")
+    JdbcOperations sourceOperations;
 
-    @Inject @Named("target")
-    DataSource targetData;
+    @Inject
+    @Named("target")
+    JdbcOperations targetOperations;
 
     @Test
     public void shouldInjectDataSources() {
-        assertThat(new Table(sourceData, "TESTDATA")).hasNumberOfRows(3);
-        assertThat(new Table(targetData, "TESTDATA")).hasNumberOfRows(4);
+        assertThat(countRows(sourceOperations)).isEqualTo(3);
+        assertThat(countRows(targetOperations)).isEqualTo(4);
+    }
+
+    private Integer countRows(JdbcOperations operations) {
+        return operations.prepareStatement("select count(*) from testdata", preparedStatement -> {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.first() ? resultSet.getInt(1) : -1;
+        });
     }
 }
