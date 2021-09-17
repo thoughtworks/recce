@@ -26,7 +26,6 @@ dependencies {
     implementation("info.picocli:picocli")
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut.data:micronaut-data-jdbc")
-    implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.picocli:micronaut-picocli")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("javax.annotation:javax.annotation-api")
@@ -34,6 +33,8 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.h2database:h2")
     testImplementation("org.assertj:assertj-core")
+    testImplementation("org.assertj:assertj-db:2.0.2")
+    testImplementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut:micronaut-validation")
 
     testImplementation("org.mockito:mockito-core")
