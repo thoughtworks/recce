@@ -52,6 +52,9 @@ java {
 
 
 jib {
+    from {
+        image = "eclipse-temurin:16-jdk-focal"
+    }
     to {
         image = "gcr.io/myapp/jib-image"
     }
