@@ -22,6 +22,6 @@ public class DataSourceTest {
     @Test
     public void shouldInjectDataSources() {
         assertThat(new Table(sourceData, "TESTDATA")).hasNumberOfRows(3);
-        assertThat(new Table(targetData, "TESTDATA")).hasNumberOfRows(3);
+        assertThat(new Table(targetData, "TESTDATA")).hasNumberOfRows(4);
     }
 }

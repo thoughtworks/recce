@@ -1,13 +1,13 @@
 datasources:
   source:
-    url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
     password: ''
     schema-generate: CREATE_DROP
     dialect: H2
   target:
-    url: jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
     password: ''
@@ -19,8 +19,10 @@ flyway:
     source:
       enabled: true
       locations:
-        - classpath:db/migration
+        - classpath:db/common
+        - classpath:db/source
     target:
       enabled: true
       locations:
-        - classpath:db/migration
+        - classpath:db/common
+        - classpath:db/target
