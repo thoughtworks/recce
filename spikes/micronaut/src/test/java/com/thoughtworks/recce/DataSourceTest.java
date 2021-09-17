@@ -1,4 +1,4 @@
-package com.thoughtworks.datarec;
+package com.thoughtworks.recce;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;

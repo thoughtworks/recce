@@ -1,18 +1,18 @@
-package com.thoughtworks.datarec;
+package com.thoughtworks.recce;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "datarec", description = "...",
+@Command(name = "recce", description = "...",
         mixinStandardHelpOptions = true)
-public class DatarecCommand implements Runnable {
+public class RecceCommand implements Runnable {
 
     @Option(names = {"-v", "--verbose"}, description = "...")
     boolean verbose;
 
     public static void main(String[] args) throws Exception {
-        PicocliRunner.run(DatarecCommand.class, args);
+        PicocliRunner.run(RecceCommand.class, args);
     }
 
     public void run() {

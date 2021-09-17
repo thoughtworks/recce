@@ -5,7 +5,7 @@ plugins {
 }
 
 version = "0.1"
-group = "com.thoughtworks.datarec"
+group = "com.thoughtworks.recce"
 
 repositories {
     mavenCentral()
@@ -15,7 +15,7 @@ micronaut {
     testRuntime("junit5")
     processing {
         incremental(true)
-        annotations("com.thoughtworks.datarec.*")
+        annotations("com.thoughtworks.recce.*")
     }
 }
 
@@ -41,16 +41,14 @@ dependencies {
 
 }
 
-
 application {
-    mainClass.set("com.thoughtworks.datarec.DatarecCommand")
+    mainClass.set("com.thoughtworks.recce.RecceCommand")
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("16")
     targetCompatibility = JavaVersion.toVersion("16")
 }
-
-
 
 jib {
     from {

@@ -1,16 +1,16 @@
-package com.thoughtworks.datarec;
+package com.thoughtworks.recce;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.env.Environment;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DatarecCommandTest {
+public class RecceCommandTest {
 
     @Test
     public void testWithCommandLineOption() throws Exception {
@@ -19,9 +19,9 @@ public class DatarecCommandTest {
 
         try (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
             String[] args = new String[] { "-v" };
-            PicocliRunner.run(DatarecCommand.class, ctx, args);
+            PicocliRunner.run(RecceCommand.class, ctx, args);
 
-            // datarec
+            // recce
             assertTrue(baos.toString().contains("Hi!"));
         }
     }

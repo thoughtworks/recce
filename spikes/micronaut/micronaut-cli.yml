@@ -1,5 +1,5 @@
 applicationType: cli
-defaultPackage: com.thoughtworks.datarec
+defaultPackage: com.thoughtworks.recce
 testFramework: junit
 sourceLanguage: java
 buildTool: gradle_kotlin
