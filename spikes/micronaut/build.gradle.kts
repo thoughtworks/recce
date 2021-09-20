@@ -1,7 +1,8 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("io.micronaut.application") version "2.0.4"
-    id("com.google.cloud.tools.jib") version "2.8.0"
+    id("io.micronaut.application") version "2.0.5"
+    id("com.google.cloud.tools.jib") version "3.1.4"
+    id("com.github.ben-manes.versions") version "0.39.0"
 }
 
 version = "0.1"
