@@ -1,4 +1,7 @@
 datasources:
+  default:
+    url: jdbc:tc:postgresql:12:///postgre
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
   source:
     url: jdbc:h2:mem:sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver

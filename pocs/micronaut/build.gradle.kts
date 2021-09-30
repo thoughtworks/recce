@@ -1,54 +1,78 @@
 plugins {
+    id("org.jetbrains.kotlin.jvm") version "1.5.21"
+    id("org.jetbrains.kotlin.kapt") version "1.5.21"
     id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("io.micronaut.application") version "2.0.5"
+    id("io.micronaut.application") version "2.0.6"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.5.21"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.5.21"
     id("com.google.cloud.tools.jib") version "3.1.4"
     id("com.github.ben-manes.versions") version "0.39.0"
 }
 
 version = "0.1"
-group = "com.thoughtworks.recce"
+group = "com.thoughtworks.recce.server"
 
+val kotlinVersion = project.properties.get("kotlinVersion")
 repositories {
     mavenCentral()
 }
 
 micronaut {
+    runtime("netty")
     testRuntime("junit5")
     processing {
         incremental(true)
-        annotations("com.thoughtworks.recce.*")
+        annotations("com.thoughtworks.recce.server.*")
     }
 }
 
 dependencies {
-    annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("info.picocli:picocli-codegen")
-    annotationProcessor("io.micronaut.data:micronaut-data-processor")
-    implementation("info.picocli:picocli")
+    kapt("io.micronaut:micronaut-http-validation")
+    kapt("io.micronaut.data:micronaut-data-processor")
+    implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-runtime")
+    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.flyway:micronaut-flyway")
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
     implementation("io.micronaut.data:micronaut-data-jdbc")
-    implementation("io.micronaut.picocli:micronaut-picocli")
+    implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("javax.annotation:javax.annotation-api")
-    compileOnly("org.projectlombok:lombok")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    runtimeOnly("com.h2database:h2")
-    testImplementation("org.assertj:assertj-core")
-    testImplementation("org.assertj:assertj-db:2.0.2")
-    testImplementation("io.micronaut.flyway:micronaut-flyway")
-    implementation("io.micronaut:micronaut-validation")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
 
+    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
 
+    testRuntimeOnly("com.h2database:h2")
 }
 
 application {
-    mainClass.set("com.thoughtworks.recce.RecceCommand")
+    mainClass.set("com.thoughtworks.recce.server.ApplicationKt")
 }
 
 java {
     sourceCompatibility = JavaVersion.toVersion("16")
-    targetCompatibility = JavaVersion.toVersion("16")
+}
+
+tasks {
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "16"
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "16"
+        }
+    }
 }
 
 jib {
@@ -56,6 +80,6 @@ jib {
         image = "eclipse-temurin:16-jdk-focal"
     }
     to {
-        image = "gcr.io/myapp/jib-image"
+        image = "gcr.io/recce/recce-server"
     }
 }
