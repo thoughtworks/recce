@@ -1,4 +1,4 @@
-## Micronaut 3.0.2 Documentation
+## Micronaut Documentation
 
 - [User Guide](https://docs.micronaut.io/3.0.2/guide/index.html)
 - [API Reference](https://docs.micronaut.io/3.0.2/api/index.html)

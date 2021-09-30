@@ -91,6 +91,6 @@ jib {
         image = "eclipse-temurin:16-jdk-focal"
     }
     to {
-        image = "gcr.io/recce/recce-server"
+        image = "recce/recce-server"
     }
 }
