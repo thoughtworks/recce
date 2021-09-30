@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: ASDF setup
-        uses: asdf-vm/actions/install@v1
+        uses: asdf-vm/actions/setup@v1
       - name: ASDF Cache
         id: asdf-cache
         uses: actions/cache@v2
