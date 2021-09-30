@@ -30,8 +30,6 @@ jobs:
         uses: asdf-vm/actions/install@v1
         if: steps.asdf-cache.outputs.cache-hit != 'true'
       - name: Build with Gradle
-        run: ./gradlew build
-      - name: Build with Gradle
         uses: burrunan/gradle-cache-action@v1
         with:
           arguments: build
