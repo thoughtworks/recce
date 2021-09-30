@@ -62,7 +62,9 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("16")
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
 }
 
 tasks {
