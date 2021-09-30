@@ -19,7 +19,6 @@ class DataSourceTest {
     @field:Named("target")
     lateinit var targetOperations: JdbcOperations
 
-
     @Test
     fun `should load multiple data sources`() {
         Assertions.assertThat(countRows(sourceOperations)).isEqualTo(3)

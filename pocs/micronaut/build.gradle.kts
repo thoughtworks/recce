@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.jpa") version "1.5.21"
     id("com.google.cloud.tools.jib") version "3.1.4"
     id("com.github.ben-manes.versions") version "0.39.0"
+    id("com.diffplug.spotless") version "5.15.2"
 }
 
 version = "0.1"
@@ -38,8 +39,8 @@ dependencies {
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("javax.annotation:javax.annotation-api")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
 
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("org.postgresql:postgresql")
@@ -72,6 +73,16 @@ tasks {
         kotlinOptions {
             jvmTarget = "16"
         }
+    }
+}
+
+configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    // configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    kotlin {
+        ktlint()
+    }
+    kotlinGradle {
+        ktlint()
     }
 }
 
