@@ -12,7 +12,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 ## Pre-requisites
 
 * Docker
-* JDK (if you use [ASDF](https://asdf-vm.com/)) you can `asdf install` to install one
+* JDK (if you use [ASDF](https://asdf-vm.com/) you can `asdf install` to install one)
 
 ## Getting Started
 
