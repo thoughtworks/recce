@@ -42,6 +42,9 @@ it deserves in a sensitive/PII environment, and are suitable for automation.
     * by domain concept (e.g user group/class)
     * by time (month-by-month or day-by-day)
 * Suitable for running in production
+* Should be compare tables with ~30-40 million rows at column level without use of aggregates
+  * Obvious caveat is that it depends on the dataset query and source/target table design
+  * Intent is that the reconciliation tool and its own database should not be the blocker here
 
 # Other possible features
 
@@ -50,17 +53,23 @@ it deserves in a sensitive/PII environment, and are suitable for automation.
 # High Level Design Considerations
 
 * should have its own database where reconciliation results are stored
-    * in order to avoid having to do a massive, un-scalable in-memory merge or map-reduce
-    * to allow for querying results over time and interacting with them
-* the user will need to designate a migration primary key that is common across source and target data sources for
+  * in order to avoid having to do a massive, un-scalable in-memory merge or map-reduce
+  * to allow for querying results over time and interacting with them
+* the user will need to designate a **migration primary key** that is common across source and target data sources for
   comparison
-    * this key will be assumed to not contain PII/sensitive data
-* data from both source+target rows should generally be compared by hashes; to avoid persistent of PII data inside the
+  * this key will be assumed to not contain PII/sensitive data
+* data from both source+target rows should generally be compared by hashes; to avoid persistence of PII data inside the
   database
-    * this will lead to some loss of specificity when understanding why a row does not match
-    * it may be possible to directly compare data, but this should be on an opt-in basis (private by default -> compare
-      hashes)
+  * this will lead to some loss of specificity when understanding why a row does not match
+  * it may be possible to directly compare data, but this should be on an opt-in basis (private by default -> compare
+    hashes)
 * Expressing intended differences in storage between source and target will be done in SQL by developer e.g.
-    * a NUMBER enumeration converted to a VARCHAR enumeration
-    * numerical tolerance differences
-    * character encoding differences
+  * a NUMBER enumeration converted to a VARCHAR enumeration
+  * numerical tolerance differences
+  * character encoding differences
+* API would primarily be used to trigger an existing pre-configured reconciliation dataset
+  * as opposed to sending details/SQL and data source definitions for an entire new dataset
+  * ensures that the reconciliation
+* Approach scaling through running multiple threads executing various queries in the background via connection pools
+  rather than multiple pods/container instances
+  * Avoids complexity in scheduling, and we want this tool to be relatively simple to setup and use
