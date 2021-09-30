@@ -16,16 +16,3 @@ datasources:
     password: ''
     schema-generate: CREATE_DROP
     dialect: H2
-
-flyway:
-  datasources:
-    source:
-      enabled: true
-      locations:
-        - classpath:db/common
-        - classpath:db/source
-    target:
-      enabled: true
-      locations:
-        - classpath:db/common
-        - classpath:db/target
