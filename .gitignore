@@ -1,19 +1,29 @@
+## Desktop stuff
 Thumbs.db
 .DS_Store
+
+## Gradle
 .gradle
 **/build/
 !src/**/build/
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+## IntelliJ IDEA stuff
 **/out/
 .idea
 *.iml
 *.ipr
 *.iws
+
+## Eclipse stuff
 .project
 .settings
 .classpath
 .factorypath
 
-# Package Files #
+## Generic Archives
 *.jar
 *.war
 *.nar
