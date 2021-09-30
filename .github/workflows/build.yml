@@ -31,6 +31,10 @@ jobs:
         if: steps.asdf-cache.outputs.cache-hit != 'true'
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Build with Gradle
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          arguments: build
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
