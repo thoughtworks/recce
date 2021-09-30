@@ -77,7 +77,6 @@ tasks {
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-    // configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
         ktlint()
     }
