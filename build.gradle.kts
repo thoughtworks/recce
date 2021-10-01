@@ -15,6 +15,7 @@ group = "com.thoughtworks.recce.server"
 
 val javaMajorVersion = 16
 val kotlinVersion = project.properties.get("kotlinVersion")
+val exposedVersion = "0.34.1"
 
 repositories {
     mavenCentral()
@@ -53,8 +54,8 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
-    testImplementation("org.jetbrains.exposed:exposed-core:0.34.1")
-    testImplementation("org.jetbrains.exposed:exposed-jdbc:0.34.1")
+    testImplementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    testImplementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
 
     testRuntimeOnly("com.h2database:h2")
 }
