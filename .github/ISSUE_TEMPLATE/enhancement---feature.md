@@ -1,12 +1,3 @@
----
-name: Enhancement / Feature
-about: Raise a new enhancement/feature request
-title: ''
-labels: enhancement
-assignees: ''
-
----
-
 **Context / Goal**
 <!-- Is the enhancement/feature request related to a problem? Please describe. -->
 
