@@ -54,7 +54,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.jetbrains.exposed:exposed-core:0.34.1")
-    testImplementation("org.jetbrains.exposed:exposed-jdbc:0.34.1")
+    testImplementation("org.jetbrains.exposed:exposed-jdbc:0.35.1")
 
     testRuntimeOnly("com.h2database:h2")
 }
