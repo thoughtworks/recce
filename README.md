@@ -30,6 +30,6 @@ You can get started work on Recce by compiling
     ```
 * Build a Docker image locally and run it
     ```shell
-    ./gradlew jobDockerBuild
+    ./gradlew jibDockerBuild
     docker run recce/recce-server
     ```
