@@ -29,8 +29,12 @@ jobs:
       - name: ASDF tool install
         uses: asdf-vm/actions/install@v1
         if: steps.asdf-cache.outputs.cache-hit != 'true'
+      - name: Set JAVA_HOME
+        run: echo "JAVA_HOME=$(dirname $(dirname $(asdf which java))" >> $GITHUB_ENV
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: --version
       - name: Upload test results
