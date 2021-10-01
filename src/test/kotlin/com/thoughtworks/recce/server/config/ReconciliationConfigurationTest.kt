@@ -22,5 +22,4 @@ class ReconciliationConfigurationTest {
                 assertThat(it.target.query).contains("targetdatacount")
             }
     }
-
 }
