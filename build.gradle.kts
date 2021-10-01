@@ -13,7 +13,9 @@ plugins {
 version = "0.1"
 group = "com.thoughtworks.recce.server"
 
+val javaMajorVersion = 16
 val kotlinVersion = project.properties.get("kotlinVersion")
+
 repositories {
     mavenCentral()
 }
@@ -63,19 +65,19 @@ application {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(javaMajorVersion))
     }
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "16"
+            jvmTarget = "$javaMajorVersion"
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            jvmTarget = "16"
+            jvmTarget = "$javaMajorVersion"
         }
     }
 }
@@ -91,7 +93,7 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 
 jib {
     from {
-        image = "eclipse-temurin:16-jdk-focal"
+        image = "eclipse-temurin:$javaMajorVersion-jdk-alpine"
     }
     to {
         image = "recce/recce-server"
