@@ -15,7 +15,7 @@ group = "com.thoughtworks.recce.server"
 
 val javaMajorVersion = 16
 val kotlinVersion = project.properties.get("kotlinVersion")
-val exposedVersion = "0.34.1"
+val exposedVersion = "0.35.1"
 
 repositories {
     mavenCentral()
