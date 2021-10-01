@@ -1,12 +1,3 @@
----
-name: Task / Chore
-about: Add a technical task or chore
-title: ''
-labels: task
-assignees: ''
-
----
-
 **Context / Goal**
 <!-- Is the enhancement/feature request related to a problem? Please describe. -->
 
