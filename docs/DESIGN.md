@@ -37,7 +37,9 @@ it deserves in a sensitive/PII environment, and are suitable for automation.
       basis
     * allowing developers to express aggregate queries that must match on both sides is likely sufficient to be able to
       achieve this
-* should allow for reconciliation to take place daily to
+* should allow for reconciliation to take place daily to allow for monitoring the synchronization of two systems over time
+   * during migration projects we often run old+new systems in parallel, dual-persisting data or otherwide synchronizing them
+   * we want to establish if there is any drift happening through normal operations 
 * datasets to reconcile should be able to be **sliced** by developers for performance reasons
     * by domain concept (e.g user group/class)
     * by time (month-by-month or day-by-day)
