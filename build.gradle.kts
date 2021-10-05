@@ -62,7 +62,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
-    testImplementation("io.projectreactor:reactor-test:3.4.8")
+    testImplementation("io.projectreactor:reactor-test:3.4.10")
 
     testImplementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     testImplementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
