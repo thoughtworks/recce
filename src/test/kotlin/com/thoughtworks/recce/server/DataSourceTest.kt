@@ -1,6 +1,5 @@
 package com.thoughtworks.recce.server
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.jetbrains.exposed.sql.Database
@@ -8,10 +7,10 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import javax.sql.DataSource
 
-@MicronautTest
 abstract class DataSourceTest {
 
     @Inject
@@ -55,6 +54,15 @@ abstract class DataSourceTest {
         }
         transaction(targetDb) {
             insertUsers(2)
+        }
+    }
+
+    @AfterEach
+    fun tearDown() {
+        for (db in listOf(sourceDb, targetDb)) {
+            transaction(db) {
+                SchemaUtils.drop(TestData)
+            }
         }
     }
 

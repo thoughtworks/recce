@@ -1,10 +1,12 @@
 package com.thoughtworks.recce.server
 
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.assertj.core.api.Assertions
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 
+@MicronautTest
 class JdbcDataSourceTest : DataSourceTest() {
 
     @Test
