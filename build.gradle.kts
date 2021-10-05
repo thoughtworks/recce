@@ -95,11 +95,12 @@ tasks {
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    val editorConfig = mapOf("disabled_rules" to "no-wildcard-imports")
     kotlin {
-        ktlint()
+        ktlint().userData(editorConfig)
     }
     kotlinGradle {
-        ktlint()
+        ktlint().userData(editorConfig)
     }
 }
 
