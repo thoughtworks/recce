@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server
+package com.thoughtworks.recce.server.config
 
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 
-@MicronautTest
+@MicronautTest(environments = arrayOf("test-integration"))
 class ReactiveDataSourceTest : DataSourceTest() {
     @Inject
     @field:Named("reactive-source")

@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server
+package com.thoughtworks.recce.server.config
 
 import jakarta.inject.Inject
 import jakarta.inject.Named

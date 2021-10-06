@@ -62,6 +62,8 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     testImplementation("io.projectreactor:reactor-test:3.4.10")
 
     testImplementation("org.jetbrains.exposed:exposed-core:$exposedVersion")

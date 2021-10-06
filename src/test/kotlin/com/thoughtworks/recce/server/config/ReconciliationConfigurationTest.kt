@@ -5,21 +5,27 @@ import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-@MicronautTest(propertySources = arrayOf("classpath:configuration/application-test-dataset.yml"))
-class ReconciliationConfigurationTest {
+@MicronautTest(
+    environments = arrayOf("test-integration"),
+    propertySources = arrayOf("classpath:config/application-test-dataset.yml"),
+)
+internal class ReconciliationConfigurationTest {
 
     @Inject
     lateinit var config: ReconciliationConfiguration
 
     @Test
     fun `should parse dataset configuration from yaml`() {
-        assertThat(config.dataSets)
+        assertThat(config.datasets)
             .hasSize(1)
             .hasEntrySatisfying("test-dataset") {
-                assertThat(it.source.dataSourceRef).isEqualTo("source")
+                assertThat(it.name).isEqualTo("test-dataset")
+                assertThat(it.source.dataSourceRef).isEqualTo("reactive-source")
                 assertThat(it.source.query).contains("sourcedatacount")
-                assertThat(it.target.dataSourceRef).isEqualTo("target")
+                assertThat(it.source.dbOperations).isNotNull
+                assertThat(it.target.dataSourceRef).isEqualTo("reactive-target")
                 assertThat(it.target.query).contains("targetdatacount")
+                assertThat(it.target.dbOperations).isNotNull
             }
     }
 }

@@ -1,0 +1,9 @@
+reconciliation:
+  datasets:
+    test-dataset:
+      source:
+        dataSourceRef: reactive-source
+        query: select "sourcedatacount" as MigrationKey, count(*) from testdata
+      target:
+        dataSourceRef: reactive-target
+        query: select "targetdatacount" as MigrationKey, count(*) from testdata

@@ -1,9 +1,0 @@
-reconciliation:
-  dataSets:
-    test-dataset:
-      source:
-        dataSourceRef: source
-        query: select "sourcedatacount" as MigrationKey, count(*) from testdata
-      target:
-        dataSourceRef: target
-        query: select "targetdatacount" as MigrationKey, count(*) from testdata
