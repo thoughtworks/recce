@@ -14,7 +14,7 @@ private val logger = KotlinLogging.logger {}
 
 @Singleton
 open class DataSetService(@Inject val config: ReconciliationConfiguration) {
-    fun start(dataSetName: String): Flux<String> {
+    fun start(dataSetName: String): Flux<HashedRow> {
 
         val source = config.datasets[dataSetName]?.source
             ?: throw IllegalArgumentException("[$dataSetName] not found!")
@@ -23,13 +23,13 @@ open class DataSetService(@Inject val config: ReconciliationConfiguration) {
 
         return Mono.from(source.dbOperations.connectionFactory().create())
             .flatMapMany { it.createStatement(source.query).execute() }
-            .flatMap { result -> result.map { row, _ -> row.toString() } }
+            .flatMap { result -> result.map(::toHashedRow) }
     }
 
     @EventListener
     @Async
-    open fun doOnStart(event: ServiceReadyEvent): Flux<String> {
+    open fun doOnStart(event: ServiceReadyEvent): Flux<HashedRow> {
         return start("test-dataset")
-            .doOnEach { logger.info { it } }
+            .doOnEach { logger.info { it.toString() } }
     }
 }

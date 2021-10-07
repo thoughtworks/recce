@@ -2,7 +2,7 @@ package com.thoughtworks.recce.server.dataset
 
 import com.thoughtworks.recce.server.config.DataSourceTest
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import io.r2dbc.spi.*
+import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -32,7 +32,15 @@ class DataSetServiceIntegrationTest : DataSourceTest() {
     @Test
     fun `start can stream a source dataset`() {
         StepVerifier.create(service.start("test-dataset"))
-            .assertNext { assertThat(it).contains("name='COUNT(*)', value=3") }
+            .assertNext {
+                assertThat(it)
+                    .isEqualTo(
+                        HashedRow(
+                            "sourcedatacount",
+                            "b57448e19e0e383cdabaf669a4b85676bb7061e7f3720e57ea148a5735de957a"
+                        )
+                    )
+            }
             .verifyComplete()
     }
 
