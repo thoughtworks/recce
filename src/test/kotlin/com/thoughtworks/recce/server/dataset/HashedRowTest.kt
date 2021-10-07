@@ -1,5 +1,6 @@
 package com.thoughtworks.recce.server.dataset
 
+import com.thoughtworks.recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import org.assertj.core.api.Assertions.assertThat
@@ -17,13 +18,13 @@ import java.time.LocalDateTime
 internal class HashedRowTest {
 
     val meta = mock<RowMetadata> {
-        on { columnNames } doReturn arrayListOf(HashedRow.migrationKeyColumnName, "test")
+        on { columnNames } doReturn arrayListOf(migrationKeyColumnName, "test")
     }
 
     @Test
     fun `should throw on no migration key`() {
         val row = mock<Row> {
-            on { get(HashedRow.migrationKeyColumnName, String::class.java) } doReturn null
+            on { get(migrationKeyColumnName, String::class.java) } doReturn null
         }
         assertThatThrownBy { toHashedRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
@@ -48,7 +49,7 @@ internal class HashedRowTest {
 
     private fun mockSingleColumnRowReturning(input: Any): Row {
         val row = mock<Row> {
-            on { get(HashedRow.migrationKeyColumnName, String::class.java) } doReturn "key"
+            on { get(migrationKeyColumnName, String::class.java) } doReturn "key"
             on { get("test") } doReturn input
         }
         return row

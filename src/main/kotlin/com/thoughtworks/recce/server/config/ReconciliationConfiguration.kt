@@ -42,4 +42,8 @@ class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val quer
         dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(dataSourceRef))
             .orElseThrow { ConfigurationException("Cannot locate ${R2dbcOperations::class.java.simpleName} named [$dataSourceRef] in configuration!") }
     }
+
+    companion object {
+        const val migrationKeyColumnName: String = "MigrationKey"
+    }
 }
