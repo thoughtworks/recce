@@ -40,6 +40,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("javax.annotation:javax.annotation-api")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
 
     implementation("io.micronaut.flyway:micronaut-flyway")
 
@@ -62,6 +63,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-inline:3.9.0")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     testImplementation("io.projectreactor:reactor-test:3.4.10")
