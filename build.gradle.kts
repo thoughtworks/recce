@@ -66,7 +66,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.mockito:mockito-inline:3.12.4")
+    testImplementation("org.mockito:mockito-inline:4.0.0")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     testImplementation("io.projectreactor:reactor-test:3.4.10")
