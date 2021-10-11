@@ -17,15 +17,12 @@ val javaMajorVersion = 16
 val kotlinVersion = "1.5.31"
 val exposedVersion = "0.35.1"
 
-// Override to get fix for https://github.com/micronaut-projects/micronaut-r2dbc/issues/158 Remove on Micronaut 3.0.4+
-val micronautDataVersion = "3.0.1"
-
 repositories {
     mavenCentral()
 }
 
 micronaut {
-    version("3.0.3")
+    version("3.1.0")
     runtime("netty")
     testRuntime("junit5")
     processing {
@@ -60,7 +57,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     // R2BDC
-    implementation("io.micronaut.data:micronaut-data-r2dbc:$micronautDataVersion")
+    implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
 

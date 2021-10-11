@@ -32,7 +32,6 @@ open class DataSetService(
                 }
             }
             .flatMap { record -> recordRepository.save(record) }
-            .onErrorContinue { err, record -> logger.warn(err) { "Failed to persist $record" } }
             .count()
             .map { DataSetResults(it) }
     }
