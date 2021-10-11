@@ -54,7 +54,7 @@ dependencies {
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Traditional JDBC data access
-    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+    implementation("jakarta.persistence:jakarta.persistence-api:2.2.3")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     runtimeOnly("org.postgresql:postgresql")
