@@ -18,7 +18,7 @@ val kotlinVersion = "1.5.31"
 val exposedVersion = "0.35.1"
 
 // Override to get fix for https://github.com/micronaut-projects/micronaut-r2dbc/issues/158 Remove on Micronaut 3.0.4+
-val micronautDataVersion = "3.0.1"
+val micronautDataVersion = "3.1.0"
 
 repositories {
     mavenCentral()
