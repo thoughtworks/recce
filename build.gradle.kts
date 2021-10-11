@@ -14,7 +14,7 @@ version = "0.1"
 group = "com.thoughtworks.recce.server"
 
 val javaMajorVersion = 16
-val kotlinVersion = project.properties.get("kotlinVersion")
+val kotlinVersion = "1.5.31"
 val exposedVersion = "0.35.1"
 
 // Override to get fix for https://github.com/micronaut-projects/micronaut-r2dbc/issues/158 Remove on Micronaut 3.0.4+
@@ -25,6 +25,7 @@ repositories {
 }
 
 micronaut {
+    version("3.0.3")
     runtime("netty")
     testRuntime("junit5")
     processing {
