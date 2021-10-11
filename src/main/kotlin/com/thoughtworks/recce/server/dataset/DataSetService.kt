@@ -7,14 +7,16 @@ import io.micronaut.scheduling.annotation.Async
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import mu.KotlinLogging
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 private val logger = KotlinLogging.logger {}
 
 @Singleton
-open class DataSetService(@Inject val config: ReconciliationConfiguration) {
-    fun start(dataSetName: String): Flux<HashedRow> {
+open class DataSetService(
+    @Inject private val config: ReconciliationConfiguration,
+    private val recordRepository: MigrationRecordRepository
+) {
+    fun start(dataSetName: String): Mono<DataSetResults> {
 
         val source = config.datasets[dataSetName]?.source
             ?: throw IllegalArgumentException("[$dataSetName] not found!")
@@ -24,12 +26,23 @@ open class DataSetService(@Inject val config: ReconciliationConfiguration) {
         return Mono.from(source.dbOperations.connectionFactory().create())
             .flatMapMany { it.createStatement(source.query).execute() }
             .flatMap { result -> result.map(::toHashedRow) }
+            .map { row ->
+                MigrationRecord(MigrationRecordKey(dataSetName, row.migrationKey)).apply {
+                    sourceData = row.hashedValue
+                }
+            }
+            .flatMap { record -> recordRepository.save(record) }
+            .onErrorContinue { err, record -> logger.warn(err) { "Failed to persist $record" } }
+            .count()
+            .map { DataSetResults(it) }
     }
 
     @EventListener
     @Async
-    open fun doOnStart(event: ServiceReadyEvent): Flux<HashedRow> {
+    open fun doOnStart(event: ServiceReadyEvent): Mono<DataSetResults> {
         return start("test-dataset")
             .doOnEach { logger.info { it.toString() } }
     }
 }
+
+data class DataSetResults(val sourceRowsInserted: Long)

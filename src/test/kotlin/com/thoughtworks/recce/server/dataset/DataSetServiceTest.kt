@@ -15,7 +15,7 @@ import reactor.test.StepVerifier
 internal class DataSetServiceTest {
     @Test
     fun `start should throw on missing dataset`() {
-        Assertions.assertThatThrownBy { DataSetService(mock()).start("test-dataset") }
+        Assertions.assertThatThrownBy { DataSetService(mock(), mock()).start("test-dataset") }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("test-dataset")
     }
@@ -29,17 +29,23 @@ class DataSetServiceIntegrationTest : DataSourceTest() {
     @Inject
     lateinit var service: DataSetService
 
+    @Inject
+    lateinit var recordRepository: MigrationRecordRepository
+
     @Test
     fun `start can stream a source dataset`() {
         StepVerifier.create(service.start("test-dataset"))
             .assertNext {
-                assertThat(it)
-                    .isEqualTo(
-                        HashedRow(
-                            "sourcedatacount",
-                            "b57448e19e0e383cdabaf669a4b85676bb7061e7f3720e57ea148a5735de957a"
-                        )
-                    )
+                assertThat(it).isEqualTo(DataSetResults(1))
+            }
+            .verifyComplete()
+
+        StepVerifier.create(recordRepository.findAll())
+            .assertNext {
+                MigrationRecord(
+                    MigrationRecordKey("test-dataset", "sourcedatacount"),
+                    sourceData = "b57448e19e0e383cdabaf669a4b85676bb7061e7f3720e57ea148a5735de957a"
+                )
             }
             .verifyComplete()
     }
