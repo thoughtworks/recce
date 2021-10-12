@@ -43,21 +43,21 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     implementation("javax.annotation:javax.annotation-api")
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
-
-    implementation("io.micronaut.flyway:micronaut-flyway")
-
     implementation("com.google.guava:guava:31.0.1-jre")
 
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Traditional JDBC data access
-    implementation("jakarta.persistence:jakarta.persistence-api:2.2.3")
+    // Core persistence support with Micronaut Data
+    compileOnly("jakarta.persistence:jakarta.persistence-api:2.2.3")
+
+    // Traditional JDBC data access (for rec DB)
+    implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     runtimeOnly("org.postgresql:postgresql")
 
-    // R2BDC
+    // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
