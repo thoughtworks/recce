@@ -49,7 +49,7 @@ dependencies {
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Core persistence support with Micronaut Data
-    compileOnly("jakarta.persistence:jakarta.persistence-api:2.2.3")
+    compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
