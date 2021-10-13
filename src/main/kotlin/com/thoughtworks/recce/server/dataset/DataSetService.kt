@@ -8,8 +8,10 @@ import io.micronaut.scheduling.annotation.Async
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import mu.KotlinLogging
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.util.function.*
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 
 private val logger = KotlinLogging.logger {}
 
@@ -34,22 +36,23 @@ open class DataSetService(
         return streamFromSource(source, migrationRun)
             .count()
             .zipWith(migrationRun)
-            .map { it.t2.apply { results = DataSetResults(it.t1) } }
+            .map { (count, run) -> run.apply { results = DataSetResults(count) } }
     }
 
-    private fun streamFromSource(
-        source: DataLoadDefinition,
-        run: Mono<MigrationRun>
-    ) = Mono.from(source.dbOperations.connectionFactory().create())
-        .flatMapMany { it.createStatement(source.query).execute() }
-        .flatMap { result -> result.map(::toHashedRow) }
-        .zipWith(run.repeat())
-        .map { (row, run) ->
-            MigrationRecord(MigrationRecordKey(run.id!!, row.migrationKey)).apply {
-                sourceData = row.hashedValue
+    private fun streamFromSource(source: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> {
+        return Flux.usingWhen(
+            source.dbOperations.connectionFactory().create(),
+            { it.createStatement(source.query).execute() },
+            { it.close() })
+            .flatMap { result -> result.map(::toHashedRow) }
+            .zipWith(run.repeat())
+            .map { (row, run) ->
+                MigrationRecord(MigrationRecordKey(run.id!!, row.migrationKey)).apply {
+                    sourceData = row.hashedValue
+                }
             }
-        }
-        .flatMap { record -> recordRepository.save(record) }
+            .flatMap { record -> recordRepository.save(record) }
+    }
 
     @EventListener
     @Async

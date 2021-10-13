@@ -61,6 +61,7 @@ dependencies {
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
+    implementation("io.r2dbc:r2dbc-pool:0.8.7.RELEASE")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
 
     testImplementation("org.assertj:assertj-core")

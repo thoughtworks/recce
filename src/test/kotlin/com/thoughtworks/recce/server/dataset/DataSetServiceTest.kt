@@ -48,17 +48,19 @@ class DataSetServiceIntegrationTest : DataSourceTest() {
             }
             .verifyComplete()
 
-        StepVerifier.create(recordRepository.findAll())
+        val migrationRuns = runRepository.findAll()
+
+        StepVerifier.create(migrationRuns)
+            .assertNext {
+                assertThat(it.dataSetId).isEqualTo("test-dataset")
+            }
+            .verifyComplete()
+
+        StepVerifier.create(migrationRuns.flatMap { run -> recordRepository.findByIdMigrationId(run.id!!) })
             .assertNext { record ->
                 assertThat(record.id.migrationId).isNotNull
                 assertThat(record.id.migrationKey).isEqualTo("sourcedatacount")
                 assertThat(record.sourceData).isEqualTo("b57448e19e0e383cdabaf669a4b85676bb7061e7f3720e57ea148a5735de957a")
-
-                StepVerifier.create(runRepository.findById(record.id.migrationId))
-                    .assertNext {
-                        assertThat(it.dataSetId).isEqualTo("test-dataset")
-                    }
-                    .verifyComplete()
             }
             .verifyComplete()
     }

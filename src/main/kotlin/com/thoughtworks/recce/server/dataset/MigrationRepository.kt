@@ -5,6 +5,7 @@ import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.repository.reactive.ReactorCrudRepository
+import reactor.core.publisher.Flux
 import java.io.Serializable
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -13,7 +14,9 @@ import javax.persistence.*
 interface MigrationRunRepository : ReactorCrudRepository<MigrationRun, Int>
 
 @R2dbcRepository(dialect = Dialect.H2)
-interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, MigrationRecordKey>
+interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, MigrationRecordKey> {
+    fun findByIdMigrationId(id: Int): Flux<MigrationRecord>
+}
 
 @Entity
 @Table(name = "data_set_migration_run")
