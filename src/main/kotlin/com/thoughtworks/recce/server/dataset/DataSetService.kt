@@ -9,6 +9,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -25,14 +26,14 @@ open class DataSetService(
 
         logger.info { "Starting reconciliation run for [$dataSetId]..." }
 
-        val savedMigration = runRepository
+        val migrationRun = runRepository
             .save(MigrationRun(dataSetId))
             .doOnNext { logger.info { "Starting reconciliation run for $it}..." } }
             .cache()
 
-        return streamFromSource(source, savedMigration)
+        return streamFromSource(source, migrationRun)
             .count()
-            .zipWith(savedMigration)
+            .zipWith(migrationRun)
             .map { it.t2.apply { results = DataSetResults(it.t1) } }
     }
 
@@ -43,9 +44,9 @@ open class DataSetService(
         .flatMapMany { it.createStatement(source.query).execute() }
         .flatMap { result -> result.map(::toHashedRow) }
         .zipWith(run.repeat())
-        .map { tuple ->
-            MigrationRecord(MigrationRecordKey(tuple.t2.id!!, tuple.t1.migrationKey)).apply {
-                sourceData = tuple.t1.hashedValue
+        .map { (row, run) ->
+            MigrationRecord(MigrationRecordKey(run.id!!, row.migrationKey)).apply {
+                sourceData = row.hashedValue
             }
         }
         .flatMap { record -> recordRepository.save(record) }
