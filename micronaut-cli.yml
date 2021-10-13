@@ -1,6 +1,0 @@
-applicationType: default
-defaultPackage: com.thoughtworks.recce.server
-testFramework: junit
-sourceLanguage: kotlin
-buildTool: gradle_kotlin
-features: [ annotation-api, app-name, assertj, data, data-jpa, flyway, gradle, http-client, jdbc-hikari, junit, kotlin, kotlin-application, logback, mockito, netty-server, postgres, readme, shade, testcontainers, yaml ]
