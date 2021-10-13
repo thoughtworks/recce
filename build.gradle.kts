@@ -73,7 +73,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:4.0.0")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
-    testImplementation("io.projectreactor:reactor-test:3.4.10")
+    testImplementation("io.projectreactor:reactor-test:3.4.11")
 
     testImplementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     testImplementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
