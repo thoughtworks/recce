@@ -22,13 +22,13 @@ internal class HashedRowTest {
     }
 
     @Test
-    fun `should throw on no migration key`() {
+    fun `should throw on null migration key`() {
         val row = mock<Row> {
-            on { get(migrationKeyColumnName, String::class.java) } doReturn null
+            on { get(migrationKeyColumnName) } doReturn null
         }
         assertThatThrownBy { toHashedRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("Result rows do not have String column called")
+            .hasMessageContaining("MigrationKey has null value somewhere in data set")
     }
 
     @Test
@@ -49,7 +49,7 @@ internal class HashedRowTest {
 
     private fun mockSingleColumnRowReturning(input: Any): Row {
         val row = mock<Row> {
-            on { get(migrationKeyColumnName, String::class.java) } doReturn "key"
+            on { get(migrationKeyColumnName) } doReturn "key"
             on { get("test") } doReturn input
         }
         return row

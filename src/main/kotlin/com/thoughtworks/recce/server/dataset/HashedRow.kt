@@ -12,8 +12,8 @@ data class HashedRow(val migrationKey: String, val hashedValue: String)
 @Suppress("UnstableApiUsage")
 fun toHashedRow(row: Row, meta: RowMetadata): HashedRow {
 
-    val migrationKey = row.get(migrationKeyColumnName, String::class.java)
-        ?: throw IllegalArgumentException("Result rows do not have String column called [$migrationKeyColumnName]!")
+    val migrationKey = row.get(migrationKeyColumnName)?.toString()
+        ?: throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in data set")
 
     val hash = Hashing.sha256().newHasher()
     meta.columnNames
