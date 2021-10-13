@@ -1,5 +1,6 @@
 package com.thoughtworks.recce.server.dataset
 
+import com.thoughtworks.recce.server.config.DataLoadDefinition
 import com.thoughtworks.recce.server.config.ReconciliationConfiguration
 import io.micronaut.discovery.event.ServiceReadyEvent
 import io.micronaut.runtime.event.annotation.EventListener
@@ -24,23 +25,30 @@ open class DataSetService(
 
         logger.info { "Starting reconciliation run for [$dataSetId]..." }
 
-        // TODO Make this properly async/reactive
-        val migrationRun = runRepository.save(MigrationRun(dataSetId)).block()!!
+        val savedMigration = runRepository
+            .save(MigrationRun(dataSetId))
+            .doOnNext { logger.info { "Starting reconciliation run for $it}..." } }
+            .cache()
 
-        logger.info { "Streaming $migrationRun from [source]..." }
-
-        return Mono.from(source.dbOperations.connectionFactory().create())
-            .flatMapMany { it.createStatement(source.query).execute() }
-            .flatMap { result -> result.map(::toHashedRow) }
-            .map { row ->
-                MigrationRecord(MigrationRecordKey(migrationRun.id!!, row.migrationKey)).apply {
-                    sourceData = row.hashedValue
-                }
-            }
-            .flatMap { record -> recordRepository.save(record) }
+        return streamFromSource(source, savedMigration)
             .count()
-            .map { migrationRun.apply { results = DataSetResults(it) } }
+            .zipWith(savedMigration)
+            .map { it.t2.apply { results = DataSetResults(it.t1) } }
     }
+
+    private fun streamFromSource(
+        source: DataLoadDefinition,
+        run: Mono<MigrationRun>
+    ) = Mono.from(source.dbOperations.connectionFactory().create())
+        .flatMapMany { it.createStatement(source.query).execute() }
+        .flatMap { result -> result.map(::toHashedRow) }
+        .zipWith(run.repeat())
+        .map { tuple ->
+            MigrationRecord(MigrationRecordKey(tuple.t2.id!!, tuple.t1.migrationKey)).apply {
+                sourceData = tuple.t1.hashedValue
+            }
+        }
+        .flatMap { record -> recordRepository.save(record) }
 
     @EventListener
     @Async
