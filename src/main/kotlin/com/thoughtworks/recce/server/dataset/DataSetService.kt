@@ -14,34 +14,38 @@ private val logger = KotlinLogging.logger {}
 @Singleton
 open class DataSetService(
     @Inject private val config: ReconciliationConfiguration,
+    private val runRepository: MigrationRunRepository,
     private val recordRepository: MigrationRecordRepository
 ) {
-    fun start(dataSetName: String): Mono<DataSetResults> {
+    fun start(dataSetId: String): Mono<MigrationRun> {
 
-        val source = config.datasets[dataSetName]?.source
-            ?: throw IllegalArgumentException("[$dataSetName] not found!")
+        val source = config.datasets[dataSetId]?.source
+            ?: throw IllegalArgumentException("[$dataSetId] not found!")
 
-        logger.info { "Streaming [$dataSetName] from [source]..." }
+        logger.info { "Starting reconciliation run for [$dataSetId]..." }
+
+        // TODO Make this properly async/reactive
+        val migrationRun = runRepository.save(MigrationRun(dataSetId)).block()!!
+
+        logger.info { "Streaming $migrationRun from [source]..." }
 
         return Mono.from(source.dbOperations.connectionFactory().create())
             .flatMapMany { it.createStatement(source.query).execute() }
             .flatMap { result -> result.map(::toHashedRow) }
             .map { row ->
-                MigrationRecord(MigrationRecordKey(dataSetName, row.migrationKey)).apply {
+                MigrationRecord(MigrationRecordKey(migrationRun.id!!, row.migrationKey)).apply {
                     sourceData = row.hashedValue
                 }
             }
             .flatMap { record -> recordRepository.save(record) }
             .count()
-            .map { DataSetResults(it) }
+            .map { migrationRun.apply { results = DataSetResults(it) } }
     }
 
     @EventListener
     @Async
-    open fun doOnStart(event: ServiceReadyEvent): Mono<DataSetResults> {
+    open fun doOnStart(event: ServiceReadyEvent): Mono<MigrationRun> {
         return start("test-dataset")
             .doOnEach { logger.info { it.toString() } }
     }
 }
-
-data class DataSetResults(val sourceRowsInserted: Long)
