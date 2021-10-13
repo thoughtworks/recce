@@ -43,7 +43,8 @@ open class DataSetService(
         return Flux.usingWhen(
             source.dbOperations.connectionFactory().create(),
             { it.createStatement(source.query).execute() },
-            { it.close() })
+            { it.close() }
+        )
             .flatMap { result -> result.map(::toHashedRow) }
             .zipWith(run.repeat())
             .map { (row, run) ->

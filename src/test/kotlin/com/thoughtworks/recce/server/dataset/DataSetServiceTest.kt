@@ -10,7 +10,10 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
+import reactor.util.function.Tuples
 
 internal class DataSetServiceTest {
     @Test
@@ -44,23 +47,33 @@ class DataSetServiceIntegrationTest : DataSourceTest() {
                 assertThat(run.createdTime).isNotNull
                 assertThat(run.updatedTime).isNotNull
                 assertThat(run.completedTime).isNull()
-                assertThat(run.results).isEqualTo(DataSetResults(1))
+                assertThat(run.results).isEqualTo(DataSetResults(3))
             }
             .verifyComplete()
 
-        val migrationRuns = runRepository.findAll()
-
-        StepVerifier.create(migrationRuns)
-            .assertNext {
-                assertThat(it.dataSetId).isEqualTo("test-dataset")
+        StepVerifier.create(
+            runRepository.findAll()
+                .flatMap { run ->
+                    recordRepository.findByIdMigrationId(run.id!!).map { Tuples.of(run, it) }
+                }
+        )
+            .assertNext { (run, record) ->
+                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(record.id.migrationId).isEqualTo(run.id)
+                assertThat(record.id.migrationKey).isEqualTo("1")
+                assertThat(record.sourceData).isEqualTo("88aa59c134b8a7e484f77340ae745df5d8e0434b5fef012af499ed002cb63b78")
             }
-            .verifyComplete()
-
-        StepVerifier.create(migrationRuns.flatMap { run -> recordRepository.findByIdMigrationId(run.id!!) })
-            .assertNext { record ->
-                assertThat(record.id.migrationId).isNotNull
-                assertThat(record.id.migrationKey).isEqualTo("sourcedatacount")
-                assertThat(record.sourceData).isEqualTo("b57448e19e0e383cdabaf669a4b85676bb7061e7f3720e57ea148a5735de957a")
+            .assertNext { (run, record) ->
+                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(record.id.migrationId).isEqualTo(run.id)
+                assertThat(record.id.migrationKey).isEqualTo("2")
+                assertThat(record.sourceData).isEqualTo("8bc642e12847c144c236eadfeef828491f94871b194902972dc72f759b78def8")
+            }
+            .assertNext { (run, record) ->
+                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(record.id.migrationId).isEqualTo(run.id)
+                assertThat(record.id.migrationKey).isEqualTo("3")
+                assertThat(record.sourceData).isEqualTo("94a226822921b49fb04c55f7fb6e862978eeaadbefed44a5cbcc7eb7cc210124")
             }
             .verifyComplete()
     }

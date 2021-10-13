@@ -21,10 +21,10 @@ internal class ReconciliationConfigurationTest {
             .hasEntrySatisfying("test-dataset") {
                 assertThat(it.name).isEqualTo("test-dataset")
                 assertThat(it.source.dataSourceRef).isEqualTo("reactive-source")
-                assertThat(it.source.query).contains("sourcedatacount")
+                assertThat(it.source.query).contains("select id as MigrationKey")
                 assertThat(it.source.dbOperations).isNotNull
                 assertThat(it.target.dataSourceRef).isEqualTo("reactive-target")
-                assertThat(it.target.query).contains("targetdatacount")
+                assertThat(it.target.query).contains("select id as MigrationKey")
                 assertThat(it.target.dbOperations).isNotNull
             }
     }

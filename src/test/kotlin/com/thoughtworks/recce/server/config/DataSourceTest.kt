@@ -69,8 +69,8 @@ abstract class DataSourceTest {
     private fun insertUsers(num: Int) {
         for (i in 0 until num) {
             TestData.insert {
-                it[name] = "Test"
-                it[value] = "User"
+                it[name] = "Test$i"
+                it[value] = "User$i"
             }
         }
     }
