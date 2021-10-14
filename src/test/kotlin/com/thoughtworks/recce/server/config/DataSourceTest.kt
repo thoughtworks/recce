@@ -9,7 +9,6 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.testcontainers.containers.MSSQLR2DBCDatabaseContainer
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
@@ -34,7 +33,6 @@ abstract class DataSourceTest {
             withPassword("pasword")
         }
     }
-
 
     @Inject
     @field:Named("target")

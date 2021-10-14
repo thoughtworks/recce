@@ -1,6 +1,5 @@
 package com.thoughtworks.recce.server.config
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
@@ -10,8 +9,8 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 
 @Testcontainers
-//@MicronautTest(environments = arrayOf("test-multisource"))
-internal class MultiDataSourceTest :DataSourceTest() {
+// @MicronautTest(environments = arrayOf("test-multisource"))
+internal class MultiDataSourceTest : DataSourceTest() {
 
     private var source: ConnectionFactory = ConnectionFactories.get(
         ConnectionFactoryOptions.parse(mysql.jdbcUrl.replace("jdbc", "r2dbc"))
