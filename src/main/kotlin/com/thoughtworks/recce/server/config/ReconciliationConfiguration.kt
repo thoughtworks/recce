@@ -10,13 +10,13 @@ import javax.annotation.PostConstruct
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
-interface PostConstructedConfig {
-    fun populate(locator: BeanLocator) {}
+interface PostConstructable {
+    fun populate(locator: BeanLocator)
 }
 
 @ConfigurationProperties("reconciliation")
 class ReconciliationConfiguration @ConfigurationInject constructor(val datasets: Map<String, DataSetConfiguration>) :
-    PostConstructedConfig {
+    PostConstructable {
     @PostConstruct
     override fun populate(locator: BeanLocator) {
         for ((name, config) in datasets) {
@@ -27,7 +27,7 @@ class ReconciliationConfiguration @ConfigurationInject constructor(val datasets:
 }
 
 class DataSetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val target: DataLoadDefinition) :
-    PostConstructedConfig {
+    PostConstructable {
     lateinit var name: String
     override fun populate(locator: BeanLocator) {
         source.populate(locator)
@@ -35,7 +35,7 @@ class DataSetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val
     }
 }
 
-class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val query: String) : PostConstructedConfig {
+class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val query: String) : PostConstructable {
     lateinit var dbOperations: R2dbcOperations
 
     override fun populate(locator: BeanLocator) {
