@@ -16,10 +16,11 @@ data class HashedRow(val migrationKey: String, val hashedValue: String) {
                 ?: throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in data set")
 
             val hash = Hashing.sha256().newHasher()
-            meta.columnNames
-                .filter { !it.equals(migrationKeyColumnName) }
-                .forEach {
-                    when (val col = row.get(it)) {
+            meta.columnMetadatas
+                .filter { !it.name.equals(migrationKeyColumnName) }
+                .forEach { colMeta ->
+                    when (val col = row.get(colMeta.name)) {
+                        null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
                         is Boolean -> hash.putBoolean(col)
                         is BigDecimal -> {
                             hash.putLong(col.unscaledValue().toLong())
@@ -32,7 +33,7 @@ data class HashedRow(val migrationKey: String, val hashedValue: String) {
                         is Double -> hash.putDouble(col)
                         is String -> hash.putString(col, Charsets.UTF_8)
                         is ByteBuffer -> hash.putBytes(col)
-                        else -> throw IllegalArgumentException("Does not understand how to hash ${col?.javaClass?.simpleName} for column [$it]")
+                        else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.simpleName} for column [${colMeta.name}]")
                     }
                 }
             return HashedRow(migrationKey, hash.hash().toString())

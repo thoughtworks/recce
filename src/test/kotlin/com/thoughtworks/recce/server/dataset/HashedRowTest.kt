@@ -1,6 +1,7 @@
 package com.thoughtworks.recce.server.dataset
 
 import com.thoughtworks.recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
+import io.r2dbc.spi.ColumnMetadata
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import org.assertj.core.api.Assertions.assertThat
@@ -17,8 +18,24 @@ import java.time.LocalDateTime
 
 internal class HashedRowTest {
 
-    val meta = mock<RowMetadata> {
-        on { columnNames } doReturn arrayListOf(migrationKeyColumnName, "test")
+    val meta = mockRowMetaWithColumnOf(String::class.java)
+
+    private fun <T> mockRowMetaWithColumnOf(clazz: Class<T>): RowMetadata {
+        val cols = arrayListOf(
+            mock<ColumnMetadata> { on { name } doReturn migrationKeyColumnName },
+            mock { on { name } doReturn "test"; on { javaType } doReturn clazz },
+        )
+        return mock {
+            on { columnMetadatas } doReturn cols
+        }
+    }
+
+    private fun mockSingleColumnRowReturning(input: Any?): Row {
+        val row = mock<Row> {
+            on { get(migrationKeyColumnName) } doReturn "key"
+            on { get("test") } doReturn input
+        }
+        return row
     }
 
     @Test
@@ -40,24 +57,28 @@ internal class HashedRowTest {
             .hasMessageContaining("test")
     }
 
-    @ParameterizedTest
-    @MethodSource("types")
-    fun `should hash all column types`(type: Class<Any>, input: Any, expectedHash: String) {
-        val row = mockSingleColumnRowReturning(input)
-        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash))
+    @Test
+    fun `nulls of different defined column java types should be considered unequal`() {
+        val row = mockSingleColumnRowReturning(null)
+        val intMeta = mockRowMetaWithColumnOf(Integer::class.java)
+
+        val stringTypeRow = HashedRow.fromRow(row, meta)
+        val intTypeRow = HashedRow.fromRow(row, intMeta)
+
+        assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
     }
 
-    private fun mockSingleColumnRowReturning(input: Any): Row {
-        val row = mock<Row> {
-            on { get(migrationKeyColumnName) } doReturn "key"
-            on { get("test") } doReturn input
-        }
-        return row
+    @ParameterizedTest
+    @MethodSource("types")
+    fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
+        val row = mockSingleColumnRowReturning(input)
+        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash))
     }
 
     companion object {
         @JvmStatic
         fun types() = listOf(
+            Arguments.of(String::class.java, null, "ca7f6cfcd4f417dbff9cea143b1071decb72f8ec40eb6aa33856224e0e07df7e"),
             Arguments.of(Boolean::class.java, true, "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"),
             Arguments.of(
                 BigDecimal::class.java,
