@@ -26,7 +26,7 @@ internal class HashedRowTest {
         val row = mock<Row> {
             on { get(migrationKeyColumnName) } doReturn null
         }
-        assertThatThrownBy { toHashedRow(row, meta) }
+        assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("MigrationKey has null value somewhere in data set")
     }
@@ -34,7 +34,7 @@ internal class HashedRowTest {
     @Test
     fun `should throw on unrecognized type`() {
         val row = mockSingleColumnRowReturning(LocalDateTime.now())
-        assertThatThrownBy { toHashedRow(row, meta) }
+        assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("LocalDateTime")
             .hasMessageContaining("test")
@@ -44,7 +44,7 @@ internal class HashedRowTest {
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any, expectedHash: String) {
         val row = mockSingleColumnRowReturning(input)
-        assertThat(toHashedRow(row, meta)).isEqualTo(HashedRow("key", expectedHash))
+        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash))
     }
 
     private fun mockSingleColumnRowReturning(input: Any): Row {

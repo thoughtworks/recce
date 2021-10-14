@@ -4,33 +4,21 @@ import com.thoughtworks.recce.server.config.DataSourceTest
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
+import reactor.kotlin.core.util.function.*
 import reactor.test.StepVerifier
 import reactor.util.function.Tuples
-
-internal class DataSetServiceTest {
-    @Test
-    fun `start should throw on missing dataset`() {
-        Assertions.assertThatThrownBy { DataSetService(mock(), mock(), mock()).start("test-dataset") }
-            .isExactlyInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("test-dataset")
-    }
-}
 
 @MicronautTest(
     environments = arrayOf("test-integration"),
     propertySources = arrayOf("classpath:config/application-test-dataset.yml")
 )
-class DataSetServiceIntegrationTest : DataSourceTest() {
+class MigrationRunServiceIntegrationTest : DataSourceTest() {
     @Inject
-    lateinit var service: DataSetService
+    lateinit var service: MigrationRunService
 
     @Inject
     lateinit var runRepository: MigrationRunRepository

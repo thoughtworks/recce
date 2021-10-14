@@ -16,7 +16,7 @@ import reactor.kotlin.core.util.function.component2
 private val logger = KotlinLogging.logger {}
 
 @Singleton
-open class DataSetService(
+open class MigrationRunService(
     @Inject private val config: ReconciliationConfiguration,
     private val runRepository: MigrationRunRepository,
     private val recordRepository: MigrationRecordRepository
@@ -45,7 +45,7 @@ open class DataSetService(
             { it.createStatement(source.query).execute() },
             { it.close() }
         )
-            .flatMap { result -> result.map(::toHashedRow) }
+            .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .map { (row, run) ->
                 MigrationRecord(MigrationRecordKey(run.id!!, row.migrationKey)).apply {
