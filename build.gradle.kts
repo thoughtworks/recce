@@ -9,6 +9,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.39.0"
     id("com.diffplug.spotless") version "5.17.0"
     id("com.adarshr.test-logger") version "3.0.0"
+    jacoco
 }
 
 version = "0.1"
@@ -113,6 +114,14 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlinGradle {
         ktlint().userData(editorConfig)
     }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
 }
 
 jib {
