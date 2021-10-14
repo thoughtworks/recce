@@ -9,13 +9,32 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.testcontainers.containers.MSSQLR2DBCDatabaseContainer
+import org.testcontainers.containers.MySQLContainer
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
 import javax.sql.DataSource
 
 abstract class DataSourceTest {
 
-    @Inject
-    @field:Named("source")
-    protected lateinit var sourceDataSource: DataSource
+    companion object {
+        @JvmStatic
+        @Container
+        protected val mysql: MySQLContainer<Nothing> = MySQLContainer<Nothing>("mysql:8").apply {
+            withDatabaseName("sourceDb")
+            withUsername("sa")
+            withPassword("pasword")
+        }
+
+        @JvmStatic
+        @Container
+        protected val postgre: PostgreSQLContainer <Nothing> = PostgreSQLContainer<Nothing>("postgres:13-alpine").apply {
+            withDatabaseName("targetdb")
+            withUsername("sa")
+            withPassword("pasword")
+        }
+    }
+
 
     @Inject
     @field:Named("target")
@@ -31,12 +50,12 @@ abstract class DataSourceTest {
 
     protected val sourceDb: Database
         get() {
-            return Database.connect(sourceDataSource)
+            return Database.connect(mysql.jdbcUrl, user = mysql.username, password = mysql.password)
         }
 
     protected val targetDb: Database
         get() {
-            return Database.connect(targetDataSource)
+            return Database.connect(postgre.jdbcUrl, user = postgre.username, password = postgre.password)
         }
 
     @BeforeEach

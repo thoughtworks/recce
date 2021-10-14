@@ -69,6 +69,10 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:r2dbc")
+    testRuntimeOnly("mysql:mysql-connector-java")
+    testImplementation("org.testcontainers:mysql")
+    testImplementation("org.testcontainers:mssqlserver")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.mockito:mockito-inline:4.0.0")
@@ -81,6 +85,8 @@ dependencies {
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")
+
+    testRuntimeOnly("dev.miku:r2dbc-mysql")
 }
 
 application {
