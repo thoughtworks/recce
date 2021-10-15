@@ -16,9 +16,9 @@ import reactor.util.function.Tuples
     environments = arrayOf("test-integration"),
     propertySources = arrayOf("classpath:config/application-test-dataset.yml")
 )
-class MigrationRunServiceIntegrationTest : DataSourceTest() {
+class ReconciliationServiceIntegrationTest : DataSourceTest() {
     @Inject
-    lateinit var service: MigrationRunService
+    lateinit var service: ReconciliationService
 
     @Inject
     lateinit var runRepository: MigrationRunRepository
@@ -28,13 +28,13 @@ class MigrationRunServiceIntegrationTest : DataSourceTest() {
 
     @Test
     fun `start can stream a source dataset`() {
-        StepVerifier.create(service.start("test-dataset"))
+        StepVerifier.create(service.runFor("test-dataset"))
             .assertNext { run ->
                 assertThat(run.id).isNotNull
                 assertThat(run.dataSetId).isEqualTo("test-dataset")
                 assertThat(run.createdTime).isNotNull
-                assertThat(run.updatedTime).isNotNull
-                assertThat(run.completedTime).isNull()
+                assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
+                assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
                 assertThat(run.results).isEqualTo(DataSetResults(3))
             }
             .verifyComplete()
@@ -70,7 +70,7 @@ class MigrationRunServiceIntegrationTest : DataSourceTest() {
     fun `should emit error on bad query`() {
         transaction(sourceDb) { SchemaUtils.drop(TestData) }
 
-        StepVerifier.create(service.start("test-dataset"))
+        StepVerifier.create(service.runFor("test-dataset"))
             .expectError(R2dbcBadGrammarException::class.java)
             .verify()
     }
