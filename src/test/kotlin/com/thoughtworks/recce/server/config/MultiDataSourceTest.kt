@@ -1,6 +1,5 @@
 package com.thoughtworks.recce.server.config
 
-import com.thoughtworks.recce.server.config.DataSourceTest.TestData.autoIncrement
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
@@ -10,7 +9,6 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.containers.PostgreSQLContainer
@@ -27,7 +25,7 @@ internal class MultiDataSourceTest {
         @JvmStatic
         @Container
         protected val mysql: MySQLContainer<Nothing> = MySQLContainer<Nothing>("mysql:8").apply {
-            withDatabaseName("sourceDb")
+            withDatabaseName("mysql")
             withUsername("sa")
             withPassword("pasword")
         }
@@ -35,27 +33,19 @@ internal class MultiDataSourceTest {
         @JvmStatic
         @Container
         protected val postgre: PostgreSQLContainer<Nothing> = PostgreSQLContainer<Nothing>("postgres:13-alpine").apply {
-            withDatabaseName("targetdb")
+            withDatabaseName("postgre")
             withUsername("sa")
             withPassword("pasword")
         }
+
+//        @JvmStatic
+//        @Container
+//        protected val mssql: MSSQLServerContainer <Nothing> = MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2017-CU12").apply {
+//            withDatabaseName("mssql")
+//            withUsername("sa")
+//            withPassword("pasword")
+//        }.acceptLicense()
     }
-
-    private var source: ConnectionFactory = ConnectionFactories.get(
-        ConnectionFactoryOptions.parse(mysql.jdbcUrl.replace("jdbc", "r2dbc"))
-            .mutate()
-            .option(ConnectionFactoryOptions.USER, mysql.username)
-            .option(ConnectionFactoryOptions.PASSWORD, mysql.password)
-            .build()
-    )
-
-    private var target: ConnectionFactory = ConnectionFactories.get(
-        ConnectionFactoryOptions.parse(postgre.jdbcUrl.replace("jdbc", "r2dbc"))
-            .mutate()
-            .option(ConnectionFactoryOptions.USER, postgre.username)
-            .option(ConnectionFactoryOptions.PASSWORD, postgre.password)
-            .build()
-    )
 
     protected object TestData : Table() {
         val id = integer("id").autoIncrement()
@@ -67,15 +57,26 @@ internal class MultiDataSourceTest {
 
     protected val sourceDb: Database
         get() {
-            return Database.connect(mysql.jdbcUrl, user = mysql.username, password = mysql.password)
+            return getDatabase(currentSource)
         }
 
     protected val targetDb: Database
         get() {
-            return Database.connect(postgre.jdbcUrl, user = postgre.username, password = postgre.password)
+            return getDatabase(currentTarget)
         }
 
-    @BeforeEach
+    private var currentSource = sources.NA
+    private var currentTarget = sources.NA
+
+    fun getDatabase(source: sources): Database {
+        if (source == sources.PostGre)
+            return Database.connect(postgre.jdbcUrl, user = postgre.username, password = postgre.password)
+//        else if(source == sources.MSSql)
+//            return Database.connect(mssql.jdbcUrl, user = mssql.username, password = mssql.password)
+        else
+            return Database.connect(mysql.jdbcUrl, user = mysql.username, password = mysql.password)
+    }
+
     fun setup() {
         for (db in listOf(sourceDb, targetDb)) {
             transaction(db) {
@@ -111,13 +112,45 @@ internal class MultiDataSourceTest {
         }
     }
 
+    fun getConnectionFactory(source: sources): ConnectionFactory {
+        if (source == sources.MySQL) {
+            return ConnectionFactories.get(
+                ConnectionFactoryOptions.parse(mysql.jdbcUrl.replace("jdbc", "r2dbc"))
+                    .mutate()
+                    .option(ConnectionFactoryOptions.USER, mysql.username)
+                    .option(ConnectionFactoryOptions.PASSWORD, mysql.password)
+                    .build()
+            )
+        }
+//        else if(source == sources.MSSql)
+//        {
+//            return ConnectionFactories.get(
+//                ConnectionFactoryOptions.parse(mssql.jdbcUrl.replace("jdbc", "r2dbc"))
+//                    .mutate()
+//                    .option(ConnectionFactoryOptions.USER, mssql.username)
+//                    .option(ConnectionFactoryOptions.PASSWORD, mssql.password)
+//                    .build());
+//        }
+        else
+            return ConnectionFactories.get(
+                ConnectionFactoryOptions.parse(postgre.jdbcUrl.replace("jdbc", "r2dbc"))
+                    .mutate()
+                    .option(ConnectionFactoryOptions.USER, postgre.username)
+                    .option(ConnectionFactoryOptions.PASSWORD, postgre.password)
+                    .build()
+            )
+    }
+
     @Test
-    fun `should load data from reactive datasource`() {
-        StepVerifier.create(getCount(source))
+    fun `should load data from Mysql & postgre`() {
+        this.currentSource = sources.MySQL
+        this.currentTarget = sources.PostGre
+        setup()
+        StepVerifier.create(getCount(getConnectionFactory(currentSource)))
             .expectNext(3)
             .verifyComplete()
 
-        StepVerifier.create(getCount(target))
+        StepVerifier.create(getCount(getConnectionFactory(currentTarget)))
             .expectNext(4)
             .verifyComplete()
     }
@@ -126,4 +159,11 @@ internal class MultiDataSourceTest {
         Mono.from(connectionFactory.create())
             .flatMapMany { it.createStatement("SELECT count(*) as count from TestData").execute() }
             .flatMap { result -> result.map { row, _ -> row.get("count") as Long } }
+}
+
+internal enum class sources {
+    NA,
+    MySQL,
+    PostGre,
+    MSSql
 }
