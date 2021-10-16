@@ -31,3 +31,6 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+
+# Batect
+.batect/

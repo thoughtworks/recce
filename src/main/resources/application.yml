@@ -1,3 +1,22 @@
 micronaut:
   application:
     name: recce
+datasources:
+  default:
+    url: jdbc:postgresql://recce-db:5432/db
+    driverClassName: org.postgresql.Driver
+    username: user
+    password: password
+    dialect: POSTGRES
+flyway:
+  datasources:
+    default:
+      enabled: true
+r2dbc:
+  datasources:
+    default:
+      url: r2dbc:pool:postgresql://recce-db:5432/db
+      driverClassName: org.postgresql.Driver
+      username: user
+      password: password
+      dialect: POSTGRES

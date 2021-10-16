@@ -5,10 +5,6 @@ datasources:
     username: sa
     password: ''
     dialect: H2
-flyway:
-  datasources:
-    default:
-      enabled: true
 r2dbc:
   datasources:
     default:

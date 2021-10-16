@@ -64,6 +64,7 @@ dependencies {
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
     implementation("io.r2dbc:r2dbc-pool:0.8.7.RELEASE")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
+    runtimeOnly("dev.miku:r2dbc-mysql")
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.testcontainers:junit-jupiter")
@@ -85,8 +86,6 @@ dependencies {
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")
-
-    testRuntimeOnly("dev.miku:r2dbc-mysql")
 }
 
 application {

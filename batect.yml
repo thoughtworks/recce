@@ -1,0 +1,98 @@
+containers:
+  recce:
+    image: eclipse-temurin:16-jdk-alpine
+    dependencies:
+      - recce-db
+      - source-db-mysql
+      - target-db-mysql
+    volumes:
+      - local: .
+        container: /code
+      - type: cache
+        name: gradle-cache
+        container: /root/.gradle
+    working_directory: /code
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
+  recce-db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - local: 9000
+        container: 5432
+    volumes:
+      - type: cache
+        name: recce-db-data
+        container: /var/lib/postgresql/data
+  source-db-mysql:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - local: 8000
+        container: 3306
+    volumes:
+      - type: cache
+        name: source-db-data
+        container: /var/lib/mysql
+  source-flyway:
+    image: flyway/flyway:8-alpine
+    dependencies:
+      - source-db-mysql
+    volumes:
+      - local: examples/simple-mysql/migration # make this configurable
+        container: /flyway/sql
+        options: ro
+  target-db-mysql:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - local: 8001
+        container: 3306
+    volumes:
+      - type: cache
+        name: target-db-data
+        container: /var/lib/mysql
+  target-flyway:
+    image: flyway/flyway:8-alpine
+    dependencies:
+      - target-db-mysql
+    volumes:
+      - local: examples/simple-mysql/migration # make this configurable
+        container: /flyway/sql
+        options: ro
+tasks:
+  migrate-source:
+    description: Start and populate a source DB
+    group: db
+    run:
+      container: source-flyway
+      command: '-url=jdbc:mysql://source-db-mysql:3306/db -user=user -password=password -connectRetries=60 migrate'
+  migrate-target:
+    description: Start and populate a target DB
+    group: db
+    run:
+      container: target-flyway
+      command: '-url=jdbc:mysql://target-db-mysql:3306/db -user=user -password=password -connectRetries=60 migrate'
+  recce:
+    description: Migrate both source and target DB
+    group: db
+    prerequisites:
+      - migrate-source
+      - migrate-target
+    run:
+      container: recce
+      command: ./gradlew run # <-- add in micronaut args for dbs and or config here!
+      environment:
+        MICRONAUT_ENVIRONMENTS: local-mysql
+        MICRONAUT_CONFIG_FILES: examples/simple-mysql/application-local-mysql.yml
