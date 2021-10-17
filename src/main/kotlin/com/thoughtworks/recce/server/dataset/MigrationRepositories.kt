@@ -10,10 +10,10 @@ import java.io.Serializable
 import java.time.LocalDateTime
 import javax.persistence.*
 
-@R2dbcRepository(dialect = Dialect.H2)
+@R2dbcRepository(dialect = Dialect.POSTGRES)
 interface MigrationRunRepository : ReactorCrudRepository<MigrationRun, Int>
 
-@R2dbcRepository(dialect = Dialect.H2)
+@R2dbcRepository(dialect = Dialect.POSTGRES)
 interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, MigrationRecordKey> {
     fun findByIdMigrationId(id: Int): Flux<MigrationRecord>
 }
