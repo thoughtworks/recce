@@ -8,6 +8,10 @@ datasources:
     username: user
     password: password
     dialect: POSTGRES
+    initialization-fail-timeout: 10000
+    # Only need a small pool; as only should be required for migration during startup if we continue to use R2DBC
+    maximum-pool-size: 2
+    minimum-idle: 1
 flyway:
   datasources:
     default:
