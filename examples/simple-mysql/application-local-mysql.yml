@@ -11,6 +11,8 @@ r2dbc:
       password: password
       dialect: MYSQL
 reconciliation:
+  trigger-on-start:
+    - test-dataset
   datasets:
     test-dataset:
       source:

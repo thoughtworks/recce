@@ -58,7 +58,7 @@ abstract class DataSourceTest {
     }
 
     @AfterEach
-    fun tearDown() {
+    open fun tearDown() {
         for (db in listOf(sourceDb, targetDb)) {
             transaction(db) {
                 SchemaUtils.drop(TestData)

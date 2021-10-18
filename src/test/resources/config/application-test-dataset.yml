@@ -1,4 +1,5 @@
 reconciliation:
+  trigger-on-start: [ ]
   datasets:
     test-dataset:
       source:

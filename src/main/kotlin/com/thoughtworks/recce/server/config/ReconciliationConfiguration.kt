@@ -4,6 +4,7 @@ import io.micronaut.context.BeanLocator
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.ConfigurationProperties
 import io.micronaut.context.exceptions.ConfigurationException
+import io.micronaut.core.bind.annotation.Bindable
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.inject.qualifiers.Qualifiers
 import javax.annotation.PostConstruct
@@ -15,8 +16,12 @@ interface PostConstructable {
 }
 
 @ConfigurationProperties("reconciliation")
-class ReconciliationConfiguration @ConfigurationInject constructor(val datasets: Map<String, DataSetConfiguration>) :
-    PostConstructable {
+class ReconciliationConfiguration
+@ConfigurationInject constructor(
+    @Bindable(defaultValue = "") val triggerOnStart: List<String> = emptyList(),
+    val datasets: Map<String, DataSetConfiguration>
+) : PostConstructable {
+
     @PostConstruct
     override fun populate(locator: BeanLocator) {
         for ((name, config) in datasets) {

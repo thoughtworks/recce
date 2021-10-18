@@ -7,6 +7,7 @@ import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import reactor.kotlin.core.util.function.*
 import reactor.test.StepVerifier
@@ -25,6 +26,12 @@ class ReconciliationServiceIntegrationTest : DataSourceTest() {
 
     @Inject
     lateinit var recordRepository: MigrationRecordRepository
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        runRepository.deleteAll().block()
+    }
 
     @Test
     fun `start can stream a source dataset`() {
@@ -73,5 +80,12 @@ class ReconciliationServiceIntegrationTest : DataSourceTest() {
         StepVerifier.create(service.runFor("test-dataset"))
             .expectError(R2dbcBadGrammarException::class.java)
             .verify()
+    }
+
+    @Test
+    fun `triggering multiple recs ignores failures`() {
+        StepVerifier.create(service.runIgnoreFailure(listOf("bad", "test-dataset", "bad2")))
+            .assertNext { assertThat(it.dataSetId).isEqualTo("test-dataset") }
+            .verifyComplete()
     }
 }

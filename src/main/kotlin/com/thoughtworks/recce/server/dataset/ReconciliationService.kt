@@ -2,9 +2,7 @@ package com.thoughtworks.recce.server.dataset
 
 import com.thoughtworks.recce.server.config.DataLoadDefinition
 import com.thoughtworks.recce.server.config.ReconciliationConfiguration
-import io.micronaut.discovery.event.ServiceReadyEvent
-import io.micronaut.runtime.event.annotation.EventListener
-import io.micronaut.scheduling.annotation.Async
+import io.micronaut.scheduling.annotation.Scheduled
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import mu.KotlinLogging
@@ -18,7 +16,7 @@ private val logger = KotlinLogging.logger {}
 @Singleton
 open class ReconciliationService(
     @Inject private val config: ReconciliationConfiguration,
-    @Inject private val runService: MigrationRunService,
+    private val runService: MigrationRunService,
     private val recordRepository: MigrationRecordRepository
 ) {
     fun runFor(dataSetId: String): Mono<MigrationRun> {
@@ -52,10 +50,16 @@ open class ReconciliationService(
             .flatMap { record -> recordRepository.save(record) }
     }
 
-    @EventListener
-    @Async
-    open fun doOnStart(event: ServiceReadyEvent): Mono<MigrationRun> {
-        return runFor("test-dataset")
+    fun runIgnoreFailure(dataSetIds: List<String>): Flux<MigrationRun> {
+        return Flux.fromIterable(dataSetIds)
+            .filter { it.isNotEmpty() }
+            .flatMap { runFor(it) }
+            .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }
             .doOnEach { logger.info { it.toString() } }
+    }
+
+    @Scheduled(initialDelay = "0s", fixedDelay = "1d")
+    open fun scheduledStart() {
+        runIgnoreFailure(config.triggerOnStart).subscribe()
     }
 }

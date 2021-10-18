@@ -14,5 +14,5 @@ CREATE TABLE data_set_migration_record
     source_data   VARCHAR(1024),
     target_data   VARCHAR(1024),
     PRIMARY KEY (migration_id, migration_key),
-    FOREIGN KEY (migration_id) REFERENCES data_set_migration_run (id)
+    CONSTRAINT fk_migration_id FOREIGN KEY (migration_id) REFERENCES data_set_migration_run (id) ON DELETE CASCADE
 );
