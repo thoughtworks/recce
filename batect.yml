@@ -1,10 +1,39 @@
+config_variables:
+  example-scenario:
+    description: Which example scenario to run from `ls examples`
+    default: simple-mysql
+  db-name:
+    description: Name of the DB to create for all local DBs
+    default: db
+  db-user:
+    description: Username to use for all local DBs
+    default: user
+  db-password:
+    description: Password to use for all local DBs
+    default: password
+include:
+  - examples/db/batect-source-mysql.yml
+  - examples/db/batect-target-mysql.yml
 containers:
+  recce-db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: <{db-name}
+      POSTGRES_USER: <{db-user}
+      POSTGRES_PASSWORD: <{db-password}
+    ports:
+      - local: 9000
+        container: 5432
+    volumes:
+      - type: cache
+        name: recce-db-data
+        container: /var/lib/postgresql/data
   recce:
     image: eclipse-temurin:16-jdk-alpine
     dependencies:
       - recce-db
-      - source-db-mysql
-      - target-db-mysql
+      - source-db # Expected to be defined by an included file
+      - target-db # Expected to be defined by an included file
     volumes:
       - local: .
         container: /code
@@ -14,84 +43,14 @@ containers:
     working_directory: /code
     environment:
       GRADLE_OPTS: -Dorg.gradle.daemon=false
-  recce-db:
-    image: postgres:13-alpine
-    environment:
-      POSTGRES_DB: db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - local: 9000
-        container: 5432
-    volumes:
-      - type: cache
-        name: recce-db-data
-        container: /var/lib/postgresql/data
-  source-db-mysql:
-    image: mysql:8
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
-      MYSQL_DATABASE: db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - local: 8000
-        container: 3306
-    volumes:
-      - type: cache
-        name: source-db-data
-        container: /var/lib/mysql
-  source-flyway:
-    image: flyway/flyway:8-alpine
-    dependencies:
-      - source-db-mysql
-    volumes:
-      - local: examples/simple-mysql/migration # make this configurable
-        container: /flyway/sql
-        options: ro
-  target-db-mysql:
-    image: mysql:8
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
-      MYSQL_DATABASE: db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - local: 8001
-        container: 3306
-    volumes:
-      - type: cache
-        name: target-db-data
-        container: /var/lib/mysql
-  target-flyway:
-    image: flyway/flyway:8-alpine
-    dependencies:
-      - target-db-mysql
-    volumes:
-      - local: examples/simple-mysql/migration # make this configurable
-        container: /flyway/sql
-        options: ro
 tasks:
-  migrate-source:
-    description: Start and populate a source DB
-    group: db
-    run:
-      container: source-flyway
-      command: '-url=jdbc:mysql://source-db-mysql:3306/db -user=user -password=password -connectRetries=60 migrate'
-  migrate-target:
-    description: Start and populate a target DB
-    group: db
-    run:
-      container: target-flyway
-      command: '-url=jdbc:mysql://target-db-mysql:3306/db -user=user -password=password -connectRetries=60 migrate'
   recce:
-    description: Migrate both source and target DB
-    group: db
+    description: Compile and run the Recce server within Gradle with a configured `example-scenario`
+    group: gradle
     prerequisites:
-      - migrate-source
-      - migrate-target
+      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
       container: recce
-      command: ./gradlew run # <-- add in micronaut args for dbs and or config here!
+      command: ./gradlew run
       environment:
-        MICRONAUT_CONFIG_FILES: examples/simple-mysql/application-local-mysql.yml
+        MICRONAUT_CONFIG_FILES: examples/scenario/<{example-scenario}/application-<{example-scenario}.yml

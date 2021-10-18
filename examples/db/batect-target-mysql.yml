@@ -1,0 +1,35 @@
+containers:
+  target-db:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_DATABASE: <{db-name}
+      MYSQL_USER: <{db-user}
+      MYSQL_PASSWORD: <{db-password}
+    ports:
+      - local: 8001
+        container: 3306
+    volumes:
+      - type: cache
+        name: target-db-mysql
+        container: /var/lib/mysql
+  target-flyway-mysql:
+    image: flyway/flyway:7-alpine
+    environment:
+      FLYWAY_URL: jdbc:mysql://target-db:3306/<{db-name}
+      FLYWAY_USER: <{db-user}
+      FLYWAY_PASSWORD: <{db-password}
+      FLYWAY_CONNECT_RETRIES: 60
+    command: migrate
+    dependencies:
+      - target-db
+    volumes:
+      - local: ../scenario/<{example-scenario}/target
+        container: /flyway/sql
+        options: ro
+tasks:
+  migrate-target-mysql:
+    description: Start and populate a target mysql DB from `config_variables.example-scenario`
+    group: db
+    run:
+      container: target-flyway-mysql

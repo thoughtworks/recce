@@ -1,12 +1,12 @@
 r2dbc:
   datasources:
     reactive-source:
-      url: r2dbc:pool:mysql://source-db-mysql:3306/db
+      url: r2dbc:pool:mysql://source-db:3306/db
       username: user
       password: password
       dialect: MYSQL
     reactive-target:
-      url: r2dbc:pool:mysql://target-db-mysql:3306/db
+      url: r2dbc:pool:mysql://target-db:3306/db
       username: user
       password: password
       dialect: MYSQL
