@@ -1,7 +1,5 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
-import com.thoughtworks.recce.server.config.DataLoadDefinition
-import com.thoughtworks.recce.server.config.ReconciliationConfiguration
 import io.micronaut.scheduling.annotation.Scheduled
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -10,6 +8,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import recce.server.config.DataLoadDefinition
+import recce.server.config.ReconciliationConfiguration
 
 private val logger = KotlinLogging.logger {}
 

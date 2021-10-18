@@ -13,7 +13,7 @@ plugins {
 }
 
 version = "0.1"
-group = "com.thoughtworks.recce.server"
+group = "recce.server"
 
 val javaMajorVersion = 16
 val kotlinVersion = "1.5.31"
@@ -29,7 +29,7 @@ micronaut {
     testRuntime("junit5")
     processing {
         incremental(true)
-        annotations("com.thoughtworks.recce.server.*")
+        annotations("recce.server.*")
     }
 }
 
@@ -89,7 +89,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.thoughtworks.recce.server.ApplicationKt")
+    mainClass.set("recce.server.ApplicationKt")
 }
 
 java {

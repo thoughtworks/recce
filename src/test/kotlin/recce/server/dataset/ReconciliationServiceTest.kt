@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test

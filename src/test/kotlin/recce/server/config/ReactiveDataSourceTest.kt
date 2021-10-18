@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server.config
+package recce.server.config
 
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest

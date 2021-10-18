@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
 import jakarta.inject.Singleton
 import mu.KotlinLogging

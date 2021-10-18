@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server.config
+package recce.server.config
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.exceptions.BeanInstantiationException

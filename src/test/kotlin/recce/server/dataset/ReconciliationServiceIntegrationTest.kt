@@ -1,6 +1,5 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
-import com.thoughtworks.recce.server.config.DataSourceTest
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.Test
 import reactor.kotlin.core.util.function.*
 import reactor.test.StepVerifier
 import reactor.util.function.Tuples
+import recce.server.config.DataSourceTest
 
 @MicronautTest(
     environments = arrayOf("test-integration"),

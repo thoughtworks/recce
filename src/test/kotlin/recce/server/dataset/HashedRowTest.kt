@@ -1,6 +1,5 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
-import com.thoughtworks.recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
 import io.r2dbc.spi.ColumnMetadata
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
@@ -12,6 +11,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.LocalDateTime

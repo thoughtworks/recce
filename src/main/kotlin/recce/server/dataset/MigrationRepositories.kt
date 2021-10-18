@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated

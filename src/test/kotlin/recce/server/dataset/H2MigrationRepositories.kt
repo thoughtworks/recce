@@ -1,4 +1,4 @@
-package com.thoughtworks.recce.server.dataset
+package recce.server.dataset
 
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.data.model.query.builder.sql.Dialect
