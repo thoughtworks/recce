@@ -94,5 +94,4 @@ tasks:
       container: recce
       command: ./gradlew run # <-- add in micronaut args for dbs and or config here!
       environment:
-        MICRONAUT_ENVIRONMENTS: local-mysql
         MICRONAUT_CONFIG_FILES: examples/simple-mysql/application-local-mysql.yml
