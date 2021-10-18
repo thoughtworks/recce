@@ -18,17 +18,17 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 
 ## Getting Started
 
-You can get started work on Recce by compiling
+To get started work on Recce:
 
 * **Build** Lint, Test and compile
     ```shell
     ./gradlew build
     ```
-* **Run** Recce within Gradle
+* **Run** Recce within a container with example source/target DBs
     ```shell
-    ./gradlew run
+    ./batect recce
     ```
-* Build a Docker image locally and run it
+* **Build a Docker image** locally and run it
     ```shell
     ./gradlew jibDockerBuild
     docker run recce/recce-server
