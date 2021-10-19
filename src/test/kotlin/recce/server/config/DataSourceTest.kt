@@ -22,11 +22,10 @@ abstract class DataSourceTest {
     protected lateinit var targetDataSource: DataSource
 
     protected object TestData : Table() {
-        val id = integer("id").autoIncrement()
         val name = varchar("name", 255)
         val value = varchar("value", 255)
 
-        override val primaryKey = PrimaryKey(id)
+        override val primaryKey = PrimaryKey(name)
     }
 
     protected val sourceDb: Database
@@ -44,16 +43,15 @@ abstract class DataSourceTest {
         for (db in listOf(sourceDb, targetDb)) {
             transaction(db) {
                 SchemaUtils.create(TestData)
-
-                insertUsers(2)
             }
         }
 
         transaction(sourceDb) {
-            insertUsers(1)
+            insertUsers(0 until 3)
         }
         transaction(targetDb) {
-            insertUsers(2)
+            insertUsers(0 until 2)
+            insertUsers(3 until 5)
         }
     }
 
@@ -66,8 +64,8 @@ abstract class DataSourceTest {
         }
     }
 
-    private fun insertUsers(num: Int) {
-        for (i in 0 until num) {
+    private fun insertUsers(users: IntRange) {
+        for (i in users) {
             TestData.insert {
                 it[name] = "Test$i"
                 it[value] = "User$i"

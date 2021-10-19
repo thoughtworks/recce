@@ -35,7 +35,7 @@ data class MigrationRun(
     var results: DataSetResults? = null
 }
 
-data class DataSetResults(val sourceRowsInserted: Long)
+data class DataSetResults(val sourceRows: Long, val targetRows: Long)
 
 @Entity
 @Table(name = "data_set_migration_record")

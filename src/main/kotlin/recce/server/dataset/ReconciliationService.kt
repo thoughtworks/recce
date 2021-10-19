@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import recce.server.config.DataLoadDefinition
+import recce.server.config.DataSetConfiguration
 import recce.server.config.ReconciliationConfiguration
 
 private val logger = KotlinLogging.logger {}
@@ -21,42 +22,59 @@ open class ReconciliationService(
 ) {
     fun runFor(dataSetId: String): Mono<MigrationRun> {
 
-        val source = config.datasets[dataSetId]?.source
-            ?: throw IllegalArgumentException("[$dataSetId] not found!")
+        val dataSetConfig = config.datasets[dataSetId] ?: throw IllegalArgumentException("[$dataSetId] not found!")
 
         logger.info { "Starting reconciliation run for [$dataSetId]..." }
 
         val migrationRun = runService.start(dataSetId)
 
-        return streamFromSource(source, migrationRun)
-            .count()
-            .flatMap { count -> migrationRun.map { it.apply { results = DataSetResults(count) } } }
+        return loadFromSourceThenTarget(dataSetConfig, migrationRun)
+            .flatMap { runResults -> migrationRun.map { it.apply { results = runResults } } }
             .flatMap { runService.complete(it) }
     }
 
-    private fun streamFromSource(source: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> {
-        return Flux.usingWhen(
-            source.dbOperations.connectionFactory().create(),
-            { it.createStatement(source.query).execute() },
-            { it.close() }
-        )
+    private fun loadFromSourceThenTarget(dataSetConfig: DataSetConfiguration, migrationRun: Mono<MigrationRun>) =
+        loadFromSource(dataSetConfig.source, migrationRun).count()
+            .zipWhen(
+                { loadFromTarget(dataSetConfig.target, migrationRun).count() },
+                { sourceCount, targetCount -> DataSetResults(sourceCount, targetCount) }
+            )
+
+    private fun loadFromSource(source: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
+        withConnection(source)
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .map { (row, run) ->
-                MigrationRecord(MigrationRecordKey(run.id!!, row.migrationKey)).apply {
+                MigrationRecord(
+                    MigrationRecordKey(run.id!!, row.migrationKey),
                     sourceData = row.hashedValue
-                }
+                )
             }
             .flatMap { record -> recordRepository.save(record) }
-    }
 
-    fun runIgnoreFailure(dataSetIds: List<String>): Flux<MigrationRun> {
-        return Flux.fromIterable(dataSetIds)
-            .filter { it.isNotEmpty() }
-            .flatMap { runFor(it) }
-            .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }
-            .doOnEach { logger.info { it.toString() } }
-    }
+    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
+        withConnection(target)
+            .flatMap { result -> result.map(HashedRow::fromRow) }
+            .zipWith(run.repeat())
+            .flatMap { (row, run) ->
+                val key = MigrationRecordKey(run.id!!, row.migrationKey)
+                recordRepository
+                    .findById(key)
+                    .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
+                    .switchIfEmpty(recordRepository.save(MigrationRecord(key, targetData = row.hashedValue)))
+            }
+
+    private fun withConnection(def: DataLoadDefinition) = Flux.usingWhen(
+        def.dbOperations.connectionFactory().create(),
+        { it.createStatement(def.query).execute() },
+        { it.close() }
+    )
+
+    fun runIgnoreFailure(dataSetIds: List<String>): Flux<MigrationRun> = Flux.fromIterable(dataSetIds)
+        .filter { it.isNotEmpty() }
+        .flatMap { runFor(it) }
+        .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }
+        .doOnEach { logger.info { it.toString() } }
 
     @Scheduled(initialDelay = "0s", fixedDelay = "1d")
     open fun scheduledStart() {

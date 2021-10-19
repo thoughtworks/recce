@@ -17,7 +17,7 @@ data class HashedRow(val migrationKey: String, val hashedValue: String) {
 
             val hash = Hashing.sha256().newHasher()
             meta.columnMetadatas
-                .filter { !it.name.equals(migrationKeyColumnName) }
+                .filter { !it.name.equals(migrationKeyColumnName, ignoreCase = true) }
                 .forEach { colMeta ->
                     when (val col = row.get(colMeta.name)) {
                         null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
