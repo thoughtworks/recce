@@ -41,7 +41,7 @@ open class ReconciliationService(
             )
 
     private fun loadFromSource(source: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
-        withConnection(source)
+        source.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .map { (row, run) ->
@@ -53,7 +53,7 @@ open class ReconciliationService(
             .flatMap { record -> recordRepository.save(record) }
 
     private fun loadFromTarget(target: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
-        withConnection(target)
+        target.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .flatMap { (row, run) ->
@@ -63,12 +63,6 @@ open class ReconciliationService(
                     .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
                     .switchIfEmpty(recordRepository.save(MigrationRecord(key, targetData = row.hashedValue)))
             }
-
-    private fun withConnection(def: DataLoadDefinition) = Flux.usingWhen(
-        def.dbOperations.connectionFactory().create(),
-        { it.createStatement(def.query).execute() },
-        { it.close() }
-    )
 
     fun runIgnoreFailure(dataSetIds: List<String>): Flux<MigrationRun> = Flux.fromIterable(dataSetIds)
         .filter { it.isNotEmpty() }
