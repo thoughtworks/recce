@@ -15,16 +15,23 @@ plugins {
 version = "0.1"
 group = "recce.server"
 
-val javaMajorVersion = 16
-val kotlinVersion = "1.5.31"
-val exposedVersion = "0.35.3"
+// Workaround to allow dependabot to update the micronaut version, since dependabot
+// doesn't understand the micronaut plugin DSL
+val depDescriptors = mapOf(
+    "micronaut" to "io.micronaut:micronaut-core:3.1.0"
+)
+val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
+    "javaMajor" to "16",
+    "exposed" to "0.35.2",
+    "kotlin" to "1.5.31",
+)
 
 repositories {
     mavenCentral()
 }
 
 micronaut {
-    version("3.1.0")
+    version(depVersions["micronaut"])
     runtime("netty")
     testRuntime("junit5")
     processing {
@@ -40,8 +47,8 @@ dependencies {
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${depVersions["kotlin"]}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${depVersions["kotlin"]}")
     implementation("javax.annotation:javax.annotation-api")
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
     implementation("com.google.guava:guava:31.0.1-jre")
@@ -81,8 +88,8 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("io.projectreactor:reactor-test:3.4.11")
 
-    testImplementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    testImplementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
+    testImplementation("org.jetbrains.exposed:exposed-jdbc:${depVersions["exposed"]}")
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")
@@ -94,19 +101,19 @@ application {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(javaMajorVersion))
+        languageVersion.set(JavaLanguageVersion.of(depVersions["javaMajor"]!!))
     }
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "$javaMajorVersion"
+            jvmTarget = depVersions["javaMajor"]!!
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            jvmTarget = "$javaMajorVersion"
+            jvmTarget = depVersions["javaMajor"]!!
         }
     }
 }
@@ -131,7 +138,7 @@ tasks.jacocoTestReport {
 
 jib {
     from {
-        image = "eclipse-temurin:$javaMajorVersion-jdk-alpine"
+        image = "eclipse-temurin:${depVersions["javaMajor"]}-jdk-alpine"
     }
     to {
         image = "recce/recce-server"
