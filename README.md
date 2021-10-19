@@ -24,7 +24,7 @@ To get started work on Recce:
     ```shell
     ./gradlew build
     ```
-* **Run** Recce within a container with example source/target DBs
+* **Run** Recce within a container with an [example scenario](examples/README.md) against a source/target DB
     ```shell
     ./batect recce
     ```

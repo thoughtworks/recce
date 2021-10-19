@@ -4,7 +4,7 @@ reconciliation:
     test-dataset:
       source:
         dataSourceRef: reactive-source
-        query: select id as MigrationKey, name, value from testdata
+        query: select name as MigrationKey, name, value from testdata
       target:
         dataSourceRef: reactive-target
-        query: select id as MigrationKey, name, value from testdata
+        query: select name as MigrationKey, name, value from testdata

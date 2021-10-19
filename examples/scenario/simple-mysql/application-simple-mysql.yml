@@ -1,0 +1,27 @@
+r2dbc:
+  datasources:
+    reactive-source:
+      url: r2dbc:pool:mysql://source-db:3306/db
+      username: user
+      password: password
+      dialect: MYSQL
+    reactive-target:
+      url: r2dbc:pool:mysql://target-db:3306/db
+      username: user
+      password: password
+      dialect: MYSQL
+reconciliation:
+  trigger-on-start:
+    - test-dataset
+  datasets:
+    test-dataset:
+      source:
+        dataSourceRef: reactive-source
+        query: >
+          select record.migration_key as MigrationKey, run.*, record.*
+          from data_set_migration_run run join data_set_migration_record record on run.id = record.migration_id
+      target:
+        dataSourceRef: reactive-target
+        query: >
+          select record.migration_key as MigrationKey, run.*, record.*
+          from data_set_migration_run run join data_set_migration_record record on run.id = record.migration_id
