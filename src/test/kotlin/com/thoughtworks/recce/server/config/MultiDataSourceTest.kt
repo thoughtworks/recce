@@ -20,7 +20,10 @@ import reactor.test.StepVerifier
 @Testcontainers
 // @MicronautTest(environments = arrayOf("test-multisource"))
 internal class MultiDataSourceTest {
-
+    // MSSQL setup requires the dependencies to be included for testcontainers. Apparently Test containers are not working for MSSQL with .apply function and
+    // needs the micronaut settings to make it work. Since Micronaut creates separate containers for JDBC and R2DBC current setup does not support testing
+    // through Micronaut. We need figure out a way to reuse containers in order to achieve this.
+    // This is tracked as an issue https://github.com/testcontainers/testcontainers-java/issues/4473
     companion object {
         @JvmStatic
         @Container
