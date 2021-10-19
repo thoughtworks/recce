@@ -70,10 +70,11 @@ internal class DataLoadDefinitionTest {
             .expectNext(result)
             .verifyComplete()
 
-        val inOrder = inOrder(mockConnection, statement)
-        inOrder.verify(mockConnection).createStatement(eq(testQuery))
-        inOrder.verify(statement).execute()
-        inOrder.verify(mockConnection).close()
+        inOrder(mockConnection, statement).apply {
+            verify(mockConnection).createStatement(eq(testQuery))
+            verify(statement).execute()
+            verify(mockConnection).close()
+        }
     }
 
     @Test
@@ -90,8 +91,9 @@ internal class DataLoadDefinitionTest {
             }
             .verify()
 
-        val inOrder = inOrder(mockConnection)
-        inOrder.verify(mockConnection).createStatement(eq(testQuery))
-        inOrder.verify(mockConnection).close()
+        inOrder(mockConnection).apply {
+            verify(mockConnection).createStatement(eq(testQuery))
+            verify(mockConnection).close()
+        }
     }
 }
