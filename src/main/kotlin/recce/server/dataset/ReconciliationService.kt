@@ -68,7 +68,6 @@ open class ReconciliationService(
         .filter { it.isNotEmpty() }
         .flatMap { runFor(it) }
         .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }
-        .doOnEach { logger.info { it.toString() } }
 
     @Scheduled(initialDelay = "0s", fixedDelay = "1d")
     open fun scheduledStart() {
