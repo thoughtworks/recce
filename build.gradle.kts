@@ -17,7 +17,7 @@ group = "recce.server"
 
 val javaMajorVersion = 16
 val kotlinVersion = "1.5.31"
-val exposedVersion = "0.35.2"
+val exposedVersion = "0.35.3"
 
 repositories {
     mavenCentral()
