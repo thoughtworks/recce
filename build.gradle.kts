@@ -18,7 +18,7 @@ group = "recce.server"
 // Workaround to allow dependabot to update the micronaut version, since dependabot
 // doesn't understand the micronaut plugin DSL
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.1.0"
+    "micronaut" to "io.micronaut:micronaut-core:3.1.1"
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "16",
