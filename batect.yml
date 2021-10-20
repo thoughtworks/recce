@@ -46,11 +46,18 @@ containers:
 tasks:
   recce:
     description: Compile and run the Recce server within Gradle with a configured `example-scenario`
-    group: gradle
+    group: recce
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
       container: recce
       command: ./gradlew run
       environment:
+        DATABASE_HOST: recce-db
+        DATABASE_PORT: 5432
         MICRONAUT_CONFIG_FILES: examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
+  db:
+    description: Start a standalone Postgres DB for use with Recce run locally (e.g from IDE/Gradle for debugging)
+    group: db
+    run:
+      container: recce-db

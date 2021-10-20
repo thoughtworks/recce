@@ -1,13 +1,18 @@
 micronaut:
   application:
     name: recce
+database:
+  host: localhost
+  port: 9000
+  name: db
+  username: user
+  password: password
 datasources:
   default:
-    url: jdbc:postgresql://recce-db:5432/db
+    url: jdbc:postgresql://${database.host}:${database.port}/${database.name}
     driverClassName: org.postgresql.Driver
-    username: user
-    password: password
-    dialect: POSTGRES
+    username: ${database.username}
+    password: ${database.password}
     initialization-fail-timeout: 10000
     # Only need a small pool; as only should be required for migration during startup if we continue to use R2DBC
     maximum-pool-size: 2
@@ -19,8 +24,6 @@ flyway:
 r2dbc:
   datasources:
     default:
-      url: r2dbc:pool:postgresql://recce-db:5432/db
-      driverClassName: org.postgresql.Driver
-      username: user
-      password: password
-      dialect: POSTGRES
+      url: r2dbc:pool:postgresql://${database.host}:${database.port}/${database.name}
+      username: ${database.username}
+      password: ${database.password}
