@@ -38,11 +38,11 @@ class ReconciliationServiceIntegrationTest : DataSourceTest() {
         StepVerifier.create(service.runFor("test-dataset"))
             .assertNext { run ->
                 assertThat(run.id).isNotNull
-                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(run.datasetId).isEqualTo("test-dataset")
                 assertThat(run.createdTime).isNotNull
                 assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
                 assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
-                assertThat(run.results).isEqualTo(DataSetResults(3, 4))
+                assertThat(run.results).isEqualTo(DatasetResults(3, 4))
             }
             .verifyComplete()
 
@@ -53,35 +53,35 @@ class ReconciliationServiceIntegrationTest : DataSourceTest() {
                 }
         )
             .assertNext { (run, record) ->
-                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(run.datasetId).isEqualTo("test-dataset")
                 assertThat(record.id.migrationId).isEqualTo(run.id)
                 assertThat(record.id.migrationKey).isEqualTo("Test0")
                 assertThat(record.sourceData).isEqualTo("4e92a72630647a5bc6fc3909b52387e6dd6e4466fc7bcceb7439fd6df18fe866")
                 assertThat(record.targetData).isEqualTo("4e92a72630647a5bc6fc3909b52387e6dd6e4466fc7bcceb7439fd6df18fe866")
             }
             .assertNext { (run, record) ->
-                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(run.datasetId).isEqualTo("test-dataset")
                 assertThat(record.id.migrationId).isEqualTo(run.id)
                 assertThat(record.id.migrationKey).isEqualTo("Test1")
                 assertThat(record.sourceData).isEqualTo("ba4d2f35698204cfda7e42cb31752d878f578822920440b5aa0ed79f1ac79785")
                 assertThat(record.targetData).isEqualTo("ba4d2f35698204cfda7e42cb31752d878f578822920440b5aa0ed79f1ac79785")
             }
             .assertNext { (run, record) ->
-                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(run.datasetId).isEqualTo("test-dataset")
                 assertThat(record.id.migrationId).isEqualTo(run.id)
                 assertThat(record.id.migrationKey).isEqualTo("Test2")
                 assertThat(record.sourceData).isEqualTo("eb25fb4ad862a2ba8a753d1d1c42889d18651150070113527bf55d50b663e7ac")
                 assertThat(record.targetData).isNull()
             }
             .assertNext { (run, record) ->
-                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(run.datasetId).isEqualTo("test-dataset")
                 assertThat(record.id.migrationId).isEqualTo(run.id)
                 assertThat(record.id.migrationKey).isEqualTo("Test3")
                 assertThat(record.sourceData).isNull()
                 assertThat(record.targetData).isEqualTo("168c587d9c765ec2cda598750201d15a2e616641455696df176f51d6433dff37")
             }
             .assertNext { (run, record) ->
-                assertThat(run.dataSetId).isEqualTo("test-dataset")
+                assertThat(run.datasetId).isEqualTo("test-dataset")
                 assertThat(record.id.migrationId).isEqualTo(run.id)
                 assertThat(record.id.migrationKey).isEqualTo("Test4")
                 assertThat(record.sourceData).isNull()
@@ -102,7 +102,7 @@ class ReconciliationServiceIntegrationTest : DataSourceTest() {
     @Test
     fun `triggering multiple recs ignores failures`() {
         StepVerifier.create(service.runIgnoreFailure(listOf("bad", "test-dataset", "bad2")))
-            .assertNext { assertThat(it.dataSetId).isEqualTo("test-dataset") }
+            .assertNext { assertThat(it.datasetId).isEqualTo("test-dataset") }
             .verifyComplete()
     }
 }

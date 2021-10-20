@@ -9,8 +9,8 @@ private val logger = KotlinLogging.logger {}
 
 @Singleton
 open class MigrationRunService(private val runRepository: MigrationRunRepository) {
-    fun start(dataSetId: String): Mono<MigrationRun> = runRepository
-        .save(MigrationRun(dataSetId))
+    fun start(datasetId: String): Mono<MigrationRun> = runRepository
+        .save(MigrationRun(datasetId))
         .doOnNext { logger.info { "Starting reconciliation run for $it}..." } }
         .cache()
 

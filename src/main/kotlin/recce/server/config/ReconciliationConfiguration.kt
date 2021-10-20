@@ -15,7 +15,7 @@ interface PostConstructable {
 class ReconciliationConfiguration
 @ConfigurationInject constructor(
     @Bindable(defaultValue = "") val triggerOnStart: List<String> = emptyList(),
-    val datasets: Map<String, DataSetConfiguration>
+    val datasets: Map<String, DatasetConfiguration>
 ) : PostConstructable {
 
     @PostConstruct
@@ -27,7 +27,7 @@ class ReconciliationConfiguration
     }
 }
 
-class DataSetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val target: DataLoadDefinition) :
+class DatasetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val target: DataLoadDefinition) :
     PostConstructable {
     lateinit var name: String
     override fun populate(locator: BeanLocator) {

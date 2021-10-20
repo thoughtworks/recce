@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 
 internal class MigrationRunServiceTest {
 
-    private val startedRun = MigrationRun(1, dataSetId, LocalDateTime.now())
+    private val startedRun = MigrationRun(1, datasetId, LocalDateTime.now())
 
     @Test
     fun `should return start results`() {
@@ -20,7 +20,7 @@ internal class MigrationRunServiceTest {
             on { save(any()) } doReturn Mono.just(startedRun)
         }
 
-        val eventualRun = MigrationRunService(runRepository).start(dataSetId)
+        val eventualRun = MigrationRunService(runRepository).start(datasetId)
 
         StepVerifier.create(eventualRun)
             .expectNext(startedRun)
@@ -41,6 +41,6 @@ internal class MigrationRunServiceTest {
     }
 
     companion object {
-        private const val dataSetId = "my-dataset"
+        private const val datasetId = "my-dataset"
     }
 }

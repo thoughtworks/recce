@@ -19,26 +19,26 @@ interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, Mig
 }
 
 @Entity
-@Table(name = "data_set_migration_run")
+@Table(name = "dataset_migration_run")
 data class MigrationRun(
     @Id @GeneratedValue val id: Int?,
-    val dataSetId: String,
+    val datasetId: String,
     @DateCreated val createdTime: LocalDateTime?,
 ) {
     @DateUpdated
     var updatedTime: LocalDateTime? = null
     var completedTime: LocalDateTime? = null
 
-    constructor(dataSetId: String) : this(null, dataSetId, null)
+    constructor(datasetId: String) : this(null, datasetId, null)
 
     @Transient
-    var results: DataSetResults? = null
+    var results: DatasetResults? = null
 }
 
-data class DataSetResults(val sourceRows: Long, val targetRows: Long)
+data class DatasetResults(val sourceRows: Long, val targetRows: Long)
 
 @Entity
-@Table(name = "data_set_migration_record")
+@Table(name = "dataset_migration_record")
 data class MigrationRecord(
     @EmbeddedId val id: MigrationRecordKey,
     var sourceData: String? = null,

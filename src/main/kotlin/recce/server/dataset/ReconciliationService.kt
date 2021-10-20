@@ -9,35 +9,39 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import recce.server.config.DataLoadDefinition
-import recce.server.config.DataSetConfiguration
+import recce.server.config.DatasetConfiguration
 import recce.server.config.ReconciliationConfiguration
 
 private val logger = KotlinLogging.logger {}
+
+interface ReconciliationRunner {
+    fun runFor(datasetId: String): Mono<MigrationRun>
+}
 
 @Singleton
 open class ReconciliationService(
     @Inject private val config: ReconciliationConfiguration,
     private val runService: MigrationRunService,
     private val recordRepository: MigrationRecordRepository
-) {
-    fun runFor(dataSetId: String): Mono<MigrationRun> {
+) : ReconciliationRunner {
+    override fun runFor(datasetId: String): Mono<MigrationRun> {
 
-        val dataSetConfig = config.datasets[dataSetId] ?: throw IllegalArgumentException("[$dataSetId] not found!")
+        val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("[$datasetId] not found!")
 
-        logger.info { "Starting reconciliation run for [$dataSetId]..." }
+        logger.info { "Starting reconciliation run for [$datasetId]..." }
 
-        val migrationRun = runService.start(dataSetId)
+        val migrationRun = runService.start(datasetId)
 
-        return loadFromSourceThenTarget(dataSetConfig, migrationRun)
+        return loadFromSourceThenTarget(datasetConfig, migrationRun)
             .flatMap { runResults -> migrationRun.map { it.apply { results = runResults } } }
             .flatMap { runService.complete(it) }
     }
 
-    private fun loadFromSourceThenTarget(dataSetConfig: DataSetConfiguration, migrationRun: Mono<MigrationRun>) =
-        loadFromSource(dataSetConfig.source, migrationRun).count()
+    private fun loadFromSourceThenTarget(datasetConfig: DatasetConfiguration, migrationRun: Mono<MigrationRun>) =
+        loadFromSource(datasetConfig.source, migrationRun).count()
             .zipWhen(
-                { loadFromTarget(dataSetConfig.target, migrationRun).count() },
-                { sourceCount, targetCount -> DataSetResults(sourceCount, targetCount) }
+                { loadFromTarget(datasetConfig.target, migrationRun).count() },
+                { sourceCount, targetCount -> DatasetResults(sourceCount, targetCount) }
             )
 
     private fun loadFromSource(source: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
@@ -64,7 +68,7 @@ open class ReconciliationService(
                     .switchIfEmpty(recordRepository.save(MigrationRecord(key, targetData = row.hashedValue)))
             }
 
-    fun runIgnoreFailure(dataSetIds: List<String>): Flux<MigrationRun> = Flux.fromIterable(dataSetIds)
+    fun runIgnoreFailure(datasetIds: List<String>): Flux<MigrationRun> = Flux.fromIterable(datasetIds)
         .filter { it.isNotEmpty() }
         .flatMap { runFor(it) }
         .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }
