@@ -28,8 +28,14 @@ To get started work on Recce:
     ```shell
     ./batect recce
     ```
+* **Run** A DB to use with Recce locally
+    ```shell
+    ./batect db
+    ./gradlew run # or run/debug `RecceServer.kt` from your IDE
+    ```
 * **Build a Docker image** locally and run it
     ```shell
     ./gradlew jibDockerBuild
-    docker run recce/recce-server
+    ./batect db
+    docker run -e DATABASE_HOST=host.docker.internal -p 8080:8080 recce/recce-server
     ```
