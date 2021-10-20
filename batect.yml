@@ -1,6 +1,6 @@
 config_variables:
   example-scenario:
-    description: Which example scenario to run from `ls examples`
+    description: Which example scenario to run from `ls examples/scenario`
     default: simple-mysql
   db-name:
     description: Name of the DB to create for all local DBs
