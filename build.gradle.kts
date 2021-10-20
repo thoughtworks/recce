@@ -96,7 +96,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("recce.server.ApplicationKt")
+    mainClass.set("recce.server.RecceServerKt")
 }
 
 java {
