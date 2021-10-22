@@ -70,19 +70,13 @@ dependencies {
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
     implementation("io.r2dbc:r2dbc-pool:0.8.7.RELEASE")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
+    runtimeOnly("io.r2dbc:r2dbc-mssql")
     runtimeOnly("dev.miku:r2dbc-mysql")
 
     testImplementation("io.micronaut:micronaut-http-client")
     testImplementation("org.assertj:assertj-core")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:r2dbc")
-    testRuntimeOnly("mysql:mysql-connector-java")
-    testImplementation("org.testcontainers:mysql")
-    testImplementation("org.testcontainers:mssqlserver")
-    testImplementation("org.mockito:mockito-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-inline:4.0.0")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
@@ -90,6 +84,16 @@ dependencies {
 
     testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
     testImplementation("org.jetbrains.exposed:exposed-jdbc:${depVersions["exposed"]}")
+
+    // Database testing infra
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testRuntimeOnly("org.postgresql:postgresql")
+    testImplementation("org.testcontainers:mysql")
+    testRuntimeOnly("mysql:mysql-connector-java")
+    testImplementation("org.testcontainers:mssqlserver")
+    testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.0.jre16")
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")
