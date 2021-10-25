@@ -9,8 +9,6 @@ r2dbc:
       username: user
       password: password
 reconciliation:
-  trigger-on-start:
-    - test-dataset
   datasets:
     test-dataset:
       source:

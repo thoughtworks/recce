@@ -3,7 +3,6 @@ package recce.server.config
 import io.micronaut.context.BeanLocator
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.ConfigurationProperties
-import io.micronaut.core.bind.annotation.Bindable
 import javax.annotation.PostConstruct
 import javax.validation.constraints.NotNull
 
@@ -13,10 +12,7 @@ interface PostConstructable {
 
 @ConfigurationProperties("reconciliation")
 class ReconciliationConfiguration
-@ConfigurationInject constructor(
-    @Bindable(defaultValue = "") val triggerOnStart: List<String> = emptyList(),
-    val datasets: Map<String, DatasetConfiguration>
-) : PostConstructable {
+@ConfigurationInject constructor(val datasets: Map<String, DatasetConfiguration>) : PostConstructable {
 
     @PostConstruct
     override fun populate(locator: BeanLocator) {

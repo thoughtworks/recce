@@ -1,6 +1,5 @@
 package recce.server.dataset
 
-import io.micronaut.scheduling.annotation.Scheduled
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import mu.KotlinLogging
@@ -71,10 +70,5 @@ open class DatasetRecService(
     fun runIgnoreFailure(datasetIds: List<String>): Flux<RecRun> = Flux.fromIterable(datasetIds)
         .filter { it.isNotEmpty() }
         .flatMap { runFor(it) }
-        .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }
-
-    @Scheduled(initialDelay = "0s", fixedDelay = "1d")
-    open fun scheduledStart() {
-        runIgnoreFailure(config.triggerOnStart).subscribe()
-    }
+        .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } } // FIXME can hang if all have errors?
 }
