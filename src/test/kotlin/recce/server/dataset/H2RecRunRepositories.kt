@@ -16,6 +16,6 @@ interface H2RecRunRepository : RecRunRepository
  * Allow running of repository tests against H2 Database for speed. To re-evaluate later if we would prefer to use
  * slower TestContainers startups
  */
-@Replaces(RecRunRecordRepository::class)
+@Replaces(RecRecordRepository::class)
 @R2dbcRepository(dialect = Dialect.H2)
-interface H2RecRunRecordRepository : RecRunRecordRepository
+interface H2RecRunRecordRepository : RecRecordRepository

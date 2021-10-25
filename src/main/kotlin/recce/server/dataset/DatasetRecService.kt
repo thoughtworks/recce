@@ -22,7 +22,7 @@ interface DatasetRecRunner {
 open class DatasetRecService(
     @Inject private val config: ReconciliationConfiguration,
     private val runService: RecRunService,
-    private val recordRepository: RecRunRecordRepository
+    private val recordRepository: RecRecordRepository
 ) : DatasetRecRunner {
     override fun runFor(datasetId: String): Mono<RecRun> {
 

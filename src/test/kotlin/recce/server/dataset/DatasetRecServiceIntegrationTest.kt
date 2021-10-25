@@ -26,7 +26,7 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
     lateinit var runRepository: RecRunRepository
 
     @Inject
-    lateinit var recordRepository: RecRunRecordRepository
+    lateinit var recordRepository: RecRecordRepository
 
     @AfterEach
     override fun tearDown() {

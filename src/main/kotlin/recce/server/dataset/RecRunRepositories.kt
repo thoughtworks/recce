@@ -14,7 +14,7 @@ import javax.persistence.*
 interface RecRunRepository : ReactorCrudRepository<RecRun, Int>
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
-interface RecRunRecordRepository : ReactorCrudRepository<RecRecord, RecRecordKey> {
+interface RecRecordRepository : ReactorCrudRepository<RecRecord, RecRecordKey> {
     fun findByIdRecRunId(id: Int): Flux<RecRecord>
 }
 
