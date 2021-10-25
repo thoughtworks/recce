@@ -52,12 +52,10 @@ internal class ReconciliationControllerTest {
 internal class ReconciliationControllerApiTest {
     private val testDataset = "testDataset"
     private val testResults = MigrationRun(
-        12, testDataset,
-        LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(
-            ZoneOffset.UTC
-        )
+        id = 12,
+        datasetId = testDataset,
+        createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC),
     ).apply {
-
         completedTime = createdTime?.plusSeconds(180)
         updatedTime = completedTime?.plusSeconds(10)
         results = DatasetResults(2000, 3000)

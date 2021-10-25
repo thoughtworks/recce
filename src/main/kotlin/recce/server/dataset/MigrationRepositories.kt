@@ -21,15 +21,13 @@ interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, Mig
 @Entity
 @Table(name = "dataset_migration_run")
 data class MigrationRun(
-    @Id @GeneratedValue val id: Int?,
+    @Id @GeneratedValue val id: Int? = null,
     val datasetId: String,
-    @DateCreated val createdTime: Instant?,
+    @DateCreated val createdTime: Instant? = null,
+    @DateUpdated var updatedTime: Instant? = null,
+    var completedTime: Instant? = null,
 ) {
-    @DateUpdated
-    var updatedTime: Instant? = null
-    var completedTime: Instant? = null
-
-    constructor(datasetId: String) : this(null, datasetId, null)
+    constructor(datasetId: String) : this(null, datasetId)
 
     @Transient
     var results: DatasetResults? = null
