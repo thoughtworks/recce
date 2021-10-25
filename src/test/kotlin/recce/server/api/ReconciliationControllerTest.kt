@@ -27,6 +27,7 @@ import recce.server.dataset.MigrationRun
 import recce.server.dataset.ReconciliationRunner
 import recce.server.dataset.ReconciliationService
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 internal class ReconciliationControllerTest {
@@ -50,9 +51,14 @@ internal class ReconciliationControllerTest {
 @MicronautTest
 internal class ReconciliationControllerApiTest {
     private val testDataset = "testDataset"
-    private val testResults = MigrationRun(12, testDataset, LocalDateTime.of(2021, 10, 25, 16, 16, 16)).apply {
+    private val testResults = MigrationRun(
+        12, testDataset,
+        LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(
+            ZoneOffset.UTC
+        )
+    ).apply {
 
-        completedTime = createdTime?.plusMinutes(10)
+        completedTime = createdTime?.plusSeconds(180)
         updatedTime = completedTime?.plusSeconds(10)
         results = DatasetResults(2000, 3000)
     }
@@ -81,9 +87,9 @@ internal class ReconciliationControllerApiTest {
             statusCode(HttpStatus.SC_OK)
             body("datasetId", equalTo(testDataset))
             body("id", equalTo(testResults.id))
-            body("createdTime", equalTo(testResults.createdTime?.format(DateTimeFormatter.ISO_INSTANT)))
-            body("completedTime", equalTo(testResults.completedTime?.format(DateTimeFormatter.ISO_INSTANT)))
-            body("updatedTime", equalTo(testResults.updatedTime?.format(DateTimeFormatter.ISO_INSTANT)))
+            body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.createdTime)))
+            body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.completedTime)))
+            body("updatedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.updatedTime)))
             body("results.sourceRows", equalTo(testResults.results?.sourceRows?.toInt()))
             body("results.targetRows", equalTo(testResults.results?.targetRows?.toInt()))
         }

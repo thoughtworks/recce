@@ -3,7 +3,7 @@ package recce.server.dataset
 import jakarta.inject.Singleton
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
@@ -15,6 +15,6 @@ open class MigrationRunService(private val runRepository: MigrationRunRepository
         .cache()
 
     fun complete(run: MigrationRun): Mono<MigrationRun> =
-        runRepository.update(run.apply { completedTime = LocalDateTime.now() })
+        runRepository.update(run.apply { completedTime = Instant.now() })
             .doOnNext { logger.info { "Run completed for $it" } }
 }

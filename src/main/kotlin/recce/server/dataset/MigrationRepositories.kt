@@ -7,7 +7,7 @@ import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.repository.reactive.ReactorCrudRepository
 import reactor.core.publisher.Flux
 import java.io.Serializable
-import java.time.LocalDateTime
+import java.time.Instant
 import javax.persistence.*
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
@@ -23,11 +23,11 @@ interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, Mig
 data class MigrationRun(
     @Id @GeneratedValue val id: Int?,
     val datasetId: String,
-    @DateCreated val createdTime: LocalDateTime?,
+    @DateCreated val createdTime: Instant?,
 ) {
     @DateUpdated
-    var updatedTime: LocalDateTime? = null
-    var completedTime: LocalDateTime? = null
+    var updatedTime: Instant? = null
+    var completedTime: Instant? = null
 
     constructor(datasetId: String) : this(null, datasetId, null)
 

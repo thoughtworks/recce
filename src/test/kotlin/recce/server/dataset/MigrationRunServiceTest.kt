@@ -7,11 +7,11 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import java.time.LocalDateTime
+import java.time.Instant
 
 internal class MigrationRunServiceTest {
 
-    private val startedRun = MigrationRun(1, datasetId, LocalDateTime.now())
+    private val startedRun = MigrationRun(1, datasetId, Instant.now())
 
     @Test
     fun `should return start results`() {

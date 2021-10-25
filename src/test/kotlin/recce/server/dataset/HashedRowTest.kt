@@ -14,7 +14,7 @@ import org.mockito.kotlin.mock
 import recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
 import java.math.BigDecimal
 import java.nio.ByteBuffer
-import java.time.LocalDateTime
+import java.time.Instant
 
 internal class HashedRowTest {
 
@@ -50,10 +50,10 @@ internal class HashedRowTest {
 
     @Test
     fun `should throw on unrecognized type`() {
-        val row = mockSingleColumnRowReturning(LocalDateTime.now())
+        val row = mockSingleColumnRowReturning(Instant.now())
         assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("LocalDateTime")
+            .hasMessageContaining("Instant")
             .hasMessageContaining("test")
     }
 
