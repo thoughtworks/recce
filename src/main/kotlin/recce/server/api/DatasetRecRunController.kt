@@ -1,5 +1,6 @@
 package recce.server.api
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
@@ -10,6 +11,9 @@ import mu.KotlinLogging
 import reactor.core.publisher.Mono
 import recce.server.dataset.DatasetRecRunner
 import recce.server.dataset.RecRun
+import recce.server.dataset.RecRunResults
+import java.time.Duration
+import java.time.Instant
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
@@ -19,11 +23,32 @@ private val logger = KotlinLogging.logger {}
 @Controller("/runs")
 class DatasetRecRunController(@Inject private val runner: DatasetRecRunner) {
     @Post
-    fun create(@Body @Valid params: RunCreationParams): Mono<RecRun> {
+    fun create(@Body @Valid params: RunCreationParams): Mono<CompletedRun> {
         logger.info { "Received request to create run for $params" }
-        return runner.runFor(params.datasetId)
+        return runner.runFor(params.datasetId).map { CompletedRun(it) }
     }
 
     @Introspected
     data class RunCreationParams(@field:NotBlank val datasetId: String)
+
+    @Introspected
+    data class CompletedRun(
+        val id: Int,
+        val datasetId: String,
+        val createdTime: Instant,
+        val completedTime: Instant,
+        val results: RecRunResults,
+    ) {
+        constructor(run: RecRun) : this(
+            id = run.id!!,
+            datasetId = run.datasetId,
+            createdTime = run.createdTime!!,
+            completedTime = run.completedTime!!,
+            results = run.results!!
+        )
+
+        @get:JsonProperty("completedDurationSeconds")
+        val completedDuration: Duration
+            get() = Duration.between(createdTime, completedTime)
+    }
 }
