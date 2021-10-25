@@ -19,7 +19,8 @@ group = "recce.server"
 // doesn't understand the micronaut plugin DSL
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.1.1",
-    "exposed" to "org.jetbrains.exposed:exposed-core:0.35.3"
+    "exposed" to "org.jetbrains.exposed:exposed-core:0.35.3",
+    "restAssured" to "io.rest-assured:rest-assured:4.4.0",
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "16",
@@ -73,7 +74,6 @@ dependencies {
     runtimeOnly("io.r2dbc:r2dbc-mssql")
     runtimeOnly("dev.miku:r2dbc-mysql")
 
-    testImplementation("io.micronaut:micronaut-http-client")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.mockito:mockito-core")
@@ -84,6 +84,9 @@ dependencies {
 
     testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
     testImplementation("org.jetbrains.exposed:exposed-jdbc:${depVersions["exposed"]}")
+
+    testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
+    testImplementation("io.rest-assured:kotlin-extensions:${depVersions["restAssured"]}")
 
     // Database testing infra
     testImplementation("org.testcontainers:testcontainers")
