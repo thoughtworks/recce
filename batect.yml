@@ -34,6 +34,9 @@ containers:
       - recce-db
       - source-db # Expected to be defined by an included file
       - target-db # Expected to be defined by an included file
+    ports:
+      - local: 8080
+        container: 8080
     volumes:
       - local: .
         container: /code
