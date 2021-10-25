@@ -22,43 +22,43 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import recce.server.dataset.DatasetResults
-import recce.server.dataset.MigrationRun
-import recce.server.dataset.ReconciliationRunner
-import recce.server.dataset.ReconciliationService
+import recce.server.dataset.DatasetRecRunner
+import recce.server.dataset.DatasetRecService
+import recce.server.dataset.RecRun
+import recce.server.dataset.RecRunResults
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-internal class ReconciliationControllerTest {
+internal class DatasetRecRunControllerTest {
 
     private val testDataset = "testDataset"
 
-    private val service = mock<ReconciliationService> {
-        on { runFor(eq(testDataset)) } doReturn Mono.just(MigrationRun(testDataset))
+    private val service = mock<DatasetRecService> {
+        on { runFor(eq(testDataset)) } doReturn Mono.just(RecRun(testDataset))
     }
 
-    private val controller = ReconciliationController(service)
+    private val controller = DatasetRecRunController(service)
 
     @Test
     fun `controller should delegate to service`() {
-        StepVerifier.create(controller.create(ReconciliationController.RunCreationParams(eq(testDataset))))
-            .expectNext(MigrationRun(testDataset))
+        StepVerifier.create(controller.create(DatasetRecRunController.RunCreationParams(eq(testDataset))))
+            .expectNext(RecRun(testDataset))
             .verifyComplete()
     }
 }
 
 @MicronautTest
-internal class ReconciliationControllerApiTest {
+internal class DatasetRecRunControllerApiTest {
     private val testDataset = "testDataset"
-    private val testResults = MigrationRun(
+    private val testResults = RecRun(
         id = 12,
         datasetId = testDataset,
         createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC),
     ).apply {
         completedTime = createdTime?.plusSeconds(180)
         updatedTime = completedTime?.plusSeconds(10)
-        results = DatasetResults(2000, 3000)
+        results = RecRunResults(2000, 3000)
     }
 
     @Inject
@@ -117,8 +117,8 @@ internal class ReconciliationControllerApiTest {
             }
     }
 
-    @MockBean(ReconciliationRunner::class)
-    fun reconciliationService(): ReconciliationRunner {
+    @MockBean(DatasetRecRunner::class)
+    fun reconciliationService(): DatasetRecRunner {
         return mock {
             on { runFor(eq(testDataset)) } doReturn Mono.just(testResults)
         }

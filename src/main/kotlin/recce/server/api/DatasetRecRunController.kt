@@ -8,8 +8,8 @@ import io.micronaut.validation.Validated
 import jakarta.inject.Inject
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
-import recce.server.dataset.MigrationRun
-import recce.server.dataset.ReconciliationRunner
+import recce.server.dataset.DatasetRecRunner
+import recce.server.dataset.RecRun
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
@@ -17,11 +17,11 @@ private val logger = KotlinLogging.logger {}
 
 @Validated
 @Controller("/runs")
-class ReconciliationController(@Inject private val service: ReconciliationRunner) {
+class DatasetRecRunController(@Inject private val runner: DatasetRecRunner) {
     @Post
-    fun create(@Body @Valid params: RunCreationParams): Mono<MigrationRun> {
+    fun create(@Body @Valid params: RunCreationParams): Mono<RecRun> {
         logger.info { "Received request to create run for $params" }
-        return service.runFor(params.datasetId)
+        return runner.runFor(params.datasetId)
     }
 
     @Introspected

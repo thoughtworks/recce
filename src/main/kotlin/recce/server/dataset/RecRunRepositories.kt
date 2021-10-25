@@ -11,16 +11,16 @@ import java.time.Instant
 import javax.persistence.*
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
-interface MigrationRunRepository : ReactorCrudRepository<MigrationRun, Int>
+interface RecRunRepository : ReactorCrudRepository<RecRun, Int>
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
-interface MigrationRecordRepository : ReactorCrudRepository<MigrationRecord, MigrationRecordKey> {
-    fun findByIdMigrationId(id: Int): Flux<MigrationRecord>
+interface RecRunRecordRepository : ReactorCrudRepository<RecRecord, RecRecordKey> {
+    fun findByIdRecRunId(id: Int): Flux<RecRecord>
 }
 
 @Entity
-@Table(name = "dataset_migration_run")
-data class MigrationRun(
+@Table(name = "reconciliation_run")
+data class RecRun(
     @Id @GeneratedValue val id: Int? = null,
     val datasetId: String,
     @DateCreated val createdTime: Instant? = null,
@@ -30,21 +30,21 @@ data class MigrationRun(
     constructor(datasetId: String) : this(null, datasetId)
 
     @Transient
-    var results: DatasetResults? = null
+    var results: RecRunResults? = null
 }
 
-data class DatasetResults(val sourceRows: Long, val targetRows: Long)
+data class RecRunResults(val sourceRows: Long, val targetRows: Long)
 
 @Entity
-@Table(name = "dataset_migration_record")
-data class MigrationRecord(
-    @EmbeddedId val id: MigrationRecordKey,
+@Table(name = "reconciliation_record")
+data class RecRecord(
+    @EmbeddedId val id: RecRecordKey,
     var sourceData: String? = null,
     var targetData: String? = null
 )
 
 @Embeddable
-data class MigrationRecordKey(
-    @Column(name = "migration_id") val migrationId: Int,
+data class RecRecordKey(
+    @Column(name = "reconciliation_run_id") val recRunId: Int,
     @Column(name = "migration_key") val migrationKey: String
 ) : Serializable

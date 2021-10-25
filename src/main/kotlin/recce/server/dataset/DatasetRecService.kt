@@ -14,61 +14,61 @@ import recce.server.config.ReconciliationConfiguration
 
 private val logger = KotlinLogging.logger {}
 
-interface ReconciliationRunner {
-    fun runFor(datasetId: String): Mono<MigrationRun>
+interface DatasetRecRunner {
+    fun runFor(datasetId: String): Mono<RecRun>
 }
 
 @Singleton
-open class ReconciliationService(
+open class DatasetRecService(
     @Inject private val config: ReconciliationConfiguration,
-    private val runService: MigrationRunService,
-    private val recordRepository: MigrationRecordRepository
-) : ReconciliationRunner {
-    override fun runFor(datasetId: String): Mono<MigrationRun> {
+    private val runService: RecRunService,
+    private val recordRepository: RecRunRecordRepository
+) : DatasetRecRunner {
+    override fun runFor(datasetId: String): Mono<RecRun> {
 
         val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("[$datasetId] not found!")
 
         logger.info { "Starting reconciliation run for [$datasetId]..." }
 
-        val migrationRun = runService.start(datasetId)
+        val recRun = runService.start(datasetId)
 
-        return loadFromSourceThenTarget(datasetConfig, migrationRun)
-            .flatMap { runResults -> migrationRun.map { it.apply { results = runResults } } }
+        return loadFromSourceThenTarget(datasetConfig, recRun)
+            .flatMap { runResults -> recRun.map { it.apply { results = runResults } } }
             .flatMap { runService.complete(it) }
     }
 
-    private fun loadFromSourceThenTarget(datasetConfig: DatasetConfiguration, migrationRun: Mono<MigrationRun>) =
-        loadFromSource(datasetConfig.source, migrationRun).count()
+    private fun loadFromSourceThenTarget(datasetConfig: DatasetConfiguration, recRun: Mono<RecRun>) =
+        loadFromSource(datasetConfig.source, recRun).count()
             .zipWhen(
-                { loadFromTarget(datasetConfig.target, migrationRun).count() },
-                { sourceCount, targetCount -> DatasetResults(sourceCount, targetCount) }
+                { loadFromTarget(datasetConfig.target, recRun).count() },
+                { sourceCount, targetCount -> RecRunResults(sourceCount, targetCount) }
             )
 
-    private fun loadFromSource(source: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
+    private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Flux<RecRecord> =
         source.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .map { (row, run) ->
-                MigrationRecord(
-                    MigrationRecordKey(run.id!!, row.migrationKey),
+                RecRecord(
+                    RecRecordKey(run.id!!, row.migrationKey),
                     sourceData = row.hashedValue
                 )
             }
             .flatMap { record -> recordRepository.save(record) }
 
-    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<MigrationRun>): Flux<MigrationRecord> =
+    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Flux<RecRecord> =
         target.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .flatMap { (row, run) ->
-                val key = MigrationRecordKey(run.id!!, row.migrationKey)
+                val key = RecRecordKey(run.id!!, row.migrationKey)
                 recordRepository
                     .findById(key)
                     .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
-                    .switchIfEmpty(recordRepository.save(MigrationRecord(key, targetData = row.hashedValue)))
+                    .switchIfEmpty(recordRepository.save(RecRecord(key, targetData = row.hashedValue)))
             }
 
-    fun runIgnoreFailure(datasetIds: List<String>): Flux<MigrationRun> = Flux.fromIterable(datasetIds)
+    fun runIgnoreFailure(datasetIds: List<String>): Flux<RecRun> = Flux.fromIterable(datasetIds)
         .filter { it.isNotEmpty() }
         .flatMap { runFor(it) }
         .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } }

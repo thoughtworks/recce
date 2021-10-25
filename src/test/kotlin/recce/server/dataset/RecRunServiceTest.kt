@@ -9,18 +9,18 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.time.Instant
 
-internal class MigrationRunServiceTest {
+internal class RecRunServiceTest {
 
-    private val startedRun = MigrationRun(1, datasetId, Instant.now())
+    private val startedRun = RecRun(1, datasetId, Instant.now())
 
     @Test
     fun `should return start results`() {
 
-        val runRepository = mock<MigrationRunRepository> {
+        val runRepository = mock<RecRunRepository> {
             on { save(any()) } doReturn Mono.just(startedRun)
         }
 
-        val eventualRun = MigrationRunService(runRepository).start(datasetId)
+        val eventualRun = RecRunService(runRepository).start(datasetId)
 
         StepVerifier.create(eventualRun)
             .expectNext(startedRun)
@@ -29,11 +29,11 @@ internal class MigrationRunServiceTest {
 
     @Test
     fun `complete should set completed time`() {
-        val runRepository = mock<MigrationRunRepository> {
+        val runRepository = mock<RecRunRepository> {
             on { update(any()) } doReturn Mono.just(startedRun)
         }
 
-        StepVerifier.create(MigrationRunService(runRepository).complete(startedRun))
+        StepVerifier.create(RecRunService(runRepository).complete(startedRun))
             .assertNext {
                 assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
             }

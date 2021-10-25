@@ -8,14 +8,14 @@ import io.micronaut.data.r2dbc.annotation.R2dbcRepository
  * Allow running of repository tests against H2 Database for speed. To re-evaluate later if we would prefer to use
  * slower TestContainers startups
  */
-@Replaces(MigrationRunRepository::class)
+@Replaces(RecRunRepository::class)
 @R2dbcRepository(dialect = Dialect.H2)
-interface H2MigrationRunRepository : MigrationRunRepository
+interface H2RecRunRepository : RecRunRepository
 
 /**
  * Allow running of repository tests against H2 Database for speed. To re-evaluate later if we would prefer to use
  * slower TestContainers startups
  */
-@Replaces(MigrationRecordRepository::class)
+@Replaces(RecRunRecordRepository::class)
 @R2dbcRepository(dialect = Dialect.H2)
-interface H2MigrationRecordRepository : MigrationRecordRepository
+interface H2RecRunRecordRepository : RecRunRecordRepository
