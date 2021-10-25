@@ -22,9 +22,12 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import recce.server.dataset.DatasetResults
 import recce.server.dataset.MigrationRun
 import recce.server.dataset.ReconciliationRunner
 import recce.server.dataset.ReconciliationService
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 internal class ReconciliationControllerTest {
 
@@ -47,6 +50,12 @@ internal class ReconciliationControllerTest {
 @MicronautTest
 internal class ReconciliationControllerApiTest {
     private val testDataset = "testDataset"
+    private val testResults = MigrationRun(12, testDataset, LocalDateTime.of(2021, 10, 25, 16, 16, 16)).apply {
+
+        completedTime = createdTime?.plusMinutes(10)
+        updatedTime = completedTime?.plusSeconds(10)
+        results = DatasetResults(2000, 3000)
+    }
 
     @Inject
     lateinit var server: EmbeddedServer
@@ -70,9 +79,13 @@ internal class ReconciliationControllerApiTest {
             post("/runs")
         } Then {
             statusCode(HttpStatus.SC_OK)
-            body(
-                "datasetId", equalTo(testDataset)
-            )
+            body("datasetId", equalTo(testDataset))
+            body("id", equalTo(testResults.id))
+            body("createdTime", equalTo(testResults.createdTime?.format(DateTimeFormatter.ISO_INSTANT)))
+            body("completedTime", equalTo(testResults.completedTime?.format(DateTimeFormatter.ISO_INSTANT)))
+            body("updatedTime", equalTo(testResults.updatedTime?.format(DateTimeFormatter.ISO_INSTANT)))
+            body("results.sourceRows", equalTo(testResults.results?.sourceRows?.toInt()))
+            body("results.targetRows", equalTo(testResults.results?.targetRows?.toInt()))
         }
     }
 
@@ -103,7 +116,7 @@ internal class ReconciliationControllerApiTest {
     @MockBean(ReconciliationRunner::class)
     fun reconciliationService(): ReconciliationRunner {
         return mock {
-            on { runFor(eq(testDataset)) } doReturn Mono.just(MigrationRun(testDataset))
+            on { runFor(eq(testDataset)) } doReturn Mono.just(testResults)
         }
     }
 }
