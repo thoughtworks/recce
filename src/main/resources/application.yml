@@ -27,5 +27,8 @@ r2dbc:
       url: r2dbc:pool:postgresql://${database.host}:${database.port}/${database.name}
       username: ${database.username}
       password: ${database.password}
+jackson:
+  serialization:
+    writeDatesAsTimestamps: false
 reconcililation:
   datasets: { }
