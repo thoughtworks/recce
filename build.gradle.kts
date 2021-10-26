@@ -19,7 +19,7 @@ group = "recce.server"
 // doesn't understand the micronaut plugin DSL
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.1.1",
-    "exposed" to "org.jetbrains.exposed:exposed-core:0.35.3",
+    "exposed" to "org.jetbrains.exposed:exposed-core:0.36.1",
     "restAssured" to "io.rest-assured:rest-assured:4.4.0",
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
