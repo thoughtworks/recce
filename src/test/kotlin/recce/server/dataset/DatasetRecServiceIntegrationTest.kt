@@ -55,7 +55,7 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
                     RecRunResults(
                         source = DatasetResults(3, expectedMeta),
                         target = DatasetResults(4, expectedMeta),
-                        summary = RecRecordRepository.MatchStatus(2, 1, 2, 0)
+                        summary = RecRecordRepository.MatchStatus(1, 2, 2, 0)
                     )
                 )
             }

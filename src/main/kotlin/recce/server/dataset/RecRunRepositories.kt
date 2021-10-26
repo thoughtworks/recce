@@ -7,6 +7,7 @@ import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.data.repository.reactive.ReactorCrudRepository
+import io.r2dbc.spi.Row
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
@@ -20,53 +21,61 @@ interface RecRunRepository : ReactorCrudRepository<RecRun, Int>
 @R2dbcRepository(dialect = Dialect.POSTGRES)
 abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     ReactorCrudRepository<RecRecord, RecRecordKey> {
+
     abstract fun findByIdRecRunId(id: Int): Flux<RecRecord>
 
     fun countMatchedByIdRecRunId(id: Int): Mono<MatchStatus> {
-        val sql =
-            """
-                WITH matching_data as (SELECT migration_key,
-                                              CASE
-                                                  WHEN source_data is null THEN 'MISSING_SOURCE'
-                                                  WHEN target_data is null THEN 'MISSING_TARGET'
-                                                  WHEN source_data = target_data THEN 'MATCHED'
-                                                  ELSE 'MISMATCHED'
-                                                  END AS match_status
-                                       from reconciliation_record
-                                       where reconciliation_run_id = $1)
-                SELECT match_status, count(*) as count
-                FROM matching_data
-                GROUP BY match_status;
-            """.trimIndent()
-        val result: Flux<out io.r2dbc.spi.Result> =
-            operations.withConnection { it.createStatement(sql).bind("$1", id).execute() }.toFlux()
-
-        return result.flatMap { res ->
-            res.map { row, _ ->
-                val count = row.get("count", Number::class.java)?.toInt()
-                    ?: throw IllegalArgumentException("Missing [count] column!")
-                when (val status = row.get("match_status")) {
-                    "MISSING_SOURCE" -> MatchStatus(missing_source = count)
-                    "MISSING_TARGET" -> MatchStatus(missing_target = count)
-                    "MATCHED" -> MatchStatus(matched = count)
-                    "MISMATCHED" -> MatchStatus(mismatched = count)
-                    else -> throw IllegalArgumentException("Invalid match_status [$status]")
-                }
-            }
-        }.reduce { first, second -> first + second }
+        return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", id).execute() }
+            .toFlux()
+            .flatMap { res -> res.map { row, _ -> toMatchStatus(row) } }
+            .reduce { first, second -> first + second }
             .defaultIfEmpty(MatchStatus())
     }
 
+    private fun toMatchStatus(row: Row): MatchStatus {
+        val count = row.get(countColumnName, Number::class.java)?.toInt()
+            ?: throw IllegalArgumentException("Missing [$countColumnName] column!")
+        return when (val status = row.get(statusColumnName)) {
+            MatchStatus::sourceOnly.name -> MatchStatus(sourceOnly = count)
+            MatchStatus::targetOnly.name -> MatchStatus(targetOnly = count)
+            MatchStatus::matched.name -> MatchStatus(matched = count)
+            MatchStatus::mismatched.name -> MatchStatus(mismatched = count)
+            else -> throw IllegalArgumentException("Invalid $statusColumnName [$status]")
+        }
+    }
+
+    companion object {
+        private const val statusColumnName = "match_status"
+        private const val countColumnName = "count"
+
+        private val countRecordsByStatus =
+            """
+                WITH matching_data AS 
+                    (SELECT migration_key,
+                        CASE 
+                            WHEN target_data IS NULL       THEN '${MatchStatus::sourceOnly.name}'
+                            WHEN source_data IS NULL       THEN '${MatchStatus::targetOnly.name}'
+                            WHEN source_data = target_data THEN '${MatchStatus::matched.name}'
+                            ELSE                                '${MatchStatus::mismatched.name}'
+                        END AS $statusColumnName
+                    FROM reconciliation_record
+                    WHERE reconciliation_run_id = $1)
+                SELECT $statusColumnName, count(*) AS "$countColumnName"
+                FROM matching_data
+                GROUP BY $statusColumnName;
+            """.trimIndent()
+    }
+
     data class MatchStatus(
-        var missing_source: Int = 0,
-        var missing_target: Int = 0,
+        var sourceOnly: Int = 0,
+        var targetOnly: Int = 0,
         var matched: Int = 0,
         var mismatched: Int = 0
     ) {
         operator fun plus(increment: MatchStatus): MatchStatus {
             return MatchStatus(
-                missing_source + increment.missing_source,
-                missing_target + increment.missing_target,
+                sourceOnly + increment.sourceOnly,
+                targetOnly + increment.targetOnly,
                 matched + increment.matched,
                 mismatched + increment.mismatched
             )
