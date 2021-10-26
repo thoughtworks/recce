@@ -1,5 +1,6 @@
 package recce.server.dataset
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.model.query.builder.sql.Dialect
@@ -38,12 +39,13 @@ data class RecRunResults(val source: DatasetResults, val target: DatasetResults)
 }
 
 data class DatasetResults(val rows: Long, val meta: DatasetMeta = DatasetMeta()) {
-    fun increment(meta: DatasetMeta): DatasetResults {
-        return DatasetResults(rows + 1, if (this.meta.isEmpty()) meta else this.meta)
+    fun increment(metaSupplier: () -> DatasetMeta): DatasetResults {
+        return DatasetResults(rows + 1, if (this.meta.isEmpty()) metaSupplier.invoke() else this.meta)
     }
 }
 
 data class DatasetMeta(val cols: List<ColMeta> = emptyList()) {
+    @JsonIgnore
     fun isEmpty() = cols.isEmpty()
 }
 

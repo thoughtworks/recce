@@ -50,7 +50,7 @@ open class DatasetRecService(
             .flatMap { (row, run) ->
                 recordRepository
                     .save(RecRecord(RecRecordKey(run.id!!, row.migrationKey), sourceData = row.hashedValue))
-                    .map { row.meta }
+                    .map { row::meta }
             }
             .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
 
@@ -64,7 +64,7 @@ open class DatasetRecService(
                     .findById(key)
                     .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
                     .switchIfEmpty(recordRepository.save(RecRecord(key, targetData = row.hashedValue)))
-                    .map { row.meta }
+                    .map { row::meta }
             }
             .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
 
