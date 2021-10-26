@@ -8,13 +8,19 @@ import java.time.Instant
 private val logger = KotlinLogging.logger {}
 
 @Singleton
-open class RecRunService(private val runRepository: RecRunRepository) {
+open class RecRunService(
+    private val runRepository: RecRunRepository,
+    private val recordRepository: RecRecordRepository
+) {
     fun start(datasetId: String): Mono<RecRun> = runRepository
         .save(RecRun(datasetId))
         .doOnNext { logger.info { "Starting reconciliation run for $it}..." } }
         .cache()
 
-    fun complete(run: RecRun): Mono<RecRun> =
-        runRepository.update(run.apply { completedTime = Instant.now() })
+    fun complete(run: RecRun): Mono<RecRun> {
+        return recordRepository.countMatchedByIdRecRunId(run.id!!)
+            .map { run.apply { completedTime = Instant.now(); results?.summary = it } }
+            .flatMap(runRepository::update)
             .doOnNext { logger.info { "Run completed for $it" } }
+    }
 }
