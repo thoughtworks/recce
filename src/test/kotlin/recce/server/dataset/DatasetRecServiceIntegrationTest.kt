@@ -43,7 +43,20 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
                 assertThat(run.createdTime).isNotNull
                 assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
                 assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
-                assertThat(run.results).isEqualTo(RecRunResults(3, 4))
+
+                val expectedMeta = DatasetMeta(
+                    listOf(
+                        ColMeta("MIGRATIONKEY", "String"),
+                        ColMeta("NAME", "String"),
+                        ColMeta("VALUE", "String")
+                    )
+                )
+                assertThat(run.results).usingRecursiveComparison().isEqualTo(
+                    RecRunResults(
+                        DatasetResults(3, expectedMeta),
+                        DatasetResults(4, expectedMeta)
+                    )
+                )
             }
             .verifyComplete()
 

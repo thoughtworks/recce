@@ -37,25 +37,24 @@ open class DatasetRecService(
     }
 
     private fun loadFromSourceThenTarget(datasetConfig: DatasetConfiguration, recRun: Mono<RecRun>) =
-        loadFromSource(datasetConfig.source, recRun).count()
+        loadFromSource(datasetConfig.source, recRun)
             .zipWhen(
-                { loadFromTarget(datasetConfig.target, recRun).count() },
-                { sourceCount, targetCount -> RecRunResults(sourceCount, targetCount) }
+                { loadFromTarget(datasetConfig.target, recRun) },
+                { source: DatasetResults, target: DatasetResults -> RecRunResults(source, target) }
             )
 
-    private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Flux<RecRecord> =
+    private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetResults> =
         source.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
-            .map { (row, run) ->
-                RecRecord(
-                    RecRecordKey(run.id!!, row.migrationKey),
-                    sourceData = row.hashedValue
-                )
+            .flatMap { (row, run) ->
+                recordRepository
+                    .save(RecRecord(RecRecordKey(run.id!!, row.migrationKey), sourceData = row.hashedValue))
+                    .map { row.meta }
             }
-            .flatMap { record -> recordRepository.save(record) }
+            .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
 
-    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Flux<RecRecord> =
+    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetResults> =
         target.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
@@ -65,7 +64,9 @@ open class DatasetRecService(
                     .findById(key)
                     .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
                     .switchIfEmpty(recordRepository.save(RecRecord(key, targetData = row.hashedValue)))
+                    .map { row.meta }
             }
+            .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
 
     fun runIgnoreFailure(datasetIds: List<String>): Flux<RecRun> = Flux.fromIterable(datasetIds)
         .filter { it.isNotEmpty() }

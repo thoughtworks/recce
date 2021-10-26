@@ -7,7 +7,7 @@ import recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 
-data class HashedRow(val migrationKey: String, val hashedValue: String) {
+data class HashedRow(val migrationKey: String, val hashedValue: String, private val rowMeta: RowMetadata) {
     companion object {
         @Suppress("UnstableApiUsage")
         fun fromRow(row: Row, meta: RowMetadata): HashedRow {
@@ -36,7 +36,10 @@ data class HashedRow(val migrationKey: String, val hashedValue: String) {
                         else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.simpleName} for column [${colMeta.name}]")
                     }
                 }
-            return HashedRow(migrationKey, hash.hash().toString())
+            return HashedRow(migrationKey, hash.hash().toString(), meta)
         }
     }
+
+    val meta: DatasetMeta
+        get() = DatasetMeta(rowMeta.columnMetadatas.map { dbMeta -> ColMeta(dbMeta.name, dbMeta.javaType.simpleName) })
 }

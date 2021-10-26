@@ -33,7 +33,21 @@ data class RecRun(
     var results: RecRunResults? = null
 }
 
-data class RecRunResults(val sourceRows: Long, val targetRows: Long)
+data class RecRunResults(val source: DatasetResults, val target: DatasetResults) {
+    constructor(sourceRows: Long, targetRows: Long) : this(DatasetResults(sourceRows), DatasetResults(targetRows))
+}
+
+data class DatasetResults(val rows: Long, val meta: DatasetMeta = DatasetMeta()) {
+    fun increment(meta: DatasetMeta): DatasetResults {
+        return DatasetResults(rows + 1, if (this.meta.isEmpty()) meta else this.meta)
+    }
+}
+
+data class DatasetMeta(val cols: List<ColMeta> = emptyList()) {
+    fun isEmpty() = cols.isEmpty()
+}
+
+data class ColMeta(val name: String, val javaType: String)
 
 @Entity
 @Table(name = "reconciliation_record")

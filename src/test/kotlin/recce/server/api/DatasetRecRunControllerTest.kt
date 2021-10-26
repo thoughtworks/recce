@@ -81,8 +81,8 @@ internal class DatasetRecRunControllerApiTest {
             body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.createdTime)))
             body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.completedTime)))
             body("completedDurationSeconds", closeTo(testCompletedDuration.toSeconds().toDouble(), 0.00001))
-            body("results.sourceRows", equalTo(testResults.results?.sourceRows?.toInt()))
-            body("results.targetRows", equalTo(testResults.results?.targetRows?.toInt()))
+            body("results.source.rows", equalTo(testResults.results?.source?.rows?.toInt()))
+            body("results.target.rows", equalTo(testResults.results?.target?.rows?.toInt()))
         }
     }
 

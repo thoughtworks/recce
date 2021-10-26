@@ -22,7 +22,7 @@ internal class HashedRowTest {
 
     private fun <T> mockRowMetaWithColumnOf(clazz: Class<T>): RowMetadata {
         val cols = arrayListOf(
-            mock<ColumnMetadata> { on { name } doReturn migrationKeyColumnName },
+            mock<ColumnMetadata> { on { name } doReturn migrationKeyColumnName; on { javaType } doReturn clazz },
             mock { on { name } doReturn "test"; on { javaType } doReturn clazz },
         )
         return mock {
@@ -36,6 +36,19 @@ internal class HashedRowTest {
             on { get("test") } doReturn input
         }
         return row
+    }
+
+    @Test
+    fun `should dynamically convert row metadata`() {
+        val row = HashedRow("test", "test", meta)
+
+        val expectedMeta = DatasetMeta(
+            listOf(
+                ColMeta(migrationKeyColumnName, "String"),
+                ColMeta("test", "String")
+            )
+        )
+        assertThat(row.meta).usingRecursiveComparison().isEqualTo(expectedMeta)
     }
 
     @Test
@@ -72,14 +85,22 @@ internal class HashedRowTest {
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
         val row = mockSingleColumnRowReturning(input)
-        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash))
+        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
     }
 
     companion object {
         @JvmStatic
         fun types() = listOf(
-            Arguments.of(String::class.java, null, "ca7f6cfcd4f417dbff9cea143b1071decb72f8ec40eb6aa33856224e0e07df7e"),
-            Arguments.of(Boolean::class.java, true, "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"),
+            Arguments.of(
+                String::class.java,
+                null,
+                "ca7f6cfcd4f417dbff9cea143b1071decb72f8ec40eb6aa33856224e0e07df7e"
+            ),
+            Arguments.of(
+                Boolean::class.java,
+                true,
+                "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+            ),
             Arguments.of(
                 BigDecimal::class.java,
                 BigDecimal.TEN,
@@ -110,7 +131,11 @@ internal class HashedRowTest {
                 Integer.valueOf(10).toDouble(),
                 "24b1f4ef66b650ff816e519b01742ff1753733d36e1b4c3e3b52743168915b1f"
             ),
-            Arguments.of(String::class.java, "10", "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5"),
+            Arguments.of(
+                String::class.java,
+                "10",
+                "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5"
+            ),
             Arguments.of(
                 ByteBuffer::class.java,
                 ByteBuffer.wrap("10".toByteArray(Charsets.UTF_8)),
