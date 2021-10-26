@@ -32,9 +32,9 @@ class RecRecordRepositoryTest {
     fun `should count matches of various types`() {
         val testRecordData =
             List(1) { "test" to null } +
-                    List(2) { null to "test" } +
-                    List(3) { "test" to "test" } +
-                    List(4) { "test" to "test3" }
+                List(2) { null to "test" } +
+                List(3) { "test" to "test" } +
+                List(4) { "test" to "test3" }
 
         val setup = runRepository.save(RecRun("test-dataset")).toFlux().flatMap { run ->
             var key = 0
