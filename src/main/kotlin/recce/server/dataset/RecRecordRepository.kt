@@ -31,8 +31,8 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
         return when (val status = row.get(statusColumnName)) {
             MatchStatus::sourceOnly.name -> { st -> st.sourceOnly = count }
             MatchStatus::targetOnly.name -> { st -> st.targetOnly = count }
-            MatchStatus::matched.name -> { st -> st.matched = count }
-            MatchStatus::mismatched.name -> { st -> st.mismatched = count }
+            MatchStatus::bothMatched.name -> { st -> st.bothMatched = count }
+            MatchStatus::bothMismatched.name -> { st -> st.bothMismatched = count }
             else -> throw IllegalArgumentException("Invalid $statusColumnName [$status]")
         }
     }
@@ -48,8 +48,8 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
                         CASE 
                             WHEN target_data IS NULL       THEN '${MatchStatus::sourceOnly.name}'
                             WHEN source_data IS NULL       THEN '${MatchStatus::targetOnly.name}'
-                            WHEN source_data = target_data THEN '${MatchStatus::matched.name}'
-                            ELSE                                '${MatchStatus::mismatched.name}'
+                            WHEN source_data = target_data THEN '${MatchStatus::bothMatched.name}'
+                            ELSE                                '${MatchStatus::bothMismatched.name}'
                         END AS $statusColumnName
                     FROM reconciliation_record
                     WHERE reconciliation_run_id = $1)
@@ -62,13 +62,13 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     data class MatchStatus(
         var sourceOnly: Int = 0,
         var targetOnly: Int = 0,
-        var matched: Int = 0,
-        var mismatched: Int = 0
+        var bothMatched: Int = 0,
+        var bothMismatched: Int = 0
     ) {
         val sourceTotal: Int
-            get() = sourceOnly + matched + mismatched
+            get() = sourceOnly + bothMatched + bothMismatched
         val targetTotal: Int
-            get() = targetOnly + matched + mismatched
+            get() = targetOnly + bothMatched + bothMismatched
         val total: Int
             get() = sourceTotal + targetOnly
     }
