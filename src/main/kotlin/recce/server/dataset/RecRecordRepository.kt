@@ -20,19 +20,19 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     fun countMatchedByIdRecRunId(id: Int): Mono<MatchStatus> {
         return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", id).execute() }
             .toFlux()
-            .flatMap { res -> res.map { row, _ -> toMatchStatus(row) } }
-            .reduce { first, second -> first + second }
-            .defaultIfEmpty(MatchStatus())
+            .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
+            .reduce(MatchStatus()) { status, propSet -> propSet.invoke(status); status }
     }
 
-    private fun toMatchStatus(row: Row): MatchStatus {
+    private fun matchStatusSetterFor(row: Row): (MatchStatus) -> Unit {
         val count = row.get(countColumnName, Number::class.java)?.toInt()
             ?: throw IllegalArgumentException("Missing [$countColumnName] column!")
+
         return when (val status = row.get(statusColumnName)) {
-            MatchStatus::sourceOnly.name -> MatchStatus(sourceOnly = count)
-            MatchStatus::targetOnly.name -> MatchStatus(targetOnly = count)
-            MatchStatus::matched.name -> MatchStatus(matched = count)
-            MatchStatus::mismatched.name -> MatchStatus(mismatched = count)
+            MatchStatus::sourceOnly.name -> { st -> st.sourceOnly = count }
+            MatchStatus::targetOnly.name -> { st -> st.targetOnly = count }
+            MatchStatus::matched.name -> { st -> st.matched = count }
+            MatchStatus::mismatched.name -> { st -> st.mismatched = count }
             else -> throw IllegalArgumentException("Invalid $statusColumnName [$status]")
         }
     }
@@ -65,14 +65,12 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
         var matched: Int = 0,
         var mismatched: Int = 0
     ) {
-        operator fun plus(increment: MatchStatus): MatchStatus {
-            return MatchStatus(
-                sourceOnly + increment.sourceOnly,
-                targetOnly + increment.targetOnly,
-                matched + increment.matched,
-                mismatched + increment.mismatched
-            )
-        }
+        val sourceTotal: Int
+            get() = sourceOnly + matched + mismatched
+        val targetTotal: Int
+            get() = targetOnly + matched + mismatched
+        val total: Int
+            get() = sourceTotal + targetOnly
     }
 }
 

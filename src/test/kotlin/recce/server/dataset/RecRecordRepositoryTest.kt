@@ -2,6 +2,7 @@ package recce.server.dataset
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Flux
@@ -49,7 +50,12 @@ class RecRecordRepositoryTest {
             .verifyComplete()
 
         StepVerifier.create(recordRepository.countMatchedByIdRecRunId(1))
-            .expectNext(RecRecordRepository.MatchStatus(1, 2, 3, 4))
+            .assertNext {
+                assertThat(it).isEqualTo(RecRecordRepository.MatchStatus(1, 2, 3, 4))
+                assertThat(it.sourceTotal).isEqualTo(8)
+                assertThat(it.targetTotal).isEqualTo(9)
+                assertThat(it.total).isEqualTo(10)
+            }
             .verifyComplete()
     }
 }
