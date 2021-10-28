@@ -18,7 +18,10 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import recce.server.dataset.*
+import recce.server.dataset.DatasetRecRunner
+import recce.server.dataset.DatasetRecService
+import recce.server.dataset.RecRun
+import recce.server.dataset.RecRunResults
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -33,7 +36,7 @@ private val testResults = RecRun(
 ).apply {
     completedTime = createdTime?.plusNanos(testCompletedDuration.toNanos())
     updatedTime = completedTime?.plusSeconds(10)
-    results = RecRunResults(DatasetResults(), DatasetResults())
+    results = RecRunResults()
 }
 
 internal class DatasetRecRunControllerTest {

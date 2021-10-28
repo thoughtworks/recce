@@ -11,6 +11,7 @@ import java.time.Instant
 
 internal class RecRunServiceTest {
 
+    private val datasetId = "my-dataset"
     private val startedRun = RecRun(1, datasetId, Instant.now())
 
     @Test
@@ -37,7 +38,7 @@ internal class RecRunServiceTest {
         val runRepository = mock<RecRunRepository> {
             on { update(any()) } doReturn Mono.just(
                 startedRun.apply {
-                    results = RecRunResults(DatasetResults(), DatasetResults())
+                    results = RecRunResults()
                 }
             )
         }
@@ -48,9 +49,5 @@ internal class RecRunServiceTest {
                 assertThat(it.results?.summary).isEqualTo(expectedMatchStatus)
             }
             .verifyComplete()
-    }
-
-    companion object {
-        private const val datasetId = "my-dataset"
     }
 }

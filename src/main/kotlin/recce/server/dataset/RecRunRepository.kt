@@ -28,12 +28,10 @@ data class RecRun(
 }
 
 data class RecRunResults(
-    val source: DatasetResults,
-    val target: DatasetResults,
+    val sourceMeta: DatasetMeta = DatasetMeta(),
+    val targetMeta: DatasetMeta = DatasetMeta(),
     var summary: RecRecordRepository.MatchStatus? = null
 )
-
-data class DatasetResults(var meta: DatasetMeta = DatasetMeta())
 
 data class DatasetMeta(val cols: List<ColMeta> = emptyList()) {
     @JsonIgnore

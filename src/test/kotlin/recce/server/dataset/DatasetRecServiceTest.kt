@@ -61,7 +61,7 @@ internal class DatasetRecServiceTest {
         )
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults(DatasetResults(), DatasetResults()))
+                assertThat(it.results).isEqualTo(RecRunResults())
             }
             .verifyComplete()
     }
@@ -76,7 +76,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults(DatasetResults(), DatasetResults()))
+                assertThat(it.results).isEqualTo(RecRunResults())
             }
             .verifyComplete()
 
@@ -96,7 +96,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults(DatasetResults(), DatasetResults()))
+                assertThat(it.results).isEqualTo(RecRunResults())
             }
             .verifyComplete()
 
@@ -116,7 +116,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults(DatasetResults(), DatasetResults()))
+                assertThat(it.results).isEqualTo(RecRunResults())
             }
             .verifyComplete()
 

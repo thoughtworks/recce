@@ -53,8 +53,8 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
                 )
                 assertThat(run.results).usingRecursiveComparison().isEqualTo(
                     RecRunResults(
-                        source = DatasetResults(expectedMeta),
-                        target = DatasetResults(expectedMeta),
+                        sourceMeta = expectedMeta,
+                        targetMeta = expectedMeta,
                         summary = RecRecordRepository.MatchStatus(1, 2, 2, 0)
                     )
                 )

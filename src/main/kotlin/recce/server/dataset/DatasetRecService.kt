@@ -39,10 +39,10 @@ open class DatasetRecService(
         loadFromSource(datasetConfig.source, recRun)
             .zipWhen(
                 { loadFromTarget(datasetConfig.target, recRun) },
-                { source: DatasetResults, target: DatasetResults -> RecRunResults(source, target) }
+                { source, target -> RecRunResults(source, target) }
             )
 
-    private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetResults> =
+    private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
         source.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
@@ -53,9 +53,9 @@ open class DatasetRecService(
             }
             .defaultIfEmpty { DatasetMeta() }
             .last()
-            .map { DatasetResults(it.invoke()) }
+            .map { it.invoke() }
 
-    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetResults> =
+    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
         target.runQuery()
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
@@ -69,5 +69,5 @@ open class DatasetRecService(
             }
             .defaultIfEmpty { DatasetMeta() }
             .last()
-            .map { DatasetResults(it.invoke()) }
+            .map { it.invoke() }
 }
