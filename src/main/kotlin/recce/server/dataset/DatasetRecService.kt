@@ -3,7 +3,6 @@ package recce.server.dataset
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import mu.KotlinLogging
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
@@ -67,9 +66,4 @@ open class DatasetRecService(
                     .map { row::meta }
             }
             .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
-
-    fun runIgnoreFailure(datasetIds: List<String>): Flux<RecRun> = Flux.fromIterable(datasetIds)
-        .filter { it.isNotEmpty() }
-        .flatMap { runFor(it) }
-        .onErrorContinue { err, it -> logger.warn(err) { "Start-up rec run failed for dataset [$it]." } } // FIXME can hang if all have errors?
 }

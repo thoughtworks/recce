@@ -113,11 +113,4 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
             .expectError(R2dbcBadGrammarException::class.java)
             .verify()
     }
-
-    @Test
-    fun `triggering multiple recs ignores failures`() {
-        StepVerifier.create(service.runIgnoreFailure(listOf("bad", "test-dataset", "bad2")))
-            .assertNext { assertThat(it.datasetId).isEqualTo("test-dataset") }
-            .verifyComplete()
-    }
 }
