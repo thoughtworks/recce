@@ -31,17 +31,9 @@ data class RecRunResults(
     val source: DatasetResults,
     val target: DatasetResults,
     var summary: RecRecordRepository.MatchStatus? = null
-) {
-    constructor(sourceRows: Long, targetRows: Long) : this(DatasetResults(sourceRows), DatasetResults(targetRows))
-}
+)
 
-data class DatasetResults(var rows: Long, var meta: DatasetMeta = DatasetMeta()) {
-    fun increment(metaSupplier: () -> DatasetMeta): DatasetResults {
-        rows++
-        if (this.meta.isEmpty()) meta = metaSupplier.invoke()
-        return this
-    }
-}
+data class DatasetResults(var meta: DatasetMeta = DatasetMeta())
 
 data class DatasetMeta(val cols: List<ColMeta> = emptyList()) {
     @JsonIgnore

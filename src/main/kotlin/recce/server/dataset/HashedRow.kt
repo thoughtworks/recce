@@ -40,6 +40,6 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
         }
     }
 
-    val meta: DatasetMeta
-        get() = DatasetMeta(rowMeta.columnMetadatas.map { dbMeta -> ColMeta(dbMeta.name, dbMeta.javaType.simpleName) })
+    fun lazyMeta(): () -> DatasetMeta =
+        { DatasetMeta(rowMeta.columnMetadatas.map { dbMeta -> ColMeta(dbMeta.name, dbMeta.javaType.simpleName) }) }
 }

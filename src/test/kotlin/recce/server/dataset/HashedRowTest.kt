@@ -48,7 +48,7 @@ internal class HashedRowTest {
                 ColMeta("test", "String")
             )
         )
-        assertThat(row.meta).usingRecursiveComparison().isEqualTo(expectedMeta)
+        assertThat(row.lazyMeta().invoke()).usingRecursiveComparison().isEqualTo(expectedMeta)
     }
 
     @Test

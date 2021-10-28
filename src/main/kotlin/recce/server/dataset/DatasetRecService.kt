@@ -49,9 +49,11 @@ open class DatasetRecService(
             .flatMap { (row, run) ->
                 recordRepository
                     .save(RecRecord(RecRecordKey(run.id!!, row.migrationKey), sourceData = row.hashedValue))
-                    .map { row::meta }
+                    .map { row.lazyMeta() }
             }
-            .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
+            .defaultIfEmpty { DatasetMeta() }
+            .last()
+            .map { DatasetResults(it.invoke()) }
 
     private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetResults> =
         target.runQuery()
@@ -63,7 +65,9 @@ open class DatasetRecService(
                     .findById(key)
                     .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
                     .switchIfEmpty(recordRepository.save(RecRecord(key, targetData = row.hashedValue)))
-                    .map { row::meta }
+                    .map { row.lazyMeta() }
             }
-            .reduce(DatasetResults(0)) { res, meta -> res.increment(meta) }
+            .defaultIfEmpty { DatasetMeta() }
+            .last()
+            .map { DatasetResults(it.invoke()) }
 }
