@@ -1,3 +1,4 @@
+forbid_telemetry: true
 config_variables:
   example-scenario:
     description: Which example scenario to run from `ls examples/scenario`
