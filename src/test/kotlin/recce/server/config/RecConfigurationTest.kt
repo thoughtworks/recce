@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test
     environments = arrayOf("test-integration"),
     propertySources = arrayOf("classpath:config/application-test-dataset.yml"),
 )
-internal class ReconciliationConfigurationTest {
+internal class RecConfigurationTest {
 
     @Inject
-    lateinit var config: ReconciliationConfiguration
+    lateinit var config: RecConfiguration
 
     @Test
     fun `should parse dataset configuration from yaml`() {

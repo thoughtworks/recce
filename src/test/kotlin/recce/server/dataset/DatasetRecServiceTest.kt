@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import recce.server.config.DataLoadDefinition
 import recce.server.config.DatasetConfiguration
-import recce.server.config.ReconciliationConfiguration
+import recce.server.config.RecConfiguration
 
 internal class DatasetRecServiceTest {
     private val testDataset = "test-dataset"
@@ -52,11 +52,10 @@ internal class DatasetRecServiceTest {
             .hasMessageContaining(testDataset)
     }
 
-
     @Test
     fun `should reconcile empty datasets without error`() {
         val service = DatasetRecService(
-            ReconciliationConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             runService,
             mock()
         )
@@ -70,7 +69,7 @@ internal class DatasetRecServiceTest {
     @Test
     fun `should reconcile source with empty target`() {
         val service = DatasetRecService(
-            ReconciliationConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
             runService,
             recordRepository
         )
@@ -90,7 +89,7 @@ internal class DatasetRecServiceTest {
         `when`(recordRepository.findById(testRecordKey)).doReturn(Mono.empty())
 
         val service = DatasetRecService(
-            ReconciliationConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
             runService,
             recordRepository
         )
@@ -110,14 +109,7 @@ internal class DatasetRecServiceTest {
         `when`(recordRepository.findById(testRecordKey)).doReturn(Mono.empty())
 
         val service = DatasetRecService(
-            ReconciliationConfiguration(
-                mapOf(
-                    testDataset to DatasetConfiguration(
-                        singleRowDataLoad,
-                        singleRowDataLoad
-                    )
-                )
-            ),
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
             runService,
             recordRepository
         )
@@ -132,5 +124,4 @@ internal class DatasetRecServiceTest {
         verify(recordRepository).save(RecRecord(testRecordKey, targetData = "def"))
         verify(runService).complete(recRun)
     }
-
 }

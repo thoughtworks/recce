@@ -11,7 +11,7 @@ interface PostConstructable {
 }
 
 @ConfigurationProperties("reconciliation")
-class ReconciliationConfiguration
+class RecConfiguration
 @ConfigurationInject constructor(val datasets: Map<String, DatasetConfiguration>) : PostConstructable {
 
     @PostConstruct

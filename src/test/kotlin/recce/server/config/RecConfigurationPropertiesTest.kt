@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 // Faster tests that do not load the full configuration and are quicker to iterate on when testing
 // configuration binding
-internal class ReconciliationConfigurationPropertiesTest {
+internal class RecConfigurationPropertiesTest {
 
     private val items = HashMap<String, Any>()
 
@@ -30,7 +30,7 @@ internal class ReconciliationConfigurationPropertiesTest {
     fun `should parse from properties`() {
         val ctx = ApplicationContext.run(items)
 
-        Assertions.assertThat(ctx.getBean(ReconciliationConfiguration::class.java).datasets.values)
+        Assertions.assertThat(ctx.getBean(RecConfiguration::class.java).datasets.values)
             .hasSize(1)
             .first().satisfies {
                 Assertions.assertThat(it.name).isEqualTo("test-dataset")
@@ -49,7 +49,7 @@ internal class ReconciliationConfigurationPropertiesTest {
 
         val ctx = ApplicationContext.run(items)
 
-        Assertions.assertThatThrownBy { ctx.getBean(ReconciliationConfiguration::class.java) }
+        Assertions.assertThatThrownBy { ctx.getBean(RecConfiguration::class.java) }
             .isExactlyInstanceOf(BeanInstantiationException::class.java)
             .hasCauseExactlyInstanceOf(ConfigurationException::class.java)
             .hasMessageContaining("non-existent-datasource")

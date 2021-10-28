@@ -8,7 +8,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import recce.server.config.DataLoadDefinition
 import recce.server.config.DatasetConfiguration
-import recce.server.config.ReconciliationConfiguration
+import recce.server.config.RecConfiguration
 
 private val logger = KotlinLogging.logger {}
 
@@ -18,7 +18,7 @@ interface DatasetRecRunner {
 
 @Singleton
 open class DatasetRecService(
-    @Inject private val config: ReconciliationConfiguration,
+    @Inject private val config: RecConfiguration,
     private val runService: RecRunService,
     private val recordRepository: RecRecordRepository
 ) : DatasetRecRunner {

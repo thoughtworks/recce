@@ -35,9 +35,11 @@ internal class RecRunServiceTest {
         }
 
         val runRepository = mock<RecRunRepository> {
-            on { update(any()) } doReturn Mono.just(startedRun.apply {
-                results = RecRunResults(DatasetResults(), DatasetResults())
-            })
+            on { update(any()) } doReturn Mono.just(
+                startedRun.apply {
+                    results = RecRunResults(DatasetResults(), DatasetResults())
+                }
+            )
         }
 
         StepVerifier.create(RecRunService(runRepository, recordRepository).complete(startedRun))
