@@ -18,7 +18,7 @@ group = "recce.server"
 // Workaround to allow dependabot to update the micronaut version, since dependabot
 // doesn't understand the micronaut plugin DSL
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.1.1",
+    "micronaut" to "io.micronaut:micronaut-core:3.1.3",
     "exposed" to "org.jetbrains.exposed:exposed-core:0.36.1",
     "restAssured" to "io.rest-assured:rest-assured:4.4.0",
 )
