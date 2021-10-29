@@ -9,9 +9,10 @@ import io.micronaut.validation.Validated
 import jakarta.inject.Inject
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
+import recce.server.dataset.DatasetMeta
 import recce.server.dataset.DatasetRecRunner
+import recce.server.dataset.MatchStatus
 import recce.server.dataset.RecRun
-import recce.server.dataset.RecRunResults
 import java.time.Duration
 import java.time.Instant
 import javax.validation.Valid
@@ -37,14 +38,18 @@ class DatasetRecRunController(@Inject private val runner: DatasetRecRunner) {
         val datasetId: String,
         val createdTime: Instant,
         val completedTime: Instant,
-        val results: RecRunResults,
+        val sourceMeta: DatasetMeta,
+        val targetMeta: DatasetMeta,
+        val summary: MatchStatus?
     ) {
         constructor(run: RecRun) : this(
             id = run.id!!,
             datasetId = run.datasetId,
             createdTime = run.createdTime!!,
             completedTime = run.completedTime!!,
-            results = run.results!!
+            sourceMeta = run.sourceMeta,
+            targetMeta = run.targetMeta,
+            summary = run.summary
         )
 
         @get:JsonProperty("completedDurationSeconds")

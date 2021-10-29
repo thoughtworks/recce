@@ -29,7 +29,9 @@ internal class DatasetRecServiceTest {
         on { runQuery() } doReturn Flux.empty()
     }
 
-    private val mockMeta = mock<RowMetadata>()
+    private val mockMeta = mock<RowMetadata> {
+        on { columnMetadatas } doReturn listOf(TestR2dbcColumnMetadata("col1", String::class.java))
+    }
 
     private val singleRowResult = mock<io.r2dbc.spi.Result> {
         on { map<HashedRow>(any()) } doReturn Flux.just(HashedRow("abc", "def", mockMeta))
@@ -61,7 +63,8 @@ internal class DatasetRecServiceTest {
         )
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults())
+                assertThat(it.sourceMeta.cols).isEmpty()
+                assertThat(it.targetMeta.cols).isEmpty()
             }
             .verifyComplete()
     }
@@ -76,7 +79,8 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults())
+                assertThat(it.sourceMeta.cols).isNotEmpty
+                assertThat(it.targetMeta.cols).isEmpty()
             }
             .verifyComplete()
 
@@ -96,7 +100,8 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults())
+                assertThat(it.sourceMeta.cols).isEmpty()
+                assertThat(it.targetMeta.cols).isNotEmpty
             }
             .verifyComplete()
 
@@ -116,7 +121,8 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
-                assertThat(it.results).isEqualTo(RecRunResults())
+                assertThat(it.sourceMeta.cols).isNotEmpty
+                assertThat(it.targetMeta.cols).isNotEmpty
             }
             .verifyComplete()
 

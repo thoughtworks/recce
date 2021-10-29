@@ -30,15 +30,16 @@ internal class RecRunServiceTest {
 
     @Test
     fun `complete should set completed time`() {
-        val expectedMatchStatus = RecRecordRepository.MatchStatus(1, 1, 1, 1)
-        val recordRepository = mock<RecRecordRepository>() {
+        val expectedMatchStatus = MatchStatus(1, 1, 1, 1)
+        val recordRepository = mock<RecRecordRepository> {
             on { countMatchedByIdRecRunId(any()) } doReturn Mono.just(expectedMatchStatus)
         }
 
         val runRepository = mock<RecRunRepository> {
             on { update(any()) } doReturn Mono.just(
                 startedRun.apply {
-                    results = RecRunResults()
+                    sourceMeta = DatasetMeta()
+                    targetMeta = DatasetMeta()
                 }
             )
         }
@@ -46,7 +47,7 @@ internal class RecRunServiceTest {
         StepVerifier.create(RecRunService(runRepository, recordRepository).complete(startedRun))
             .assertNext {
                 assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
-                assertThat(it.results?.summary).isEqualTo(expectedMatchStatus)
+                assertThat(it.summary).isEqualTo(expectedMatchStatus)
             }
             .verifyComplete()
     }

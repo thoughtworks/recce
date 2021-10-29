@@ -58,20 +58,6 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
                 GROUP BY $statusColumnName;
             """.trimIndent()
     }
-
-    data class MatchStatus(
-        var sourceOnly: Int = 0,
-        var targetOnly: Int = 0,
-        var bothMatched: Int = 0,
-        var bothMismatched: Int = 0
-    ) {
-        val sourceTotal: Int
-            get() = sourceOnly + bothMatched + bothMismatched
-        val targetTotal: Int
-            get() = targetOnly + bothMatched + bothMismatched
-        val total: Int
-            get() = sourceTotal + targetOnly
-    }
 }
 
 @Entity

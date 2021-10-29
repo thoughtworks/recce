@@ -1,6 +1,5 @@
 package recce.server.dataset
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
 import io.micronaut.data.model.query.builder.sql.Dialect
@@ -20,22 +19,36 @@ data class RecRun(
     @DateCreated val createdTime: Instant? = null,
     @DateUpdated var updatedTime: Instant? = null,
     var completedTime: Instant? = null,
+    @Embedded var summary: MatchStatus? = null
 ) {
     constructor(datasetId: String) : this(null, datasetId)
 
     @Transient
-    var results: RecRunResults? = null
+    var sourceMeta: DatasetMeta = DatasetMeta()
+    @Transient
+    var targetMeta: DatasetMeta = DatasetMeta()
 }
 
-data class RecRunResults(
-    val sourceMeta: DatasetMeta = DatasetMeta(),
-    val targetMeta: DatasetMeta = DatasetMeta(),
-    var summary: RecRecordRepository.MatchStatus? = null
-)
-
-data class DatasetMeta(val cols: List<ColMeta> = emptyList()) {
-    @JsonIgnore
-    fun isEmpty() = cols.isEmpty()
-}
+data class DatasetMeta(val cols: List<ColMeta> = emptyList())
 
 data class ColMeta(val name: String, val javaType: String)
+
+@Embeddable
+data class MatchStatus(
+    var sourceOnly: Int = 0,
+    var targetOnly: Int = 0,
+    var bothMatched: Int = 0,
+    var bothMismatched: Int = 0
+) {
+    @get:Transient
+    val sourceTotal: Int
+        get() = sourceOnly + bothMatched + bothMismatched
+
+    @get:Transient
+    val targetTotal: Int
+        get() = targetOnly + bothMatched + bothMismatched
+
+    @get:Transient
+    val total: Int
+        get() = sourceTotal + targetOnly
+}

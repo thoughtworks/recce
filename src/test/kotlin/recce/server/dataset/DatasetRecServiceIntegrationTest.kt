@@ -34,16 +34,20 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
         runRepository.deleteAll().block()
     }
 
+    private fun checkPersistentFieldsFor(run: RecRun) {
+        assertThat(run.id).isNotNull
+        assertThat(run.datasetId).isEqualTo("test-dataset")
+        assertThat(run.createdTime).isNotNull
+        assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
+        assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+        assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
+    }
+
     @Test
     fun `can run a simple reconciliation`() {
         StepVerifier.create(service.runFor("test-dataset"))
             .assertNext { run ->
-                assertThat(run.id).isNotNull
-                assertThat(run.datasetId).isEqualTo("test-dataset")
-                assertThat(run.createdTime).isNotNull
-                assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
-                assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
-
+                checkPersistentFieldsFor(run)
                 val expectedMeta = DatasetMeta(
                     listOf(
                         ColMeta("MIGRATIONKEY", "String"),
@@ -51,13 +55,8 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
                         ColMeta("VALUE", "String")
                     )
                 )
-                assertThat(run.results).usingRecursiveComparison().isEqualTo(
-                    RecRunResults(
-                        sourceMeta = expectedMeta,
-                        targetMeta = expectedMeta,
-                        summary = RecRecordRepository.MatchStatus(1, 2, 2, 0)
-                    )
-                )
+                assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+                assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
             }
             .verifyComplete()
 
@@ -68,7 +67,7 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
                 }
         )
             .assertNext { (run, record) ->
-                assertThat(run.datasetId).isEqualTo("test-dataset")
+                checkPersistentFieldsFor(run)
                 assertThat(record.id.recRunId).isEqualTo(run.id)
                 assertThat(record.id.migrationKey).isEqualTo("Test0")
                 assertThat(record.sourceData).isEqualTo("4e92a72630647a5bc6fc3909b52387e6dd6e4466fc7bcceb7439fd6df18fe866")

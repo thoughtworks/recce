@@ -18,14 +18,14 @@ class RecRecordRepositoryTest {
     lateinit var recordRepository: RecRecordRepository
 
     @BeforeEach
-    fun tearDown() {
+    fun setup() {
         runRepository.deleteAll().block()
     }
 
     @Test
     fun `should count matches when empty`() {
         StepVerifier.create(recordRepository.countMatchedByIdRecRunId(1))
-            .expectNext(RecRecordRepository.MatchStatus())
+            .expectNext(MatchStatus())
             .verifyComplete()
     }
 
@@ -51,7 +51,7 @@ class RecRecordRepositoryTest {
 
         StepVerifier.create(recordRepository.countMatchedByIdRecRunId(1))
             .assertNext {
-                assertThat(it).isEqualTo(RecRecordRepository.MatchStatus(1, 2, 3, 4))
+                assertThat(it).isEqualTo(MatchStatus(1, 2, 3, 4))
                 assertThat(it.sourceTotal).isEqualTo(8)
                 assertThat(it.targetTotal).isEqualTo(9)
                 assertThat(it.total).isEqualTo(10)

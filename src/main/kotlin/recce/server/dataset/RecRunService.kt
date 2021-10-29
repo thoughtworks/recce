@@ -19,7 +19,7 @@ open class RecRunService(
 
     fun complete(run: RecRun): Mono<RecRun> {
         return recordRepository.countMatchedByIdRecRunId(run.id!!)
-            .map { run.apply { completedTime = Instant.now(); results?.summary = it } }
+            .map { run.apply { completedTime = Instant.now(); summary = it } }
             .flatMap(runRepository::update)
             .doOnNext { logger.info { "Run completed for $it" } }
     }

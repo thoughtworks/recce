@@ -31,16 +31,20 @@ open class DatasetRecService(
         val recRun = runService.start(datasetId)
 
         return loadFromSourceThenTarget(datasetConfig, recRun)
-            .flatMap { runResults -> recRun.map { it.apply { results = runResults } } }
-            .flatMap { runService.complete(it) }
+            .flatMap { (source, target) ->
+                recRun.map {
+                    it.apply {
+                        sourceMeta = source
+                        targetMeta = target
+                    }
+                }
+            }
+            .flatMap { run -> runService.complete(run) }
     }
 
     private fun loadFromSourceThenTarget(datasetConfig: DatasetConfiguration, recRun: Mono<RecRun>) =
         loadFromSource(datasetConfig.source, recRun)
-            .zipWhen(
-                { loadFromTarget(datasetConfig.target, recRun) },
-                { source, target -> RecRunResults(source, target) }
-            )
+            .zipWhen { loadFromTarget(datasetConfig.target, recRun) }
 
     private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
         source.runQuery()

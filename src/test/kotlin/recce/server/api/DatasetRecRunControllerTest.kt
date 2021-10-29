@@ -21,7 +21,6 @@ import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecRunner
 import recce.server.dataset.DatasetRecService
 import recce.server.dataset.RecRun
-import recce.server.dataset.RecRunResults
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -36,7 +35,6 @@ private val testResults = RecRun(
 ).apply {
     completedTime = createdTime?.plusNanos(testCompletedDuration.toNanos())
     updatedTime = completedTime?.plusSeconds(10)
-    results = RecRunResults()
 }
 
 internal class DatasetRecRunControllerTest {
@@ -50,12 +48,7 @@ internal class DatasetRecRunControllerTest {
     fun `controller should delegate to service`() {
         StepVerifier.create(controller.create(DatasetRecRunController.RunCreationParams(eq(testDataset))))
             .assertNext {
-                assertThat(it.id).isEqualTo(testResults.id)
-                assertThat(it.datasetId).isEqualTo(testResults.datasetId)
-                assertThat(it.createdTime).isEqualTo(testResults.createdTime)
-                assertThat(it.completedTime).isEqualTo(testResults.completedTime)
-                assertThat(it.completedDuration).isEqualTo(testCompletedDuration)
-                assertThat(it.results).isEqualTo(testResults.results)
+                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
             }
             .verifyComplete()
     }
