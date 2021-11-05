@@ -20,6 +20,9 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecRunner
 import recce.server.dataset.DatasetRecService
+import recce.server.recrun.ColMeta
+import recce.server.recrun.DatasetMeta
+import recce.server.recrun.MatchStatus
 import recce.server.recrun.RecRun
 import java.time.Duration
 import java.time.LocalDateTime
@@ -35,6 +38,9 @@ private val testResults = RecRun(
 ).apply {
     completedTime = createdTime?.plusNanos(testCompletedDuration.toNanos())
     updatedTime = completedTime?.plusSeconds(10)
+    sourceMeta = DatasetMeta(listOf(ColMeta("test1", "String")))
+    targetMeta = DatasetMeta(listOf(ColMeta("test1", "String")))
+    summary = MatchStatus(1, 2, 3, 4)
 }
 
 internal class DatasetRecRunControllerTest {
@@ -74,6 +80,17 @@ internal class DatasetRecRunControllerApiTest {
             body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.createdTime)))
             body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.completedTime)))
             body("completedDurationSeconds", closeTo(testCompletedDuration.toSeconds().toDouble(), 0.00001))
+            body("sourceMeta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
+            body("targetMeta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
+            body("summary", equalTo(mapOf(
+                "sourceOnly" to 1,
+                "targetOnly" to 2,
+                "bothMatched" to 3,
+                "bothMismatched" to 4,
+                "sourceTotal" to 8,
+                "targetTotal" to 9,
+                "total" to 10,
+            )))
         }
     }
 
