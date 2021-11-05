@@ -1,5 +1,6 @@
 package recce.server.dataset
 
+import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import recce.server.RecConfiguration
 import recce.server.recrun.*
+import java.util.function.BiFunction
 
 internal class DatasetRecServiceTest {
     private val testDataset = "test-dataset"
@@ -33,7 +35,7 @@ internal class DatasetRecServiceTest {
     }
 
     private val singleRowResult = mock<io.r2dbc.spi.Result> {
-        on { map<HashedRow>(any()) } doReturn Flux.just(HashedRow("abc", "def", mockMeta))
+        on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.just(HashedRow("abc", "def", mockMeta))
     }
 
     private val singleRowDataLoad = mock<DataLoadDefinition> {

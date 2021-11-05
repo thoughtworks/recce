@@ -42,6 +42,15 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
         assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
         assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
         assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
+        val expectedMeta = DatasetMeta(
+            listOf(
+                ColMeta("MIGRATIONKEY", "String"),
+                ColMeta("NAME", "String"),
+                ColMeta("VALUE", "String")
+            )
+        )
+        assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+        assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
     }
 
     @Test
@@ -49,15 +58,6 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
         StepVerifier.create(service.runFor("test-dataset"))
             .assertNext { run ->
                 checkPersistentFieldsFor(run)
-                val expectedMeta = DatasetMeta(
-                    listOf(
-                        ColMeta("MIGRATIONKEY", "String"),
-                        ColMeta("NAME", "String"),
-                        ColMeta("VALUE", "String")
-                    )
-                )
-                assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
-                assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
             }
             .verifyComplete()
 

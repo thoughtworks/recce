@@ -1,10 +1,17 @@
 package recce.server.recrun
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import io.micronaut.core.convert.ConversionContext
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated
+import io.micronaut.data.annotation.TypeDef
+import io.micronaut.data.model.DataType
 import io.micronaut.data.model.query.builder.sql.Dialect
+import io.micronaut.data.model.runtime.convert.AttributeConverter
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.repository.reactive.ReactorCrudRepository
+import jakarta.inject.Singleton
 import java.time.Instant
 import javax.persistence.*
 
@@ -23,15 +30,9 @@ data class RecRun(
 ) {
     constructor(datasetId: String) : this(null, datasetId)
 
-    @Transient
-    var sourceMeta: DatasetMeta = DatasetMeta()
-    @Transient
-    var targetMeta: DatasetMeta = DatasetMeta()
+    @Embedded var sourceMeta: DatasetMeta = DatasetMeta()
+    @Embedded var targetMeta: DatasetMeta = DatasetMeta()
 }
-
-data class DatasetMeta(val cols: List<ColMeta> = emptyList())
-
-data class ColMeta(val name: String, val javaType: String)
 
 @Embeddable
 data class MatchStatus(
@@ -51,4 +52,33 @@ data class MatchStatus(
     @get:Transient
     val total: Int
         get() = sourceTotal + targetOnly
+}
+
+@Embeddable
+@Suppress("JpaAttributeTypeInspection") // False positive
+data class DatasetMeta(@field:TypeDef(type = DataType.STRING, converter = ColsConverter::class) var cols: List<ColMeta> = emptyList())
+
+data class ColMeta(val name: String, val javaType: String)
+
+/**
+ * This manual conversion to JSON was required because it was not possible at time of writing to bind JSON types
+ * automatically, as theoretically should be possible with Micronaut Data and R2DBC per
+ * https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlJsonType
+ *
+ * On H2, The JsonCode is not present in 0.8.x and required a bump to 0.9 Milestone releases which didn't have stable
+ * drivers for Postgres. On Postgres there is then something wrong with the binding.
+ *
+ * It should be possible to remove this and replace the TypeDef with type = DataType.JSON at some point.
+ */
+@Singleton
+class ColsConverter : AttributeConverter<List<ColMeta>, String?> {
+    private val objectMapper = jacksonObjectMapper()
+
+    override fun convertToPersistedValue(entityValue: List<ColMeta>?, context: ConversionContext): String? {
+        return objectMapper.writeValueAsString(entityValue ?: emptyList<ColMeta>())
+    }
+
+    override fun convertToEntityValue(persistedValue: String?, context: ConversionContext): List<ColMeta>? {
+        return if (persistedValue == null) emptyList() else objectMapper.readValue(persistedValue)
+    }
 }

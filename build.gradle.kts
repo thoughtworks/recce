@@ -53,6 +53,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
     implementation("com.google.guava:guava:31.0.1-jre")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.5")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
