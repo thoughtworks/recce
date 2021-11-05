@@ -24,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 @Controller("/runs")
 class DatasetRecRunController(
     @Inject private val runner: DatasetRecRunner,
-    val runRepository: RecRunRepository
+    private val runRepository: RecRunRepository
 ) {
     @Get(uri = "/{runId}")
     fun get(runId: Int): Mono<CompletedRun> {
@@ -32,7 +32,7 @@ class DatasetRecRunController(
     }
 
     @Get
-    fun get(@QueryValue datasetId: String): Flux<CompletedRun> {
+    fun get(@QueryValue("datasetId") datasetId: String): Flux<CompletedRun> {
         return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { CompletedRun(it) }
     }
 
