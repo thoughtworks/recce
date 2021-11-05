@@ -12,9 +12,8 @@ import org.mockito.kotlin.verify
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import recce.server.config.DataLoadDefinition
-import recce.server.config.DatasetConfiguration
-import recce.server.config.RecConfiguration
+import recce.server.RecConfiguration
+import recce.server.recrun.*
 
 internal class DatasetRecServiceTest {
     private val testDataset = "test-dataset"

@@ -11,7 +11,9 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
+import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
+import recce.server.recrun.ColMeta
+import recce.server.recrun.DatasetMeta
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.Instant

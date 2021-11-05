@@ -1,4 +1,4 @@
-package recce.server.config
+package recce.server.dataset
 
 import io.micronaut.context.BeanLocator
 import io.micronaut.context.exceptions.ConfigurationException

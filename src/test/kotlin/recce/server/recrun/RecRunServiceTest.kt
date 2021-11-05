@@ -1,4 +1,4 @@
-package recce.server.dataset
+package recce.server.recrun
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

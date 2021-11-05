@@ -1,4 +1,4 @@
-package recce.server.config
+package recce.server.dataset.datasource
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.data.r2dbc.operations.R2dbcOperations

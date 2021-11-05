@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecRunner
 import recce.server.dataset.DatasetRecService
-import recce.server.dataset.RecRun
+import recce.server.recrun.RecRun
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset

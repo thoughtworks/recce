@@ -1,4 +1,4 @@
-package recce.server.config
+package recce.server.dataset.datasource
 
 import jakarta.inject.Inject
 import jakarta.inject.Named

@@ -12,7 +12,8 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
 import reactor.util.function.Tuples
-import recce.server.config.DataSourceTest
+import recce.server.dataset.datasource.DataSourceTest
+import recce.server.recrun.*
 
 @MicronautTest(
     environments = arrayOf("test-integration"),

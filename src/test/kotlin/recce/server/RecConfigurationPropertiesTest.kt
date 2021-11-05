@@ -1,4 +1,4 @@
-package recce.server.config
+package recce.server
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.exceptions.BeanInstantiationException

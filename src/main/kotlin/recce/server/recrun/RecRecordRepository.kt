@@ -1,4 +1,4 @@
-package recce.server.dataset
+package recce.server.recrun
 
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository

@@ -1,4 +1,4 @@
-package recce.server.dataset
+package recce.server.recrun
 
 import io.micronaut.data.annotation.DateCreated
 import io.micronaut.data.annotation.DateUpdated

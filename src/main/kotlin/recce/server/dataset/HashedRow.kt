@@ -3,7 +3,9 @@ package recce.server.dataset
 import com.google.common.hash.Hashing
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
-import recce.server.config.DataLoadDefinition.Companion.migrationKeyColumnName
+import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
+import recce.server.recrun.ColMeta
+import recce.server.recrun.DatasetMeta
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 

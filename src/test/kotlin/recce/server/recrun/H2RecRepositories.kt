@@ -1,4 +1,4 @@
-package recce.server.dataset
+package recce.server.recrun
 
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.data.model.query.builder.sql.Dialect

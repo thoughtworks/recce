@@ -1,4 +1,4 @@
-package recce.server.config
+package recce.server.dataset
 
 import io.micronaut.context.BeanLocator
 import io.micronaut.context.exceptions.ConfigurationException
@@ -6,6 +6,7 @@ import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.inject.qualifiers.Qualifiers
 import io.r2dbc.spi.Result
 import reactor.core.publisher.Flux
+import recce.server.PostConstructable
 import javax.validation.constraints.NotBlank
 
 class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val query: String) : PostConstructable {

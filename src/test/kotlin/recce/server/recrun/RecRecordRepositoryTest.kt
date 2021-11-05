@@ -1,4 +1,4 @@
-package recce.server.dataset
+package recce.server.recrun
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject

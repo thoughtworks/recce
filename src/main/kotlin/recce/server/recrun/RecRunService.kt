@@ -1,4 +1,4 @@
-package recce.server.dataset
+package recce.server.recrun
 
 import jakarta.inject.Singleton
 import mu.KotlinLogging
