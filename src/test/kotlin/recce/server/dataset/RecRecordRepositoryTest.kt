@@ -45,11 +45,13 @@ class RecRecordRepositoryTest {
                 }
         }
 
+        val savedRecords = mutableListOf<RecRecord>()
         StepVerifier.create(setup)
+            .recordWith { savedRecords }
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
 
-        StepVerifier.create(recordRepository.countMatchedByIdRecRunId(1))
+        StepVerifier.create(recordRepository.countMatchedByIdRecRunId(savedRecords.last().id.recRunId))
             .assertNext {
                 assertThat(it).isEqualTo(MatchStatus(1, 2, 3, 4))
                 assertThat(it.sourceTotal).isEqualTo(8)
