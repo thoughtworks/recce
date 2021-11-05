@@ -42,6 +42,9 @@ containers:
       - local: .
         container: /code
       - type: cache
+        name: gradle-working-dir
+        container: /code/.gradle
+      - type: cache
         name: gradle-cache
         container: /root/.gradle
     working_directory: /code
