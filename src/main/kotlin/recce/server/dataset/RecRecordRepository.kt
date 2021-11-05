@@ -15,10 +15,10 @@ import javax.persistence.*
 abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     ReactorCrudRepository<RecRecord, RecRecordKey> {
 
-    abstract fun findByIdRecRunId(id: Int): Flux<RecRecord>
+    abstract fun findByIdRecRunId(recRunId: Int): Flux<RecRecord>
 
-    fun countMatchedByIdRecRunId(id: Int): Mono<MatchStatus> {
-        return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", id).execute() }
+    fun countMatchedByIdRecRunId(recRunId: Int): Mono<MatchStatus> {
+        return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute() }
             .toFlux()
             .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
             .reduce(MatchStatus()) { status, propSet -> propSet.invoke(status); status }
