@@ -82,15 +82,20 @@ internal class DatasetRecRunControllerApiTest {
             body("completedDurationSeconds", closeTo(testCompletedDuration.toSeconds().toDouble(), 0.00001))
             body("sourceMeta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
             body("targetMeta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
-            body("summary", equalTo(mapOf(
-                "sourceOnly" to 1,
-                "targetOnly" to 2,
-                "bothMatched" to 3,
-                "bothMismatched" to 4,
-                "sourceTotal" to 8,
-                "targetTotal" to 9,
-                "total" to 10,
-            )))
+            body(
+                "summary",
+                equalTo(
+                    mapOf(
+                        "sourceOnly" to 1,
+                        "targetOnly" to 2,
+                        "bothMatched" to 3,
+                        "bothMismatched" to 4,
+                        "sourceTotal" to 8,
+                        "targetTotal" to 9,
+                        "total" to 10,
+                    )
+                )
+            )
         }
     }
 
