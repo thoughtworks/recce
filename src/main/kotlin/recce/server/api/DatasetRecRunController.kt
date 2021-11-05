@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
@@ -13,6 +14,7 @@ import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.DatasetMeta
 import recce.server.recrun.MatchStatus
 import recce.server.recrun.RecRun
+import recce.server.recrun.RecRunRepository
 import java.time.Duration
 import java.time.Instant
 import javax.validation.Valid
@@ -22,7 +24,15 @@ private val logger = KotlinLogging.logger {}
 
 @Validated
 @Controller("/runs")
-class DatasetRecRunController(@Inject private val runner: DatasetRecRunner) {
+class DatasetRecRunController(
+    @Inject private val runner: DatasetRecRunner,
+    val runRepository: RecRunRepository
+) {
+    @Get(uri = "/{runId}")
+    fun get(runId: Int): Mono<CompletedRun> {
+        return runRepository.findById(runId).map { CompletedRun(it) }
+    }
+
     @Post
     fun create(@Body @Valid params: RunCreationParams): Mono<CompletedRun> {
         logger.info { "Received request to create run for $params" }
