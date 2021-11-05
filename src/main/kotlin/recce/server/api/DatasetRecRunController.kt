@@ -2,13 +2,11 @@ package recce.server.api
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
-import io.micronaut.http.annotation.Body
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.*
 import io.micronaut.validation.Validated
 import jakarta.inject.Inject
 import mu.KotlinLogging
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.DatasetMeta
@@ -31,6 +29,11 @@ class DatasetRecRunController(
     @Get(uri = "/{runId}")
     fun get(runId: Int): Mono<CompletedRun> {
         return runRepository.findById(runId).map { CompletedRun(it) }
+    }
+
+    @Get
+    fun get(@QueryValue datasetId: String): Flux<CompletedRun> {
+        return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { CompletedRun(it) }
     }
 
     @Post

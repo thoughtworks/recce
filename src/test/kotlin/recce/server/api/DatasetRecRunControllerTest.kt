@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecRunner
@@ -50,6 +51,7 @@ private val service = mock<DatasetRecRunner> {
 private val runRepository = mock<RecRunRepository> {
     on { findById(testResults.id!!) } doReturn Mono.just(testResults)
     on { findById(notFoundId) } doReturn Mono.empty()
+    on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
 }
 
 internal class DatasetRecRunControllerTest {
@@ -58,6 +60,18 @@ internal class DatasetRecRunControllerTest {
     @Test
     fun `can get run by id`() {
         StepVerifier.create(controller.get(testResults.id!!))
+            .assertNext {
+                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
+            }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `can get runs by dataset id`() {
+        StepVerifier.create(controller.get(testDataset))
+            .assertNext {
+                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
+            }
             .assertNext {
                 assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
             }
