@@ -15,12 +15,14 @@ plugins {
 version = "0.1"
 group = "recce.server"
 
-// Workaround to allow dependabot to update the micronaut version, since dependabot
-// doesn't understand the micronaut plugin DSL
+// Workaround to allow dependabot to update versions of libraries together, since dependabot doesn't understand
+// the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
+// and use this to bump the others consistently.
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.1.3",
     "exposed" to "org.jetbrains.exposed:exposed-core:0.36.1",
     "restAssured" to "io.rest-assured:rest-assured:4.4.0",
+    "mockito" to "org.mockito:mockito-core:4.0.0", // Unfortunately not all Mockito libs are not in the Micronaut BOM
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "16",
@@ -79,10 +81,10 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.mockito:mockito-core")
-    testImplementation("org.mockito:mockito-inline:4.0.0")
-    testImplementation("org.mockito:mockito-junit-jupiter")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    testImplementation("org.mockito:mockito-core:${depVersions["mockito"]}")
+    testImplementation("org.mockito:mockito-inline:${depVersions["mockito"]}")
+    testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:${depVersions["mockito"]}")
     testImplementation("io.projectreactor:reactor-test:3.4.11")
 
     testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
@@ -99,7 +101,7 @@ dependencies {
     testImplementation("org.testcontainers:mysql")
     testRuntimeOnly("mysql:mysql-connector-java")
     testImplementation("org.testcontainers:mssqlserver")
-    testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.0.jre16")
+    testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")
