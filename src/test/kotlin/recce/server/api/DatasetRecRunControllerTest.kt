@@ -25,6 +25,7 @@ import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.*
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -59,7 +60,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `incomplete runs don't have duration`() {
-        assertThat(DatasetRecRunController.RunApiModel(testResults.apply { completedTime = null }).completedDuration)
+        assertThat(DatasetRecRunController.RunApiModel(RecRun(1, "empty", Instant.now())).completedDuration)
             .isNull()
     }
 
