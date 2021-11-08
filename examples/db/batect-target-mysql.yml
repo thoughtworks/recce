@@ -20,6 +20,7 @@ containers:
       FLYWAY_USER: <{db-user}
       FLYWAY_PASSWORD: <{db-password}
       FLYWAY_CONNECT_RETRIES: 60
+      FLYWAY_EDITION: community
     command: clean migrate
     dependencies:
       - target-db
