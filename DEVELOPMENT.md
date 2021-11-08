@@ -10,23 +10,22 @@ To get started work on Recce:
 * **Build** Lint, Test and compile
     ```shell
     ./gradlew build
+    ./batect build # Alternative within container. Will be slower, but perhaps cleaner.
     ```
 * **Run** Recce within a container with an [example scenario](examples/README.md) against a source/target DB
     ```shell
-    ./batect recce
+    ./batect run
     ```
-* **Run** A DB to use with Recce locally
+* **Build a Docker image** locally and run it with an [example scenario](examples/README.md) a
+    ```shell
+    ./gradlew jibDockerBuild && ./batect run-docker-prebuilt
+    ```
+* **Run** A DB on its own to use with Recce locally
     ```shell
     ./batect db
     ./gradlew run # or run/debug `RecceServer.kt` from your IDE
     ```
-* **Build a Docker image** locally and run it
-    ```shell
-    ./gradlew jibDockerBuild
-    ./batect db
-    docker run -e DATABASE_HOST=host.docker.internal -p 8080:8080 recce/recce-server
-    ```
-
+ 
 ## Technical Overview
 
 Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application written in [Kotlin](https://kotlinlang.org/) using a broadly reactive asynchronous style using [Project Reactor](https://projectreactor.io/).
