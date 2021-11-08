@@ -1,0 +1,35 @@
+containers:
+  target-db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: <{db-name}
+      POSTGRES_USER: <{db-user}
+      POSTGRES_PASSWORD: <{db-password}
+    ports:
+      - local: 8001
+        container: 5432
+    volumes:
+      - type: cache
+        name: target-db-postgres
+        container: /var/lib/postgresql/data
+  target-flyway-postgres:
+    image: flyway/flyway:7-alpine
+    environment:
+      FLYWAY_URL: jdbc:postgresql://target-db:5432/<{db-name}
+      FLYWAY_USER: <{db-user}
+      FLYWAY_PASSWORD: <{db-password}
+      FLYWAY_CONNECT_RETRIES: 60
+      FLYWAY_EDITION: community
+    command: clean migrate
+    dependencies:
+      - target-db
+    volumes:
+      - local: ../scenario/<{example-scenario}/target
+        container: /flyway/sql
+        options: ro
+tasks:
+  migrate-target-postgres:
+    description: Start and populate a target postgres DB from `config_variables.example-scenario`
+    group: db
+    run:
+      container: target-flyway-postgres
