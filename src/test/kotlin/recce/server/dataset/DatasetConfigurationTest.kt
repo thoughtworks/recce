@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test
 internal class DatasetConfigurationTest {
 
     @Test
-    fun `should produce short descriptor`() {
+    fun `should produce datasource descriptor`() {
         val conf =
             DatasetConfiguration(
                 DataLoadDefinition("source", "blah"),
                 DataLoadDefinition("target", "blah")
-            ).apply { name = "my-dataset" }
-        assertThat(conf.shortDescriptor)
-            .isEqualTo("my-dataset(source->target")
+            )
+        assertThat(conf.datasourceDescriptor)
+            .isEqualTo("(source -> target)")
     }
 }

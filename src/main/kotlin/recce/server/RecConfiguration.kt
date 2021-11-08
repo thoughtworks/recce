@@ -25,6 +25,9 @@ class RecConfiguration
             config.name = name
             config.populate(locator)
         }
-        logger.info { "Loaded ${datasets.size} datasets available for triggering: ${datasets.values.map { it.shortDescriptor }} " }
+        logger.info {
+            "Loaded ${datasets.size} datasets available for triggering: " +
+                "${datasets.values.groupBy { it.datasourceDescriptor }.toSortedMap()} "
+        }
     }
 }
