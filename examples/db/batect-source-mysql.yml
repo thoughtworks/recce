@@ -20,7 +20,7 @@ containers:
       FLYWAY_USER: <{db-user}
       FLYWAY_PASSWORD: <{db-password}
       FLYWAY_CONNECT_RETRIES: 60
-    command: migrate
+    command: clean migrate
     dependencies:
       - source-db
     volumes:
