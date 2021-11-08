@@ -183,9 +183,9 @@ reconciliation:
           SELECT pet.id as MigrationKey, category, name, status
           FROM pet
       target:
-      # Reference to a datasource defined in `r2dbc.datasources`  
+        # Reference to a datasource defined in `r2dbc.datasources`  
         dataSourceRef: my-target-db 
-          # Any SQL query to evaluate against the source DB
+        # Any SQL query to evaluate against the source DB
         query: >
           SELECT pet.id as MigrationKey, category.name as category, pet.name, status
           FROM pet INNER JOIN category ON pet.category_id = category.id
