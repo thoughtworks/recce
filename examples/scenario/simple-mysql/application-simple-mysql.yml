@@ -4,10 +4,12 @@ r2dbc:
       url: r2dbc:pool:mysql://source-db:3306/db
       username: user
       password: password
+      options: {}
     reactive-target:
       url: r2dbc:pool:mysql://target-db:3306/db
       username: user
       password: password
+      options: {}
 reconciliation:
   datasets:
     pets:

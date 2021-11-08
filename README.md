@@ -126,7 +126,7 @@ r2dbc:
   datasources:
     my-source-db: # Name your datasource anything you want, other than "default"
       # R2DBC URL for your database r2dbc:pool:DB_TYPE://DB_HOST:DB_PORT/DB_NAME
-      # DB_TYPE supported = mysql|postgresql|mssql
+      # DB_TYPE supported = mysql|postgresql|mssql|mariadb|oracle
       url: r2dbc:pool:mysql://source-db:3306/db
       username: user
       password: password
@@ -136,7 +136,16 @@ r2dbc:
       password: password
 ```
 
-#### Customising datasource connectivity
+#### Driver/database specific configuration
+
+For configuration specific to a given driver/DB you can consult their documentation. Usually additional settings needs to be in the `options:` block; or sometimes inside the connection URL.
+* [MySQL](https://github.com/mirromutth/r2dbc-mysql#configuration-items)
+* [Postgres](https://github.com/pgjdbc/r2dbc-postgresql#getting-started)
+* [MS SQL Server](https://github.com/r2dbc/r2dbc-mssql#getting-started)
+* [MariaDB](https://github.com/mariadb-corporation/mariadb-connector-r2dbc#connection-options) (can also be used for MySQL, as well as AWS RDS Aurora MySQL)
+* [Oracle](https://github.com/oracle/oracle-r2dbc#connection-creation)
+
+#### Customising datasource pooling
 
 By default, Recce is deployed with [r2dbc-pool](https://github.com/r2dbc/r2dbc-pool) to manage connection pooling to data sources. If you remove `:pool` from the URL, this will be disabled.
 

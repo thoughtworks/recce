@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.5.21"
     id("org.jetbrains.kotlin.kapt") version "1.5.21"
@@ -72,10 +70,12 @@ dependencies {
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
-    implementation("io.r2dbc:r2dbc-pool:0.8.7.RELEASE")
+    implementation("io.r2dbc:r2dbc-pool")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("io.r2dbc:r2dbc-mssql")
     runtimeOnly("dev.miku:r2dbc-mysql")
+    runtimeOnly("org.mariadb:r2dbc-mariadb")
+    runtimeOnly("com.oracle.database.r2dbc:oracle-r2dbc")
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
