@@ -109,6 +109,11 @@ internal class HashedRowTest {
                 "596c0ad17b38f4bf6c899f6b02c82f9ee326cfb7ac2d9775f49a88163364882b"
             ),
             Arguments.of(
+                Byte::class.java,
+                java.lang.Byte.valueOf(1),
+                "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+            ),
+            Arguments.of(
                 Short::class.java,
                 Integer.valueOf(10).toShort(),
                 "102b51b9765a56a3e899f7cf0ee38e5251f9c503b357b330a49183eb7b155604"

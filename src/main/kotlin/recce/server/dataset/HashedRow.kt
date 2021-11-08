@@ -28,6 +28,7 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
                             hash.putLong(col.unscaledValue().toLong())
                             hash.putInt(col.scale())
                         }
+                        is Byte -> hash.putByte(col)
                         is Short -> hash.putShort(col)
                         is Int -> hash.putInt(col)
                         is Long -> hash.putLong(col)
@@ -35,7 +36,7 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
                         is Double -> hash.putDouble(col)
                         is String -> hash.putString(col, Charsets.UTF_8)
                         is ByteBuffer -> hash.putBytes(col)
-                        else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.simpleName} for column [${colMeta.name}]")
+                        else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}]")
                     }
                 }
             return HashedRow(migrationKey, hash.hash().toString(), meta)
