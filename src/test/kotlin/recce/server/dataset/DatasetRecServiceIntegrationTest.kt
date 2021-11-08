@@ -110,7 +110,13 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
         transaction(sourceDb) { SchemaUtils.drop(TestData) }
 
         StepVerifier.create(service.runFor("test-dataset"))
-            .expectError(R2dbcBadGrammarException::class.java)
+            .consumeErrorWith {
+                assertThat(it)
+                    .isExactlyInstanceOf(DataLoadException::class.java)
+                    .hasMessageContaining("Failed to load data from source")
+                    .hasMessageContaining("\"TESTDATA\" not found")
+                    .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
+            }
             .verify()
     }
 }

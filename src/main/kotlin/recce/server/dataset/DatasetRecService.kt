@@ -23,7 +23,7 @@ open class DatasetRecService(
 ) : DatasetRecRunner {
     override fun runFor(datasetId: String): Mono<RecRun> {
 
-        val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("[$datasetId] not found!")
+        val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
 
         logger.info { "Starting reconciliation run for [$datasetId]..." }
 
@@ -54,6 +54,7 @@ open class DatasetRecService(
                     .save(RecRecord(RecRecordKey(run.id!!, row.migrationKey), sourceData = row.hashedValue))
                     .map { row.lazyMeta() }
             }
+            .onErrorMap { DataLoadException("Failed to load data from source [${source.dataSourceRef}]: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
             .last()
             .map { it.invoke() }
@@ -70,7 +71,10 @@ open class DatasetRecService(
                     .switchIfEmpty(recordRepository.save(RecRecord(key, targetData = row.hashedValue)))
                     .map { row.lazyMeta() }
             }
+            .onErrorMap { DataLoadException("Failed to load data from target [${target.dataSourceRef}]: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
             .last()
             .map { it.invoke() }
 }
+
+class DataLoadException(message: String, cause: Throwable) : Exception(message, cause)
