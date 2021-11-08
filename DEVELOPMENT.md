@@ -42,7 +42,6 @@ Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application 
 
 ### External data sources for Reconciliation
 - Recce uses raw Micronaut Data R2DBC SQL to execute configured queries ([example](examples/scenario/simple-mysql/application-simple-mysql.yml)) defined against external databases
-- These database implementat
 
 ### Testing
 
