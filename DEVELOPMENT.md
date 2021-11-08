@@ -45,7 +45,7 @@ Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application 
 
 ### Testing
 
-- Test are written using **JUnit Jupiter** with **AssertJ** and **Mockito** for mocking support
+- Tests are written using **JUnit Jupiter** with **AssertJ** and **Mockito** for mocking support
 - At time of writing, Recce's own DB tests are tested against **H2 Database** rather than Postgres, for improved feedback, however this imposes some limitations and may need to be re-evaluated later
 - [Testcontainers](https://www.testcontainers.org/) are used for starting external DBs of various types to test against
 - [Rest-assured](https://rest-assured.io/) is used for API tests
