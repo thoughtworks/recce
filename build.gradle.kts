@@ -71,7 +71,7 @@ dependencies {
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
-    implementation("io.r2dbc:r2dbc-pool")
+    runtimeOnly("io.r2dbc:r2dbc-pool")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("io.r2dbc:r2dbc-mssql")
     runtimeOnly("dev.miku:r2dbc-mysql")
