@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.testcontainers.containers.JdbcDatabaseContainer
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 
 @Testcontainers
+@Tag("requires-docker")
 internal open class MultiDataSourceConnectivityIntegrationTest {
     companion object {
         @JvmStatic

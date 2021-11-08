@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.5.21"
     id("org.jetbrains.kotlin.kapt") version "1.5.21"
@@ -136,8 +138,12 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
 }
 
+val testExcludeTags: String? by project
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
+    useJUnitPlatform {
+        excludeTags(testExcludeTags ?: "none")
+    }
 }
 
 tasks.jacocoTestReport {
