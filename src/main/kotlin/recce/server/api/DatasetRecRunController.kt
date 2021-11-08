@@ -27,32 +27,32 @@ class DatasetRecRunController(
     private val runRepository: RecRunRepository
 ) {
     @Get(uri = "/{runId}")
-    fun get(runId: Int): Mono<CompletedRun> {
+    fun get(runId: Int): Mono<RunApiModel> {
         logger.info { "Finding run [$runId]" }
-        return runRepository.findById(runId).map { CompletedRun(it) }
+        return runRepository.findById(runId).map { RunApiModel(it) }
     }
 
     @Get
-    fun get(@QueryValue("datasetId") datasetId: String): Flux<CompletedRun> {
+    fun get(@QueryValue("datasetId") datasetId: String): Flux<RunApiModel> {
         logger.info { "Find runs for [$datasetId]" }
-        return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { CompletedRun(it) }
+        return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { RunApiModel(it) }
     }
 
     @Post
-    fun create(@Body @Valid params: RunCreationParams): Mono<CompletedRun> {
+    fun create(@Body @Valid params: RunCreationParams): Mono<RunApiModel> {
         logger.info { "Received request to create run for $params" }
-        return runner.runFor(params.datasetId).map { CompletedRun(it) }
+        return runner.runFor(params.datasetId).map { RunApiModel(it) }
     }
 
     @Introspected
     data class RunCreationParams(@field:NotBlank val datasetId: String)
 
     @Introspected
-    data class CompletedRun(
+    data class RunApiModel(
         val id: Int,
         val datasetId: String,
         val createdTime: Instant,
-        val completedTime: Instant,
+        val completedTime: Instant?,
         val sourceMeta: DatasetMeta,
         val targetMeta: DatasetMeta,
         val summary: MatchStatus?
@@ -61,14 +61,14 @@ class DatasetRecRunController(
             id = run.id!!,
             datasetId = run.datasetId,
             createdTime = run.createdTime!!,
-            completedTime = run.completedTime!!,
+            completedTime = run.completedTime,
             sourceMeta = run.sourceMeta,
             targetMeta = run.targetMeta,
             summary = run.summary
         )
 
         @get:JsonProperty("completedDurationSeconds")
-        val completedDuration: Duration
-            get() = Duration.between(createdTime, completedTime)
+        val completedDuration: Duration?
+            get() = if (completedTime != null) Duration.between(createdTime, completedTime) else null
     }
 }

@@ -58,6 +58,12 @@ internal class DatasetRecRunControllerTest {
     private val controller = DatasetRecRunController(service, runRepository)
 
     @Test
+    fun `incomplete runs don't have duration`() {
+        assertThat(DatasetRecRunController.RunApiModel(testResults.apply { completedTime = null }).completedDuration)
+            .isNull()
+    }
+
+    @Test
     fun `can get run by id`() {
         StepVerifier.create(controller.get(testResults.id!!))
             .assertNext {
