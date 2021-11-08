@@ -10,14 +10,48 @@ r2dbc:
       password: password
 reconciliation:
   datasets:
-    test-dataset:
+    pets:
       source:
         dataSourceRef: reactive-source
         query: >
-          select record.migration_key as MigrationKey, run.*, record.*
-          from data_set_migration_run run join data_set_migration_record record on run.id = record.migration_id
+          select pet.id as MigrationKey, category, name, status
+          from pet
       target:
         dataSourceRef: reactive-target
         query: >
-          select record.migration_key as MigrationKey, run.*, record.*
-          from data_set_migration_run run join data_set_migration_record record on run.id = record.migration_id
+          select pet.id as MigrationKey, category.name as category, pet.name, status
+          from pet inner join category on pet.category_id = category.id
+    order-status:
+      source:
+        dataSourceRef: reactive-source
+        query: >
+          select
+            order_status.id as MigrationKey,
+            pet_name,
+            unix_timestamp(ordered_at),
+            case
+              when status = 1 then 'placed'
+              when status = 2 then 'approved'
+              when status = 3 then 'delivered'
+            end as status_text,
+            complete
+          from order_status
+      target:
+        dataSourceRef: reactive-target
+        query: >
+          select
+            order_status.id as MigrationKey,
+            pet.name,
+            unix_timestamp(ordered_at),
+            order_status.status,
+            complete
+          from order_status inner join pet on order_status.pet_id = pet.id
+    categories:
+      source:
+        dataSourceRef: reactive-source
+        query: >
+          select "# Categories" as MigrationKey, count(distinct category) from pet
+      target :
+        dataSourceRef: reactive-target
+        query: >
+          select "# Categories" as MigrationKey, count(*) from category
