@@ -2,7 +2,7 @@ forbid_telemetry: true
 config_variables:
   example-scenario:
     description: Which example scenario to run from `ls examples/scenario`
-    default: simple-mysql
+    default: petshop-mysql
   db-name:
     description: Name of the DB to create for all local DBs
     default: db

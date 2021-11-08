@@ -9,12 +9,12 @@ Examples can be managed with a "convention over configuration" approach for deve
 │   ├── batect-source-mysql.yml
 │   └── batect-target-mysql.yml
 └── scenario                                 # Scenarios go here
-    └── simple-mysql                         # Scenario called "simple-mysql"
-        ├── application-simple-mysql.yml     # Micronaut configuration fragment for this scenario 
+    └── petshop-mysql                         # Scenario called "petshop-mysql"
+        ├── application-petshop-mysql.yml     # Micronaut configuration fragment for this scenario 
         ├── source                           # Flyway migrations to apply to the "source" schema
-        │   └── V1__CREATE_SCHEMA.sql
+        │   └── V1__CREATE.sql
         └── target                           # Flyway migrations to apply to the "target" schema
-            └── V1__CREATE_SCHEMA.sql
+            └── V1__CREATE.sql
 ```
 
 ## Adding a new scenario
