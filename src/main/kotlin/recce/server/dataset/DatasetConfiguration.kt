@@ -11,4 +11,7 @@ class DatasetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val
         source.populate(locator)
         target.populate(locator)
     }
+
+    val shortDescriptor: String
+        get() = "$name(${source.dataSourceRef}->${target.dataSourceRef}"
 }

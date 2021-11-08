@@ -47,11 +47,10 @@ internal class RecConfigurationPropertiesTest {
     fun `should fail load on incorrect dataSourceRef`() {
         items["reconciliation.datasets.test-dataset.source.dataSourceRef"] = "non-existent-datasource"
 
-        val ctx = ApplicationContext.run(items)
-
-        Assertions.assertThatThrownBy { ctx.getBean(RecConfiguration::class.java) }
+        Assertions.assertThatThrownBy { ApplicationContext.run(items) }
             .isExactlyInstanceOf(BeanInstantiationException::class.java)
-            .hasCauseExactlyInstanceOf(ConfigurationException::class.java)
+            .hasMessageContaining("non-existent-datasource")
+            .hasRootCauseExactlyInstanceOf(ConfigurationException::class.java)
             .hasMessageContaining("non-existent-datasource")
     }
 }
