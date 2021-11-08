@@ -28,11 +28,13 @@ class DatasetRecRunController(
 ) {
     @Get(uri = "/{runId}")
     fun get(runId: Int): Mono<CompletedRun> {
+        logger.info { "Finding run [$runId]" }
         return runRepository.findById(runId).map { CompletedRun(it) }
     }
 
     @Get
     fun get(@QueryValue("datasetId") datasetId: String): Flux<CompletedRun> {
+        logger.info { "Find runs for [$datasetId]" }
         return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { CompletedRun(it) }
     }
 
