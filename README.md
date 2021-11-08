@@ -84,6 +84,20 @@ Recce is configured by adding **datasources** and **datasets** that you wish to 
 
 You can manage configuration as multiple files; or one single file. They will be merged together at runtime.
 
+### Configuring Recce itself
+
+As a Micronaut application, much of Recce's configuration is open for hacking and can be [expressed in multiple ways](https://docs.micronaut.io/latest/guide/#propertySource).
+
+However some basic configuration to consider overriding from the [default config](src/main/resources/application.yml).
+
+| Env value         | Default     | Description                                      |
+| ----------------- | ----------- | ------------------------------------------------ |
+| DATABASE_HOST     | `localhost` | Host your Postgres DB is on                      |
+| DATABASE_PORT     | `9000`      | Port your Postgres DB is on                      |
+| DATABASE_NAME     | `db`        | The name of the logical database within Postgres |
+| DATABASE_USERNAME | `user`      | Username to connect with                         |
+| DATABASE_PASSWORD | `password`  | Password to connect with                         |
+
 ### Adding additional configuration files for datasets
 
 As a Micronaut application, [configuration can be externalised](https://docs.micronaut.io/latest/guide/#propertySource) in many ways.
