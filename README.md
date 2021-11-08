@@ -13,7 +13,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 * Trigger reconciliation of source and target database schemas using **simple SQL expressions**
 * **Privacy** - mo sensitive data stored or output by default. By default, Recce compares **hashes** of data.
 * Supports connectivity to **MySQL**, **Postgres** and **MSSQL** databases
-* **Database agnostic** when comparing data types - 
+* **Database agnostic** when comparing database types - as long as it is coerced to a comparable JVM type consistently, it will be hashed identically
 
 ## Getting Started
 
@@ -84,7 +84,7 @@ Recce is configured by adding **datasources** and **datasets** that you wish to 
 
 You can manage configuration as multiple files; or one single file. They will be merged together at runtime.
 
-## Adding additional configuration files for datasets
+### Adding additional configuration files for datasets
 
 As a Micronaut application, [configuration can be externalised](https://docs.micronaut.io/latest/guide/#propertySource) in many ways.
 
