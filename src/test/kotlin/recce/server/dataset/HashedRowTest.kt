@@ -61,7 +61,23 @@ internal class HashedRowTest {
         }
         assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithTestCol) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("MigrationKey has null value somewhere in data set")
+            .hasMessageContaining("MigrationKey has null value somewhere in dataset")
+    }
+
+    @Test
+    fun `should throw on missing migration key column`() {
+        val cols = arrayListOf(
+            mock<ColumnMetadata> { on { name } doReturn "test"; on { javaType } doReturn String::class.java },
+        )
+        val rowMetaWithNoMigrationKey = mock<RowMetadata> {
+            on { columnMetadatas } doReturn cols
+        }
+        val row = mock<Row> {
+            on { get(0) } doReturn "test-val"
+        }
+        assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithNoMigrationKey) }
+            .isExactlyInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("No column named MigrationKey found in dataset")
     }
 
     @Test
@@ -70,7 +86,7 @@ internal class HashedRowTest {
         val row = mockSingleColumnRowReturning("key")
         assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("More than one column named MigrationKey found in data set")
+            .hasMessageContaining("More than one column named MigrationKey found in dataset")
     }
 
     @Test

@@ -18,8 +18,8 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
 
             fun trySetMigrationKey(col: Any?) {
                 when {
-                    col == null -> throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in data set")
-                    migrationKey != null -> throw IllegalArgumentException("More than one column named $migrationKeyColumnName found in data set")
+                    col == null -> throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in dataset")
+                    migrationKey != null -> throw IllegalArgumentException("More than one column named $migrationKeyColumnName found in dataset")
                     else -> migrationKey = col.toString()
                 }
             }
@@ -48,7 +48,7 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
                 }
 
             return HashedRow(
-                migrationKey ?: throw IllegalArgumentException("No column named $migrationKeyColumnName found in data set"),
+                migrationKey ?: throw IllegalArgumentException("No column named $migrationKeyColumnName found in dataset"),
                 hash.hash().toString(),
                 meta
             )
