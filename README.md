@@ -199,11 +199,23 @@ The general philosophy of Recce is that differences between source and target ar
 
 Recce needs to know which column represents a unique identifier for the row that should be consistent between `source` and `target` and implies these rows represent the **same entity**.
 
-To do this, designate a column by naming it as such
+To do this, designate a column by naming it as `MigrationKey` (case insensitive)
 ```sql
 SELECT natural_id as MigrationKey, some, other, columns
 FROM my_table
 ```
+
+Recce will complain if there is more than one column in your dataset with this name.
+
+#### Ordering of columns
+
+Currently Recce ignores names of columns _other than_ the `MigrationKey` column. That means that the **order of columns is critical and must match** between your two queries.
+
+If the column in position 3 represents datum `X` in the `source` dataset, then the column in position 3 in the `target` dataset should also represent the same datum.
+
+The data types of the columns need not match exactly; however if the values produce different hashes, this will lead to a row mismatch. For example an integer of `111` in source will produce a different hash to a string of `"111"` in target. If you want these values to be considered identical, you should use SQL to coerce the data types to match and express this intended difference.
+
+If you would like to see a `nameBased` column matching option, consider adding your thoughts to #55.
 
 #### Handling differences
 

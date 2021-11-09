@@ -20,12 +20,13 @@ import java.time.Instant
 
 internal class HashedRowTest {
 
-    val meta = mockRowMetaWithColumnOf(String::class.java)
+    private val migrationKeyIndex = 0
+    private val rowMetaWithTestCol = mockRowMetaWithColumnOf("test", String::class.java)
 
-    private fun <T> mockRowMetaWithColumnOf(clazz: Class<T>): RowMetadata {
+    private fun <T> mockRowMetaWithColumnOf(colName: String, clazz: Class<T>): RowMetadata {
         val cols = arrayListOf(
-            mock<ColumnMetadata> { on { name } doReturn migrationKeyColumnName; on { javaType } doReturn clazz },
-            mock { on { name } doReturn "test"; on { javaType } doReturn clazz },
+            mock<ColumnMetadata> { on { name } doReturn migrationKeyColumnName; on { javaType } doReturn String::class.java },
+            mock { on { name } doReturn colName; on { javaType } doReturn clazz },
         )
         return mock {
             on { columnMetadatas } doReturn cols
@@ -34,15 +35,15 @@ internal class HashedRowTest {
 
     private fun mockSingleColumnRowReturning(input: Any?): Row {
         val row = mock<Row> {
-            on { get(migrationKeyColumnName) } doReturn "key"
-            on { get("test") } doReturn input
+            on { get(migrationKeyIndex) } doReturn "key"
+            on { get(1) } doReturn input
         }
         return row
     }
 
     @Test
     fun `should dynamically convert row metadata`() {
-        val row = HashedRow("test", "test", meta)
+        val row = HashedRow("test", "test", rowMetaWithTestCol)
 
         val expectedMeta = DatasetMeta(
             listOf(
@@ -56,17 +57,26 @@ internal class HashedRowTest {
     @Test
     fun `should throw on null migration key`() {
         val row = mock<Row> {
-            on { get(migrationKeyColumnName) } doReturn null
+            on { get(migrationKeyIndex) } doReturn null
         }
-        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+        assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithTestCol) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("MigrationKey has null value somewhere in data set")
     }
 
     @Test
+    fun `should throw on duplicate migration key column`() {
+        val meta = mockRowMetaWithColumnOf(migrationKeyColumnName, String::class.java)
+        val row = mockSingleColumnRowReturning("key")
+        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+            .isExactlyInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("More than one column named MigrationKey found in data set")
+    }
+
+    @Test
     fun `should throw on unrecognized type`() {
         val row = mockSingleColumnRowReturning(Instant.now())
-        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+        assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithTestCol) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Instant")
             .hasMessageContaining("test")
@@ -75,9 +85,9 @@ internal class HashedRowTest {
     @Test
     fun `nulls of different defined column java types should be considered unequal`() {
         val row = mockSingleColumnRowReturning(null)
-        val intMeta = mockRowMetaWithColumnOf(Integer::class.java)
+        val intMeta = mockRowMetaWithColumnOf("test", Integer::class.java)
 
-        val stringTypeRow = HashedRow.fromRow(row, meta)
+        val stringTypeRow = HashedRow.fromRow(row, rowMetaWithTestCol)
         val intTypeRow = HashedRow.fromRow(row, intMeta)
 
         assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
@@ -87,7 +97,7 @@ internal class HashedRowTest {
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
         val row = mockSingleColumnRowReturning(input)
-        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
+        assertThat(HashedRow.fromRow(row, rowMetaWithTestCol)).isEqualTo(HashedRow("key", expectedHash, rowMetaWithTestCol))
     }
 
     companion object {

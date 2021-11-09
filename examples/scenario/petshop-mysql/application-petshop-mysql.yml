@@ -21,7 +21,7 @@ reconciliation:
       target:
         dataSourceRef: reactive-target
         query: >
-          select pet.id as MigrationKey, category.name as category, pet.name, status
+          select pet.id as MigrationKey, category.name, pet.name, status
           from pet inner join category on pet.category_id = category.id
     order-status:
       source:

@@ -13,33 +13,45 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
     companion object {
         @Suppress("UnstableApiUsage")
         fun fromRow(row: Row, meta: RowMetadata): HashedRow {
-
-            val migrationKey = row.get(migrationKeyColumnName)?.toString()
-                ?: throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in data set")
-
+            var migrationKey: String? = null
             val hash = Hashing.sha256().newHasher()
+
+            fun trySetMigrationKey(col: Any?) {
+                when {
+                    col == null -> throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in data set")
+                    migrationKey != null -> throw IllegalArgumentException("More than one column named $migrationKeyColumnName found in data set")
+                    else -> migrationKey = col.toString()
+                }
+            }
+
             meta.columnMetadatas
-                .filter { !it.name.equals(migrationKeyColumnName, ignoreCase = true) }
-                .forEach { colMeta ->
-                    when (val col = row.get(colMeta.name)) {
-                        null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
-                        is Boolean -> hash.putBoolean(col)
-                        is BigDecimal -> {
+                .forEachIndexed { i, colMeta ->
+                    val col = row[i]
+                    when {
+                        colMeta.name.equals(migrationKeyColumnName, ignoreCase = true) -> trySetMigrationKey(col)
+                        col == null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
+                        col is Boolean -> hash.putBoolean(col)
+                        col is BigDecimal -> {
                             hash.putLong(col.unscaledValue().toLong())
                             hash.putInt(col.scale())
                         }
-                        is Byte -> hash.putByte(col)
-                        is Short -> hash.putShort(col)
-                        is Int -> hash.putInt(col)
-                        is Long -> hash.putLong(col)
-                        is Float -> hash.putFloat(col)
-                        is Double -> hash.putDouble(col)
-                        is String -> hash.putString(col, Charsets.UTF_8)
-                        is ByteBuffer -> hash.putBytes(col)
-                        else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}]")
+                        col is Byte -> hash.putByte(col)
+                        col is Short -> hash.putShort(col)
+                        col is Int -> hash.putInt(col)
+                        col is Long -> hash.putLong(col)
+                        col is Float -> hash.putFloat(col)
+                        col is Double -> hash.putDouble(col)
+                        col is String -> hash.putString(col, Charsets.UTF_8)
+                        col is ByteBuffer -> hash.putBytes(col)
+                        else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$i]")
                     }
                 }
-            return HashedRow(migrationKey, hash.hash().toString(), meta)
+
+            return HashedRow(
+                migrationKey ?: throw IllegalArgumentException("No column named $migrationKeyColumnName found in data set"),
+                hash.hash().toString(),
+                meta
+            )
         }
     }
 
