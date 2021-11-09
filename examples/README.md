@@ -24,5 +24,5 @@ Examples can be managed with a "convention over configuration" approach for deve
 2. Create a new folder with the name of your scenario in the `scenario` folder
 3. Create `source` and `target` folders which contain *Flyway migrations* appropriate to setup data for your chosen DB
    types
-4. Create fragment of *Micronaut configuration* for your datasources and reconcilation datasets
-   in `scenario/${name}/applicatiomn-$name}.yml`
+4. Create fragment of *Micronaut configuration* for your datasources and reconciliation datasets
+   in `scenario/${name}/application-${name}.yml`
