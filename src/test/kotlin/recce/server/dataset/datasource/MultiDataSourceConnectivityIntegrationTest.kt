@@ -86,7 +86,7 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
         override val primaryKey = PrimaryKey(id)
     }
 
-    fun createTestData(db: Database) {
+    private fun createTestData(db: Database) {
         transaction(db) {
             SchemaUtils.create(TestData)
             insertUsers(4)
