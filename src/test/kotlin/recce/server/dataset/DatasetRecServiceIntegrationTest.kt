@@ -106,7 +106,7 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
     }
 
     @Test
-    fun `should emit error on bad query`() {
+    fun `should emit error on bad source query`() {
         transaction(sourceDb) { SchemaUtils.drop(TestData) }
 
         StepVerifier.create(service.runFor("test-dataset"))
@@ -114,6 +114,21 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
                 assertThat(it)
                     .isExactlyInstanceOf(DataLoadException::class.java)
                     .hasMessageContaining("Failed to load data from source")
+                    .hasMessageContaining("\"TESTDATA\" not found")
+                    .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
+            }
+            .verify()
+    }
+
+    @Test
+    fun `should emit error on bad target query`() {
+        transaction(targetDb) { SchemaUtils.drop(TestData) }
+
+        StepVerifier.create(service.runFor("test-dataset"))
+            .consumeErrorWith {
+                assertThat(it)
+                    .isExactlyInstanceOf(DataLoadException::class.java)
+                    .hasMessageContaining("Failed to load data from target")
                     .hasMessageContaining("\"TESTDATA\" not found")
                     .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
             }
