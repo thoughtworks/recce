@@ -25,6 +25,11 @@ To get started work on Recce:
     ./batect db
     ./gradlew run # or run/debug `RecceServer.kt` from your IDE
     ```
+* **Run** Only Recce's dependencies with an [example scenario](examples/README.md), so you can run/debug/profile Recce itself outside Docker
+    ```shell
+    ./batect dependencies
+    ./gradlew run # or run/debug `RecceServer.kt` from your IDE
+    ```
  
 ## Technical Overview
 

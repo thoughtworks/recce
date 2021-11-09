@@ -54,6 +54,14 @@ containers:
     working_directory: /code
     environment:
       GRADLE_OPTS: -Dorg.gradle.daemon=false
+  recce-dependencies:
+    image: alpine:latest
+    dependencies:
+      - recce-db
+      - source-db # Expected to be defined by an included file
+      - target-db # Expected to be defined by an included file
+    enable_init_process: true
+    command: sh -c "sleep 86400"
   recce-docker-prebuilt:
     image: recce/recce-server
     dependencies:
@@ -75,11 +83,18 @@ tasks:
       container: recce-gradle
       command: ./gradlew clean
   build:
-    description: Compile and test the Recce server code within Gradle
+    description: Compile and test the Recce server code within Gradle (note this excludes tests that require Docker)
     group: recce
     run:
       container: recce-gradle
       command: ./gradlew build -PtestExcludeTags='requires-docker'
+  dependencies:
+    description: Run only dependencies of Recce and a configured `example-scenario`
+    group: recce
+    prerequisites:
+      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
+    run:
+      container: recce-dependencies
   run:
     description: Compile and run the Recce server within Gradle with a configured `example-scenario`
     group: recce
