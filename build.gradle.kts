@@ -20,7 +20,7 @@ group = "recce.server"
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.1.3",
-    "exposed" to "org.jetbrains.exposed:exposed-core:0.36.1",
+    "exposed" to "org.jetbrains.exposed:exposed-core:0.36.2",
     "restAssured" to "io.rest-assured:rest-assured:4.4.0",
     "mockito" to "org.mockito:mockito-core:4.0.0", // Unfortunately not all Mockito libs are not in the Micronaut BOM
 )
