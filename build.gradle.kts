@@ -1,14 +1,15 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.5.21"
-    id("org.jetbrains.kotlin.kapt") version "1.5.21"
+    val kotlinVersion = "1.6.0-RC2"
+    id("org.jetbrains.kotlin.jvm") version kotlinVersion
+    id("org.jetbrains.kotlin.kapt") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
     id("com.github.johnrengelman.shadow") version "7.1.0"
     id("io.micronaut.application") version "2.0.8"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.5.21"
-    id("org.jetbrains.kotlin.plugin.jpa") version "1.5.21"
-    id("com.google.cloud.tools.jib") version "3.1.4"
-    id("com.github.ben-manes.versions") version "0.39.0"
     id("com.diffplug.spotless") version "5.17.1"
     id("com.adarshr.test-logger") version "3.1.0"
+    id("com.google.cloud.tools.jib") version "3.1.4"
+    id("com.github.ben-manes.versions") version "0.39.0"
     jacoco
 }
 
@@ -25,12 +26,23 @@ val depDescriptors = mapOf(
     "mockito" to "org.mockito:mockito-core:4.0.0", // Unfortunately not all Mockito libs are not in the Micronaut BOM
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
-    "javaMajor" to "16",
-    "kotlin" to "1.5.31",
+    "javaMajor" to "17",
 )
 
 repositories {
     mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(depVersions["javaMajor"]!!))
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = depVersions["javaMajor"]!!
+    }
 }
 
 micronaut {
@@ -49,8 +61,6 @@ dependencies {
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${depVersions["kotlin"]}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${depVersions["kotlin"]}")
     implementation("javax.annotation:javax.annotation-api")
     implementation("com.google.guava:guava:31.0.1-jre")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.5")
@@ -108,25 +118,6 @@ dependencies {
 
 application {
     mainClass.set("recce.server.RecceServerKt")
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(depVersions["javaMajor"]!!))
-    }
-}
-
-tasks {
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = depVersions["javaMajor"]!!
-        }
-    }
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = depVersions["javaMajor"]!!
-        }
-    }
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {

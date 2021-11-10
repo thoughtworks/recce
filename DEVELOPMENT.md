@@ -1,7 +1,7 @@
 ## Pre-requisites
 
 * Docker
-* JDK 16 (if you use [ASDF](https://asdf-vm.com/) you can `asdf install` to install one using the [.tool-versions](./.tool-versions))
+* JDK 17 (if you use [ASDF](https://asdf-vm.com/) you can `asdf install` to install one using the [.tool-versions](./.tool-versions))
 
 ## Getting Started
 

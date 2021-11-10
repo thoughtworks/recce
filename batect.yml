@@ -33,7 +33,7 @@ containers:
         name: recce-db-data
         container: /var/lib/postgresql/data
   recce-gradle:
-    image: eclipse-temurin:16-jdk-alpine
+    image: eclipse-temurin:17-jdk-alpine
     dependencies:
       - recce-db
       - source-db # Expected to be defined by an included file
