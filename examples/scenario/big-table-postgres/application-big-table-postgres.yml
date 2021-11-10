@@ -1,11 +1,11 @@
 r2dbc:
   datasources:
-    reactive-source:
+    source:
       url: r2dbc:pool:postgresql://source-db:5432/db
       username: user
       password: password
       options: {}
-    reactive-target:
+    target:
       url: r2dbc:pool:postgresql://target-db:5432/db
       username: user
       password: password
@@ -14,21 +14,21 @@ reconciliation:
   datasets:
     raw:
       source:
-        dataSourceRef: reactive-source
+        dataSourceRef: source
         query: >
           select id as MigrationKey, *
           from big_table
       target:
-        dataSourceRef: reactive-target
+        dataSourceRef: target
         query: >
           select id as MigrationKey, *
           from big_table
     counts:
       source:
-        dataSourceRef: reactive-source
+        dataSourceRef: source
         query: >
           select 'Num rows' as MigrationKey, count(*) from big_table
       target :
-        dataSourceRef: reactive-target
+        dataSourceRef: target
         query: >
           select 'Num rows' as MigrationKey, count(*) from big_table

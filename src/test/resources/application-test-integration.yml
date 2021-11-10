@@ -11,11 +11,11 @@ datasources:
     password: ''
 r2dbc:
   datasources:
-    reactive-source:
+    source:
       url: r2dbc:pool:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
       username: sa
       password: ''
-    reactive-target:
+    target:
       url: r2dbc:pool:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
       username: sa
       password: ''

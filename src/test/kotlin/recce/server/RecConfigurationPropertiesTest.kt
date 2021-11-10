@@ -16,13 +16,13 @@ internal class RecConfigurationPropertiesTest {
     @BeforeEach
     fun setUp() {
         items["flyway.datasources.default.enabled"] = false
-        items["r2dbc.datasources.reactive-source.url"] =
+        items["r2dbc.datasources.source.url"] =
             "r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-        items["r2dbc.datasources.reactive-target.url"] =
+        items["r2dbc.datasources.target.url"] =
             "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-        items["reconciliation.datasets.test-dataset.source.dataSourceRef"] = "reactive-source"
+        items["reconciliation.datasets.test-dataset.source.dataSourceRef"] = "source"
         items["reconciliation.datasets.test-dataset.source.query"] = "select count(*) as sourcedatacount from testdata"
-        items["reconciliation.datasets.test-dataset.target.dataSourceRef"] = "reactive-target"
+        items["reconciliation.datasets.test-dataset.target.dataSourceRef"] = "target"
         items["reconciliation.datasets.test-dataset.target.query"] = "select count(*) as targetdatacount from testdata"
     }
 
@@ -34,10 +34,10 @@ internal class RecConfigurationPropertiesTest {
             .hasSize(1)
             .first().satisfies {
                 Assertions.assertThat(it.name).isEqualTo("test-dataset")
-                Assertions.assertThat(it.source.dataSourceRef).isEqualTo("reactive-source")
+                Assertions.assertThat(it.source.dataSourceRef).isEqualTo("source")
                 Assertions.assertThat(it.source.query).contains("sourcedatacount")
                 Assertions.assertThat(it.source.dbOperations).isNotNull
-                Assertions.assertThat(it.target.dataSourceRef).isEqualTo("reactive-target")
+                Assertions.assertThat(it.target.dataSourceRef).isEqualTo("target")
                 Assertions.assertThat(it.target.query).contains("targetdatacount")
                 Assertions.assertThat(it.target.dbOperations).isNotNull
             }

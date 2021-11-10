@@ -11,11 +11,11 @@ import reactor.test.StepVerifier
 @MicronautTest(environments = arrayOf("test-integration"))
 class ReactiveDataSourceTest : DataSourceTest() {
     @Inject
-    @field:Named("reactive-source")
+    @field:Named("source")
     private lateinit var sourceOperations: R2dbcOperations
 
     @Inject
-    @field:Named("reactive-target")
+    @field:Named("target")
     private lateinit var targetOperations: R2dbcOperations
 
     @Test

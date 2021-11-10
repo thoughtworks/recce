@@ -2,8 +2,8 @@ reconciliation:
   datasets:
     test-dataset:
       source:
-        dataSourceRef: reactive-source
+        dataSourceRef: source
         query: select name as MigrationKey, name, value from testdata
       target:
-        dataSourceRef: reactive-target
+        dataSourceRef: target
         query: select name as MigrationKey, name, value from testdata

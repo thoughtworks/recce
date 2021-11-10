@@ -1,11 +1,11 @@
 r2dbc:
   datasources:
-    reactive-source:
+    source:
       url: r2dbc:pool:mysql://source-db:3306/db
       username: user
       password: password
       options: {}
-    reactive-target:
+    target:
       url: r2dbc:pool:mysql://target-db:3306/db
       username: user
       password: password
@@ -14,18 +14,18 @@ reconciliation:
   datasets:
     pets:
       source:
-        dataSourceRef: reactive-source
+        dataSourceRef: source
         query: >
           select pet.id as MigrationKey, category, name, status
           from pet
       target:
-        dataSourceRef: reactive-target
+        dataSourceRef: target
         query: >
           select pet.id as MigrationKey, category.name, pet.name, status
           from pet inner join category on pet.category_id = category.id
     order-status:
       source:
-        dataSourceRef: reactive-source
+        dataSourceRef: source
         query: >
           select
             order_status.id as MigrationKey,
@@ -39,7 +39,7 @@ reconciliation:
             complete
           from order_status
       target:
-        dataSourceRef: reactive-target
+        dataSourceRef: target
         query: >
           select
             order_status.id as MigrationKey,
@@ -50,10 +50,10 @@ reconciliation:
           from order_status inner join pet on order_status.pet_id = pet.id
     categories:
       source:
-        dataSourceRef: reactive-source
+        dataSourceRef: source
         query: >
           select "# Categories" as MigrationKey, count(distinct category) from pet
       target :
-        dataSourceRef: reactive-target
+        dataSourceRef: target
         query: >
           select "# Categories" as MigrationKey, count(*) from category
