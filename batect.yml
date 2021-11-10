@@ -63,7 +63,7 @@ containers:
     enable_init_process: true
     command: sh -c "sleep 86400"
   recce-docker-prebuilt:
-    image: recce/recce-server
+    image: recce-server
     dependencies:
       - recce-db
       - source-db # Expected to be defined by an included file

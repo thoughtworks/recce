@@ -142,11 +142,27 @@ tasks.jacocoTestReport {
     dependsOn(tasks.test)
 }
 
+val githubRepoOwner = "chadlwilson"
+val containerRepoName = "recce-server"
 jib {
     from {
         image = "eclipse-temurin:${depVersions["javaMajor"]}-jdk-alpine"
     }
     to {
-        image = "recce/recce-server"
+        image = "ghcr.io/$githubRepoOwner/$containerRepoName"
+        tags = setOf(version as String, "latest")
+    }
+    container {
+        creationTime = "USE_CURRENT_TIMESTAMP"
+        labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
+    }
+}
+
+// use different naming when building locally, to avoid confusion
+tasks.jibDockerBuild.configure {
+    jib {
+        to {
+            image = containerRepoName
+        }
     }
 }

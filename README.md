@@ -114,7 +114,7 @@ touch my-dataset-configs/config1.yml my-dataset-configs/config2.yml
 docker run -p 8080:8080 \
   -v $(pwd)/my-dataset-configs:/config \
   -e MICRONAUT_CONFIG_FILES=/config/config1.yml,/config/config2.yml \
-  recce/recce-server
+  recce-server
 ```
 
 ### Configuring datasources
