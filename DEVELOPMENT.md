@@ -58,5 +58,7 @@ Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application 
 
 ### Build
 - Gradle (Kotlin-style) is used to build
+- Code is linted using [Spotless Gradle](https://github.com/diffplug/spotless/tree/main/plugin-gradle), with [ktlint](https://github.com/pinterest/ktlint) for Kotlin.
+  - _Tip_: Spotless/ktlint can auto-fix a lot of nitpicks with `./gradlew spotlessApply`
 - [Batect](https://batect.dev/) is available to automate dev+testing tasks within containers, including running Recce locally
 - [GitHub Actions](.github/workflows) are being used to automate build+test
