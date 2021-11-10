@@ -18,16 +18,16 @@ To get started work on Recce:
     ```
 * **Build a Docker image** locally and run it with an [example scenario](examples/README.md) a
     ```shell
-    ./gradlew jibDockerBuild && ./batect run-docker-prebuilt
+    ./gradlew jibDockerBuild && ./batect run-docker-local
     ```
 * **Run** A DB on its own to use with Recce locally
     ```shell
-    ./batect db
+    ./batect run-db
     ./gradlew run # or run/debug `RecceServer.kt` from your IDE
     ```
 * **Run** Only Recce's dependencies with an [example scenario](examples/README.md), so you can run/debug/profile Recce itself outside Docker
     ```shell
-    ./batect dependencies
+    ./batect run-deps
     ./gradlew run # or run/debug `RecceServer.kt` from your IDE
     ```
  

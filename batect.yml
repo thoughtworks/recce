@@ -62,7 +62,7 @@ containers:
       - target-db # Expected to be defined by an included file
     enable_init_process: true
     command: sh -c "sleep 86400"
-  recce-docker-prebuilt:
+  recce-docker-local:
     image: recce-server
     dependencies:
       - recce-db
@@ -88,13 +88,6 @@ tasks:
     run:
       container: recce-gradle
       command: ./gradlew build -PtestExcludeTags='requires-docker'
-  dependencies:
-    description: Run only dependencies of Recce and a configured `example-scenario`
-    group: recce
-    prerequisites:
-      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
-    run:
-      container: recce-dependencies
   run:
     description: Compile and run the Recce server within Gradle with a configured `example-scenario`
     group: recce
@@ -107,19 +100,26 @@ tasks:
         DATABASE_HOST: recce-db
         DATABASE_PORT: 5432
         MICRONAUT_CONFIG_FILES: examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
-  run-docker-prebuilt:
+  run-docker-local:
     description: Run a previously built Recce server Docker image with a configured `example-scenario`
     group: recce
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
-      container: recce-docker-prebuilt
+      container: recce-docker-local
       environment:
         DATABASE_HOST: recce-db
         DATABASE_PORT: 5432
         MICRONAUT_CONFIG_FILES: /examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
-  db:
+  run-db:
     description: Start a standalone Postgres DB for use with Recce run locally (e.g from IDE/Gradle for debugging)
-    group: db
+    group: recce
     run:
       container: recce-db
+  run-deps:
+    description: Run only dependencies of Recce and a configured `example-scenario`
+    group: recce
+    prerequisites:
+      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
+    run:
+      container: recce-dependencies
