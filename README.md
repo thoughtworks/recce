@@ -17,11 +17,30 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 
 ## Getting Started
 
-Currently Recce isn't published externally. To get started, you can build locally. [DEVELOPMENT.md](./DEVELOPMENT.md) has more information, but you can get started with a quick example with
+Recce is currently only published as a container image to a private GHCR repo.
 
-* **Run Recce** locally with an [example](./examples) source and target database
-    ```shell
-    ./batect recce
+However, it also requires a Postgres database and to be practically useful, you want to configure it with connectivity to some data sources you wish to reconcile.
+
+These options require only JDK 11+ and Docker installed locally.
+
+* **Run Recce** locally
+  * Either **Build** locally with an [example](./examples) source and target database (More info at [DEVELOPMENT.md](./DEVELOPMENT.md)).
+      ```shell
+      ./batect recce
+      ```
+  * **Or use pre-validated Docker image** locally, using this repository only for setting up a DB for Recce, and an example scenario.
+      ```shell
+      # Run in one shell - starts a DB for Recce, and an example scenario
+      ./batect run-deps
+    
+      # Run in another shell - runs Recce
+      docker run -p 8080:8080 \
+        -v $(pwd)/examples/scenario/petshop-mysql:/config \
+        -e MICRONAUT_CONFIG_FILES=/config/application-petshop-mysql.yml \
+        -e DATABASE_HOST=host.docker.internal \
+        -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mysql://host.docker.internal:8000/db \
+        -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mysql://host.docker.internal:8001/db \
+        ghcr.io/chadlwilson/recce-server:latest
     ```
 * **Synchronously trigger** a run, waiting for to complete
     ```shell
@@ -108,13 +127,11 @@ However, the recommended way to add additional configuration is to mount a volum
 mkdir -p my-dataset-configs
 touch my-dataset-configs/config1.yml my-dataset-configs/config2.yml
 
-# Using a local docker build for demonstration
-./gradlew jibDockerBuild
-
+## Run latest from docker
 docker run -p 8080:8080 \
   -v $(pwd)/my-dataset-configs:/config \
   -e MICRONAUT_CONFIG_FILES=/config/config1.yml,/config/config2.yml \
-  recce-server
+  ghcr.io/chadlwilson/recce-server:latest
 ```
 
 ### Configuring datasources
