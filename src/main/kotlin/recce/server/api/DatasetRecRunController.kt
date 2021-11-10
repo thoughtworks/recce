@@ -33,7 +33,7 @@ class DatasetRecRunController(
     }
 
     @Get
-    fun get(@QueryValue("datasetId") datasetId: String): Flux<RunApiModel> {
+    fun get(@NotBlank @QueryValue("datasetId") datasetId: String): Flux<RunApiModel> {
         logger.info { "Find runs for [$datasetId]" }
         return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { RunApiModel(it) }
     }
