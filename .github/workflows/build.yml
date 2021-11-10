@@ -43,7 +43,21 @@ jobs:
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
-          arguments: build jib
+          arguments: build
+      - name: Build Docker image locally with Gradle
+        uses: gradle/gradle-build-action@v2
+        if: ${{ !endsWith(github.ref, '/master') }}
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+        with:
+          arguments: jibDockerBuild
+      - name: Build & push docker image with Gradle
+        uses: gradle/gradle-build-action@v2
+        if: ${{ endsWith(github.ref, '/master') }}
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+        with:
+          arguments: jib
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
