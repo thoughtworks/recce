@@ -38,29 +38,30 @@ jobs:
         if: steps.asdf-cache.outputs.cache-hit != 'true'
       - name: Set JAVA_HOME from ASDF
         run: echo "JAVA_HOME=$(dirname $(dirname $(asdf which java)))" >> $GITHUB_ENV
-      - name: Build with Gradle
+      - name: Gradle Build, Lint, Test
         uses: gradle/gradle-build-action@v2
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: build
-      - name: Build Docker image locally with Gradle
+      - name: Save test results artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report
+          path: build/reports/tests/test
+      - name: Gradle Local Docker Trial Build
         uses: gradle/gradle-build-action@v2
         if: ${{ !endsWith(github.ref, '/master') }}
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: jibDockerBuild
-      - name: Build & push docker image with Gradle
+      - name: Gradle Official Docker Build & Push
         uses: gradle/gradle-build-action@v2
         if: ${{ endsWith(github.ref, '/master') }}
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: jib
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-report
-          path: build/reports/tests/test
+
