@@ -4,6 +4,7 @@ import io.micronaut.context.BeanLocator
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.ConfigurationProperties
 import io.micronaut.context.annotation.Context
+import io.micronaut.core.bind.annotation.Bindable
 import mu.KotlinLogging
 import recce.server.dataset.DatasetConfiguration
 import javax.annotation.PostConstruct
@@ -17,7 +18,10 @@ interface PostConstructable {
 @Context
 @ConfigurationProperties("reconciliation")
 class RecConfiguration
-@ConfigurationInject constructor(val datasets: Map<String, DatasetConfiguration>) : PostConstructable {
+@ConfigurationInject constructor(
+    val datasets: Map<String, DatasetConfiguration>,
+    @Bindable(defaultValue = "1000") val defaultBatchSize: Int = 1000
+) : PostConstructable {
 
     @PostConstruct
     override fun populate(locator: BeanLocator) {

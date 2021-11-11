@@ -47,12 +47,16 @@ open class DatasetRecService(
 
     private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
         source.runQuery()
+            .doOnNext { logger.info { "Source query completed; streaming to Recce DB" } }
             .flatMap { result -> result.map(HashedRow::fromRow) }
+            .buffer(config.defaultBatchSize)
             .zipWith(run.repeat())
-            .flatMap { (row, run) ->
+            .flatMap { (rows, run) ->
+                val records = rows.map { RecRecord(RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
                 recordRepository
-                    .save(RecRecord(RecRecordKey(run.id!!, row.migrationKey), sourceData = row.hashedValue))
-                    .map { row.lazyMeta() }
+                    .saveAll(records)
+                    .index()
+                    .map { (i, _) -> rows[i.toInt()].lazyMeta() }
             }
             .onErrorMap { DataLoadException("Failed to load data from source [${source.dataSourceRef}]: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
@@ -62,6 +66,7 @@ open class DatasetRecService(
 
     private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
         target.runQuery()
+            .doOnNext { logger.info { "Target query completed; streaming to Recce DB" } }
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .flatMap { (row, run) ->

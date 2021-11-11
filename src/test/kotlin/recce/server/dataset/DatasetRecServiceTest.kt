@@ -5,6 +5,7 @@ import io.r2dbc.spi.RowMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.anyList
 import org.mockito.kotlin.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -42,6 +43,7 @@ internal class DatasetRecServiceTest {
     private val testRecord = RecRecord(testRecordKey)
     private val recordRepository = mock<RecRecordRepository> {
         on { save(any()) } doReturn Mono.just(testRecord)
+        on { saveAll(anyList()) } doReturn Flux.just(testRecord)
         on { update(eq(testRecordKey), any()) } doReturn Mono.empty()
     }
 
@@ -84,7 +86,7 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).save(RecRecord(testRecordKey, sourceData = "def"))
+        verify(recordRepository).saveAll(listOf(RecRecord(testRecordKey, sourceData = "def")))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
@@ -131,7 +133,7 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).save(RecRecord(testRecordKey, sourceData = "def"))
+        verify(recordRepository).saveAll(listOf(RecRecord(testRecordKey, sourceData = "def")))
         verify(recordRepository).existsById(testRecordKey)
         verify(recordRepository).save(RecRecord(testRecordKey, targetData = "def"))
         verifyNoMoreInteractions(recordRepository)
@@ -155,7 +157,7 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).save(RecRecord(testRecordKey, sourceData = "def"))
+        verify(recordRepository).saveAll(listOf(RecRecord(testRecordKey, sourceData = "def")))
         verify(recordRepository).existsById(testRecordKey)
         verify(recordRepository).update(testRecordKey, targetData = "def")
         verifyNoMoreInteractions(recordRepository)
