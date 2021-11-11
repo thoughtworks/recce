@@ -1,5 +1,6 @@
 package recce.server.recrun
 
+import io.micronaut.data.annotation.Id
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
@@ -14,6 +15,8 @@ import javax.persistence.*
 @R2dbcRepository(dialect = Dialect.POSTGRES)
 abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     ReactorCrudRepository<RecRecord, RecRecordKey> {
+
+    abstract fun update(@Id id: RecRecordKey, targetData: String?): Mono<Void>
 
     abstract fun findByIdRecRunId(recRunId: Int): Flux<RecRecord>
 

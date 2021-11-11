@@ -5,11 +5,7 @@ import io.r2dbc.spi.RowMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
@@ -46,6 +42,7 @@ internal class DatasetRecServiceTest {
     private val testRecord = RecRecord(testRecordKey)
     private val recordRepository = mock<RecRecordRepository> {
         on { save(any()) } doReturn Mono.just(testRecord)
+        on { update(eq(testRecordKey), any()) } doReturn Mono.empty()
     }
 
     @Test
@@ -68,6 +65,8 @@ internal class DatasetRecServiceTest {
                 assertThat(it.targetMeta.cols).isEmpty()
             }
             .verifyComplete()
+
+        verifyNoMoreInteractions(recordRepository)
     }
 
     @Test
@@ -86,12 +85,13 @@ internal class DatasetRecServiceTest {
             .verifyComplete()
 
         verify(recordRepository).save(RecRecord(testRecordKey, sourceData = "def"))
+        verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
 
     @Test
     fun `should reconcile empty source with target`() {
-        `when`(recordRepository.findById(testRecordKey)).doReturn(Mono.empty())
+        whenever(recordRepository.existsById(testRecordKey)).doReturn(Mono.just(false))
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
@@ -106,13 +106,17 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
+        verify(recordRepository).existsById(testRecordKey)
         verify(recordRepository).save(RecRecord(testRecordKey, targetData = "def"))
+        verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
 
     @Test
-    fun `should reconcile source with target`() {
-        `when`(recordRepository.findById(testRecordKey)).doReturn(Mono.empty())
+    fun `should reconcile source with target with different rows row`() {
+        // yes, we are re-using the same key, but let's pretend they are different by telling
+        // the code that the row doesn't exist
+        whenever(recordRepository.existsById(testRecordKey)).doReturn(Mono.just(false))
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
@@ -128,7 +132,33 @@ internal class DatasetRecServiceTest {
             .verifyComplete()
 
         verify(recordRepository).save(RecRecord(testRecordKey, sourceData = "def"))
+        verify(recordRepository).existsById(testRecordKey)
         verify(recordRepository).save(RecRecord(testRecordKey, targetData = "def"))
+        verifyNoMoreInteractions(recordRepository)
+        verify(runService).complete(recRun)
+    }
+
+    @Test
+    fun `should reconcile source with target when rows have matching key`() {
+        whenever(recordRepository.existsById(testRecordKey)).doReturn(Mono.just(true))
+
+        val service = DatasetRecService(
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
+            runService,
+            recordRepository
+        )
+
+        StepVerifier.create(service.runFor(testDataset))
+            .assertNext {
+                assertThat(it.sourceMeta.cols).isNotEmpty
+                assertThat(it.targetMeta.cols).isNotEmpty
+            }
+            .verifyComplete()
+
+        verify(recordRepository).save(RecRecord(testRecordKey, sourceData = "def"))
+        verify(recordRepository).existsById(testRecordKey)
+        verify(recordRepository).update(testRecordKey, targetData = "def")
+        verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
 }

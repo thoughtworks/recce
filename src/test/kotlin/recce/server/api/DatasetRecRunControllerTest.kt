@@ -51,7 +51,9 @@ private val service = mock<DatasetRecRunner> {
 
 private val runRepository = mock<RecRunRepository> {
     on { findById(testResults.id!!) } doReturn Mono.just(testResults)
+    on { existsById(testResults.id!!) } doReturn Mono.just(true)
     on { findById(notFoundId) } doReturn Mono.empty()
+    on { existsById(notFoundId) } doReturn Mono.just(false)
     on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
 }
 

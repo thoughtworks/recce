@@ -67,10 +67,14 @@ open class DatasetRecService(
             .flatMap { (row, run) ->
                 val key = RecRecordKey(run.id!!, row.migrationKey)
                 recordRepository
-                    .findById(key)
-                    .flatMap { record -> recordRepository.update(record.apply { targetData = row.hashedValue }) }
-                    .switchIfEmpty(recordRepository.save(RecRecord(key, targetData = row.hashedValue)))
-                    .map { row.lazyMeta() }
+                    .existsById(key)
+                    .flatMap { exists ->
+                        when (exists) {
+                            true -> recordRepository.update(key, targetData = row.hashedValue).thenReturn(row)
+                            false -> recordRepository.save(RecRecord(key, targetData = row.hashedValue))
+                        }
+                    }
+                    .then(Mono.just(row.lazyMeta()))
             }
             .onErrorMap { DataLoadException("Failed to load data from target [${target.dataSourceRef}]: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
