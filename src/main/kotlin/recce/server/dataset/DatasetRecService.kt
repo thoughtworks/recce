@@ -58,6 +58,7 @@ open class DatasetRecService(
             .defaultIfEmpty { DatasetMeta() }
             .last()
             .map { it.invoke() }
+            .doOnNext { logger.info { "Load from source completed" } }
 
     private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
         target.runQuery()
@@ -75,6 +76,7 @@ open class DatasetRecService(
             .defaultIfEmpty { DatasetMeta() }
             .last()
             .map { it.invoke() }
+            .doOnNext { logger.info { "Load from target completed" } }
 }
 
 class DataLoadException(message: String, cause: Throwable) : Exception(message, cause)

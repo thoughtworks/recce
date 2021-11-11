@@ -18,6 +18,7 @@ open class RecRunService(
         .cache()
 
     fun complete(run: RecRun): Mono<RecRun> {
+        logger.info { "Summarising results for $run" }
         return recordRepository.countMatchedByIdRecRunId(run.id!!)
             .map { run.apply { completedTime = Instant.now(); summary = it } }
             .flatMap(runRepository::update)
