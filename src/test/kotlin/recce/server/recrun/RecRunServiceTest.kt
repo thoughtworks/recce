@@ -32,7 +32,7 @@ internal class RecRunServiceTest {
     fun `complete should set completed time`() {
         val expectedMatchStatus = MatchStatus(1, 1, 1, 1)
         val recordRepository = mock<RecRecordRepository> {
-            on { countMatchedByIdRecRunId(any()) } doReturn Mono.just(expectedMatchStatus)
+            on { countMatchedByKeyRecRunId(any()) } doReturn Mono.just(expectedMatchStatus)
         }
 
         val runRepository = mock<RecRunRepository> {
