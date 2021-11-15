@@ -37,16 +37,8 @@ class RecRecordRepositoryTest {
                 List(3) { "test" to "test" } +
                 List(4) { "test" to "test3" }
 
-        val setup = runRepository.save(RecRun("test-dataset")).toFlux().flatMap { run ->
-            var key = 0
-            Flux.fromIterable(testRecordData)
-                .flatMap { (source, target) ->
-                    recordRepository.save(RecRecord(RecRecordKey(run.id!!, "${++key}"), source, target))
-                }
-        }
-
         val savedRecords = mutableListOf<RecRecord>()
-        StepVerifier.create(setup)
+        StepVerifier.create(saveTestRecords(testRecordData))
             .recordWith { savedRecords }
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
@@ -59,5 +51,29 @@ class RecRecordRepositoryTest {
                 assertThat(it.total).isEqualTo(10)
             }
             .verifyComplete()
+    }
+
+    private fun saveTestRecords(testRecordData: List<Pair<String?, String?>>): Flux<RecRecord> {
+        return runRepository.save(RecRun("test-dataset")).toFlux().flatMap { run ->
+            var key = 0
+            Flux.fromIterable(testRecordData)
+                .flatMap { (source, target) ->
+                    recordRepository.save(RecRecord(RecRecordKey(run.id!!, "${++key}"), source, target))
+                }
+        }
+    }
+
+    @Test
+    fun `should bulk check for existence of records`() {
+        val testRecordData = List(10) { "test" to null }
+        val savedRecords = mutableListOf<RecRecord>()
+        StepVerifier.create(saveTestRecords(testRecordData))
+            .recordWith { savedRecords }
+            .expectNextCount(testRecordData.size.toLong())
+            .verifyComplete()
+
+        StepVerifier.create(recordRepository.findByIdInList(savedRecords.map { it.id }))
+            .expectNextCount(10)
+            .verifyComplete();
     }
 }
