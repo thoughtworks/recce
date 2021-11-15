@@ -1,6 +1,5 @@
 package recce.server.recrun
 
-import io.micronaut.data.annotation.Id
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
@@ -9,18 +8,21 @@ import io.r2dbc.spi.Row
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
-import java.io.Serializable
 import javax.persistence.*
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
 abstract class RecRecordRepository(private val operations: R2dbcOperations) :
-    ReactorCrudRepository<RecRecord, RecRecordKey> {
+    ReactorCrudRepository<RecRecord, Int> {
 
-    abstract fun update(@Id id: RecRecordKey, targetData: String?): Mono<Void>
+    abstract fun existsByRecRunIdAndMigrationKey(recRunId: Int, migrationKey: String): Mono<Boolean>
 
-    abstract fun findByIdRecRunId(recRunId: Int): Flux<RecRecord>
+    abstract fun updateByRecRunIdAndMigrationKey(recRunId: Int, migrationKey: String, targetData: String?): Mono<Void>
 
-    fun countMatchedByIdRecRunId(recRunId: Int): Mono<MatchStatus> {
+    abstract fun findByRecRunIdAndMigrationKeyIn(recRunId: Int, migrationKeys: List<String>): Flux<RecRecord>
+
+    abstract fun findByRecRunId(recRunId: Int): Flux<RecRecord>
+
+    fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus> {
         return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute() }
             .toFlux()
             .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
@@ -66,13 +68,17 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
 @Entity
 @Table(name = "reconciliation_record")
 data class RecRecord(
-    @EmbeddedId val id: RecRecordKey,
+    @Id @GeneratedValue val id: Int? = null,
+    @Column(name = "reconciliation_run_id") val recRunId: Int,
+    @Column(name = "migration_key") val migrationKey: String,
     var sourceData: String? = null,
     var targetData: String? = null
-)
+) {
+    constructor(key: RecRecordKey, sourceData: String? = null, targetData: String? = null) :
+        this(recRunId = key.recRunId, migrationKey = key.migrationKey, sourceData = sourceData, targetData = targetData)
 
-@Embeddable
-data class RecRecordKey(
-    @Column(name = "reconciliation_run_id") val recRunId: Int,
-    @Column(name = "migration_key") val migrationKey: String
-) : Serializable
+    @Transient
+    val key = RecRecordKey(recRunId, migrationKey)
+}
+
+data class RecRecordKey(val recRunId: Int, val migrationKey: String)

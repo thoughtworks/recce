@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Flux
 import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
 
 @MicronautTest
@@ -24,7 +26,7 @@ class RecRecordRepositoryTest {
 
     @Test
     fun `should count matches when empty`() {
-        StepVerifier.create(recordRepository.countMatchedByIdRecRunId(1))
+        StepVerifier.create(recordRepository.countMatchedByKeyRecRunId(1))
             .expectNext(MatchStatus())
             .verifyComplete()
     }
@@ -43,7 +45,7 @@ class RecRecordRepositoryTest {
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
 
-        StepVerifier.create(recordRepository.countMatchedByIdRecRunId(savedRecords.last().id.recRunId))
+        StepVerifier.create(recordRepository.countMatchedByKeyRecRunId(savedRecords.last().key.recRunId))
             .assertNext {
                 assertThat(it).isEqualTo(MatchStatus(1, 2, 3, 4))
                 assertThat(it.sourceTotal).isEqualTo(8)
@@ -55,10 +57,10 @@ class RecRecordRepositoryTest {
 
     private fun saveTestRecords(testRecordData: List<Pair<String?, String?>>): Flux<RecRecord> {
         return runRepository.save(RecRun("test-dataset")).toFlux().flatMap { run ->
-            var key = 0
             Flux.fromIterable(testRecordData)
-                .flatMap { (source, target) ->
-                    recordRepository.save(RecRecord(RecRecordKey(run.id!!, "${++key}"), source, target))
+                .index()
+                .flatMap { (i, data) ->
+                    recordRepository.save(RecRecord(key = RecRecordKey(run.id!!, "${i + 1}"), sourceData = data.first, targetData = data.second))
                 }
         }
     }
@@ -72,8 +74,12 @@ class RecRecordRepositoryTest {
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
 
-        StepVerifier.create(recordRepository.findByIdInList(savedRecords.map { it.id }))
-            .expectNextCount(10)
-            .verifyComplete();
+        val foundRecords = mutableListOf<RecRecord>()
+        StepVerifier.create(recordRepository.findByRecRunIdAndMigrationKeyIn(savedRecords.first().recRunId, savedRecords.map { it.migrationKey }))
+            .recordWith { foundRecords }
+            .expectNextCount(testRecordData.size.toLong())
+            .verifyComplete()
+
+        assertThat(savedRecords).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(foundRecords)
     }
 }

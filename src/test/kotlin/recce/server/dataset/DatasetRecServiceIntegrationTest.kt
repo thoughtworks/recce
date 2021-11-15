@@ -64,41 +64,41 @@ class DatasetRecServiceIntegrationTest : DataSourceTest() {
         StepVerifier.create(
             runRepository.findAll()
                 .flatMap { run ->
-                    recordRepository.findByIdRecRunId(run.id!!).map { Tuples.of(run, it) }
+                    recordRepository.findByRecRunId(run.id!!).map { Tuples.of(run, it) }
                 }
         )
             .assertNext { (run, record) ->
                 checkPersistentFieldsFor(run)
-                assertThat(record.id.recRunId).isEqualTo(run.id)
-                assertThat(record.id.migrationKey).isEqualTo("Test0")
+                assertThat(record.key.recRunId).isEqualTo(run.id)
+                assertThat(record.key.migrationKey).isEqualTo("Test0")
                 assertThat(record.sourceData).isEqualTo("4e92a72630647a5bc6fc3909b52387e6dd6e4466fc7bcceb7439fd6df18fe866")
                 assertThat(record.targetData).isEqualTo("4e92a72630647a5bc6fc3909b52387e6dd6e4466fc7bcceb7439fd6df18fe866")
             }
             .assertNext { (run, record) ->
                 assertThat(run.datasetId).isEqualTo("test-dataset")
-                assertThat(record.id.recRunId).isEqualTo(run.id)
-                assertThat(record.id.migrationKey).isEqualTo("Test1")
+                assertThat(record.key.recRunId).isEqualTo(run.id)
+                assertThat(record.key.migrationKey).isEqualTo("Test1")
                 assertThat(record.sourceData).isEqualTo("ba4d2f35698204cfda7e42cb31752d878f578822920440b5aa0ed79f1ac79785")
                 assertThat(record.targetData).isEqualTo("ba4d2f35698204cfda7e42cb31752d878f578822920440b5aa0ed79f1ac79785")
             }
             .assertNext { (run, record) ->
                 assertThat(run.datasetId).isEqualTo("test-dataset")
-                assertThat(record.id.recRunId).isEqualTo(run.id)
-                assertThat(record.id.migrationKey).isEqualTo("Test2")
+                assertThat(record.key.recRunId).isEqualTo(run.id)
+                assertThat(record.key.migrationKey).isEqualTo("Test2")
                 assertThat(record.sourceData).isEqualTo("eb25fb4ad862a2ba8a753d1d1c42889d18651150070113527bf55d50b663e7ac")
                 assertThat(record.targetData).isNull()
             }
             .assertNext { (run, record) ->
                 assertThat(run.datasetId).isEqualTo("test-dataset")
-                assertThat(record.id.recRunId).isEqualTo(run.id)
-                assertThat(record.id.migrationKey).isEqualTo("Test3")
+                assertThat(record.key.recRunId).isEqualTo(run.id)
+                assertThat(record.key.migrationKey).isEqualTo("Test3")
                 assertThat(record.sourceData).isNull()
                 assertThat(record.targetData).isEqualTo("168c587d9c765ec2cda598750201d15a2e616641455696df176f51d6433dff37")
             }
             .assertNext { (run, record) ->
                 assertThat(run.datasetId).isEqualTo("test-dataset")
-                assertThat(record.id.recRunId).isEqualTo(run.id)
-                assertThat(record.id.migrationKey).isEqualTo("Test4")
+                assertThat(record.key.recRunId).isEqualTo(run.id)
+                assertThat(record.key.migrationKey).isEqualTo("Test4")
                 assertThat(record.sourceData).isNull()
                 assertThat(record.targetData).isEqualTo("8b4cde00f0a0d00546a59e74bc9b183a43d69143944101eeae789163b509038d")
             }

@@ -52,7 +52,7 @@ open class DatasetRecService(
             .buffer(config.defaultBatchSize)
             .zipWith(run.repeat())
             .flatMap { (rows, run) ->
-                val records = rows.map { RecRecord(RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
+                val records = rows.map { RecRecord(key = RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
                 recordRepository
                     .saveAll(records)
                     .index()
@@ -70,13 +70,12 @@ open class DatasetRecService(
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .zipWith(run.repeat())
             .flatMap { (row, run) ->
-                val key = RecRecordKey(run.id!!, row.migrationKey)
                 recordRepository
-                    .existsById(key)
+                    .existsByRecRunIdAndMigrationKey(run.id!!, row.migrationKey)
                     .flatMap { exists ->
                         when (exists) {
-                            true -> recordRepository.update(key, targetData = row.hashedValue).thenReturn(row)
-                            false -> recordRepository.save(RecRecord(key, targetData = row.hashedValue))
+                            true -> recordRepository.updateByRecRunIdAndMigrationKey(run.id, row.migrationKey, targetData = row.hashedValue).thenReturn(row)
+                            false -> recordRepository.save(RecRecord(recRunId = run.id, migrationKey = row.migrationKey, targetData = row.hashedValue))
                         }
                     }
                     .then(Mono.just(row.lazyMeta()))

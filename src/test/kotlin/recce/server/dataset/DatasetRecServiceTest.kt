@@ -40,11 +40,11 @@ internal class DatasetRecServiceTest {
     }
 
     private val testRecordKey = RecRecordKey(1, "abc")
-    private val testRecord = RecRecord(testRecordKey)
+    private val testRecord = RecRecord(key = testRecordKey)
     private val recordRepository = mock<RecRecordRepository> {
         on { save(any()) } doReturn Mono.just(testRecord)
         on { saveAll(anyList()) } doReturn Flux.just(testRecord)
-        on { update(eq(testRecordKey), any()) } doReturn Mono.empty()
+        on { updateByRecRunIdAndMigrationKey(eq(testRecordKey.recRunId), eq(testRecordKey.migrationKey), any()) } doReturn Mono.empty()
     }
 
     @Test
@@ -86,14 +86,15 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).saveAll(listOf(RecRecord(testRecordKey, sourceData = "def")))
+        verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
 
     @Test
     fun `should reconcile empty source with target`() {
-        whenever(recordRepository.existsById(testRecordKey)).doReturn(Mono.just(false))
+        whenever(recordRepository.existsByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey))
+            .doReturn(Mono.just(false))
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
@@ -108,8 +109,8 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).existsById(testRecordKey)
-        verify(recordRepository).save(RecRecord(testRecordKey, targetData = "def"))
+        verify(recordRepository).existsByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey)
+        verify(recordRepository).save(RecRecord(key = testRecordKey, targetData = "def"))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
@@ -118,7 +119,8 @@ internal class DatasetRecServiceTest {
     fun `should reconcile source with target with different rows row`() {
         // yes, we are re-using the same key, but let's pretend they are different by telling
         // the code that the row doesn't exist
-        whenever(recordRepository.existsById(testRecordKey)).doReturn(Mono.just(false))
+        whenever(recordRepository.existsByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey))
+            .doReturn(Mono.just(false))
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
@@ -133,16 +135,17 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).saveAll(listOf(RecRecord(testRecordKey, sourceData = "def")))
-        verify(recordRepository).existsById(testRecordKey)
-        verify(recordRepository).save(RecRecord(testRecordKey, targetData = "def"))
+        verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
+        verify(recordRepository).existsByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey)
+        verify(recordRepository).save(RecRecord(key = testRecordKey, targetData = "def"))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
 
     @Test
     fun `should reconcile source with target when rows have matching key`() {
-        whenever(recordRepository.existsById(testRecordKey)).doReturn(Mono.just(true))
+        whenever(recordRepository.existsByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey))
+            .doReturn(Mono.just(true))
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
@@ -157,9 +160,9 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).saveAll(listOf(RecRecord(testRecordKey, sourceData = "def")))
-        verify(recordRepository).existsById(testRecordKey)
-        verify(recordRepository).update(testRecordKey, targetData = "def")
+        verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
+        verify(recordRepository).existsByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey)
+        verify(recordRepository).updateByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey, targetData = "def")
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
