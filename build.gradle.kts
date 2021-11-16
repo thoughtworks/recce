@@ -29,8 +29,9 @@ val depDescriptors = mapOf(
     // which causes it to run with its "default platform", causing classpath issues.
     "junit" to "org.junit:junit-bom:5.8.1", // Be careful about bumping major versions. Needs to be compatible with Micronaut BOM.
 
-    // Unfortunately not all Mockito libs are in the Micronaut BOM, this allows us to keep versions consistent.
-    "mockito" to "org.mockito:mockito-core:4.0.0", // Be careful about bumping major versions. Needs to be compatible with Micronaut BOM.
+    // Unfortunately not all Mockito or Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
+    "mockito" to "org.mockito:mockito-core:4.0.0", // Needs to be compatible with Micronaut BOM.
+    "reactor" to "io.projectreactor:reactor-core:3.4.12" // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17",
@@ -70,6 +71,7 @@ dependencies {
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("javax.annotation:javax.annotation-api")
     implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("io.projectreactor:reactor-tools:${depVersions["reactor"]}")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
@@ -102,7 +104,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:${depVersions["mockito"]}")
     testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
     testImplementation("org.mockito.kotlin:mockito-kotlin:${depVersions["mockito"]}")
-    testImplementation("io.projectreactor:reactor-test:3.4.12")
+    testImplementation("io.projectreactor:reactor-test:${depVersions["reactor"]}")
 
     testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
     testImplementation("org.jetbrains.exposed:exposed-jdbc:${depVersions["exposed"]}")
