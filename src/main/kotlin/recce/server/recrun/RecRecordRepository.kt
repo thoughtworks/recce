@@ -14,8 +14,7 @@ import javax.persistence.*
 abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     ReactorCrudRepository<RecRecord, Int> {
 
-    abstract fun existsByRecRunIdAndMigrationKey(recRunId: Int, migrationKey: String): Mono<Boolean>
-
+    @Suppress("MicronautDataRepositoryMethodParameters") // False positive
     abstract fun updateByRecRunIdAndMigrationKey(recRunId: Int, migrationKey: String, targetData: String?): Mono<Void>
 
     abstract fun findByRecRunIdAndMigrationKeyIn(recRunId: Int, migrationKeys: List<String>): Flux<RecRecord>

@@ -20,7 +20,7 @@ interface PostConstructable {
 class RecConfiguration
 @ConfigurationInject constructor(
     val datasets: Map<String, DatasetConfiguration>,
-    @Bindable(defaultValue = "1000") val defaultBatchSize: Int = 1000
+    @Bindable(defaultValue = "100") val defaultBatchSize: Int = 100
 ) : PostConstructable {
 
     @PostConstruct
