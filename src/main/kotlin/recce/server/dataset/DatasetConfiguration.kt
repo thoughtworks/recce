@@ -8,7 +8,9 @@ class DatasetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val
     PostConstructable {
     lateinit var name: String
     override fun populate(locator: BeanLocator) {
+        source.role = DataLoadRole.source
         source.populate(locator)
+        target.role = DataLoadRole.target
         target.populate(locator)
     }
 

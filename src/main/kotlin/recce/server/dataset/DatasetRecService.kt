@@ -30,84 +30,61 @@ open class DatasetRecService(
 
         val recRun = runService.start(datasetId)
 
-        return loadFromSourceThenTarget(datasetConfig, recRun)
-            .flatMap { (source, target) ->
-                recRun.map {
-                    it.apply {
-                        sourceMeta = source
-                        targetMeta = target
-                    }
-                }
-            }
+        return loadFrom(datasetConfig.source, recRun, this::saveSourceBatch)
+            .zipWhen { loadFrom(datasetConfig.target, recRun, this::saveTargetBatch) }
+            .flatMap { (source, target) -> recRun.map { it.withMetaData(source, target) } }
             .flatMap { run -> runService.complete(run) }
     }
 
-    private fun loadFromSourceThenTarget(datasetConfig: DatasetConfiguration, recRun: Mono<RecRun>) =
-        loadFromSource(datasetConfig.source, recRun)
-            .zipWhen { loadFromTarget(datasetConfig.target, recRun) }
-
-    private fun loadFromSource(source: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> =
-        source.runQuery()
-            .doOnNext { logger.info { "Source query completed; streaming to Recce DB" } }
+    private fun loadFrom(
+        def: DataLoadDefinition,
+        run: Mono<RecRun>,
+        batchSaver: (List<HashedRow>, RecRun) -> Flux<LazyDatasetMeta>
+    ): Mono<DatasetMeta> =
+        def.runQuery()
+            .doOnNext { logger.info { "${def.role} query completed; streaming to Recce DB" } }
             .flatMap { result -> result.map(HashedRow::fromRow) }
             .buffer(config.defaultBatchSize)
             .zipWith(run.repeat())
-            .flatMap { (rows, run) ->
-                val records = rows.map { RecRecord(key = RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
-                recordRepository
-                    .saveAll(records)
-                    .index()
-                    .map { (i, _) -> rows[i.toInt()].lazyMeta() }
-            }
-            .onErrorMap { DataLoadException("Failed to load data from source [${source.dataSourceRef}]: ${it.message}", it) }
+            .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaultBatchConcurrency)
+            .onErrorMap { DataLoadException("Failed to load data from ${def.role} [${def.dataSourceRef}]: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
             .last()
-            .map { it.invoke() }
-            .doOnNext { logger.info { "Load from source completed" } }
+            .map { meta -> meta() }
+            .doOnNext { logger.info { "Load from ${def.role} completed" } }
 
-    private fun loadFromTarget(target: DataLoadDefinition, run: Mono<RecRun>): Mono<DatasetMeta> {
-        val bufferedRows = target.runQuery()
-            .doOnNext { logger.info { "Target query completed; streaming to Recce DB" } }
-            .flatMap { result -> result.map(HashedRow::fromRow) }
-            .buffer(config.defaultBatchSize)
-            .zipWith(run.repeat())
-        val batches: Flux<() -> DatasetMeta> = bufferedRows
-            .flatMap { (rows, run) ->
-//                logger.info { "Processing batch of size [${rows.size}] from target"}
-                val toPersist = rows.associateByTo(mutableMapOf()) { it.migrationKey }
-                val updatedRows = recordRepository
-                    .findByRecRunIdAndMigrationKeyIn(run.id!!, rows.map { it.migrationKey })
-                    .flatMap { found ->
-                        recordRepository.updateByRecRunIdAndMigrationKey(
-                            found.recRunId,
-                            found.migrationKey,
-                            targetData = toPersist.remove(found.migrationKey)?.hashedValue
-                        ).then(Mono.just(found))
-                    }
-                val newRows = Flux
-                    .defer {
-//                        logger.info { "Checking new rows for batch of size [${toPersist.size}]" }
-                        if (toPersist.isEmpty()) Mono.empty() else Mono.just(toPersist.values)
-                    }
-                    .map { hashedRows ->
-                        hashedRows.map {
-                            RecRecord(
-                                recRunId = run.id,
-                                migrationKey = it.migrationKey,
-                                targetData = it.hashedValue
-                            )
-                        }
-                    }.flatMap { recordRepository.saveAll(it) }
+    private fun saveSourceBatch(rows: List<HashedRow>, run: RecRun): Flux<LazyDatasetMeta> {
+        val records = rows.map { RecRecord(key = RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
+        return recordRepository
+            .saveAll(records)
+            .index()
+            .map { (i, _) -> rows[i.toInt()].lazyMeta() }
+    }
 
-                updatedRows.concatWith(newRows).map { rows.first().lazyMeta() }
+    private fun saveTargetBatch(rows: List<HashedRow>, run: RecRun): Flux<LazyDatasetMeta> {
+        val toPersist = rows.associateByTo(mutableMapOf()) { it.migrationKey }
+        val updatedRows = recordRepository
+            .findByRecRunIdAndMigrationKeyIn(run.id!!, rows.map { it.migrationKey })
+            .flatMap { found ->
+                recordRepository.updateByRecRunIdAndMigrationKey(
+                    found.recRunId,
+                    found.migrationKey,
+                    targetData = toPersist.remove(found.migrationKey)?.hashedValue
+                ).then(Mono.just(found))
             }
-        return batches
-            .doOnNext { logger.debug { "$it emitted" } }
-            .onErrorMap { DataLoadException("Failed to load data from target [${target.dataSourceRef}]: ${it.message}", it) }
-            .defaultIfEmpty { DatasetMeta() }
-            .last()
-            .map { it.invoke() }
-            .doOnNext { logger.info { "Load from target completed" } }
+        val newRows = Flux
+            .defer { if (toPersist.isEmpty()) Mono.empty() else Mono.just(toPersist.values) }
+            .map { hashedRows ->
+                hashedRows.map { row ->
+                    RecRecord(
+                        recRunId = run.id,
+                        migrationKey = row.migrationKey,
+                        targetData = row.hashedValue
+                    )
+                }
+            }.flatMap(recordRepository::saveAll)
+
+        return updatedRows.concatWith(newRows).map { rows.first().lazyMeta() }
     }
 }
 

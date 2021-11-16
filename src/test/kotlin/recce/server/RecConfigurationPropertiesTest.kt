@@ -6,6 +6,7 @@ import io.micronaut.context.exceptions.ConfigurationException
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import recce.server.dataset.DataLoadRole
 
 // Faster tests that do not load the full configuration and are quicker to iterate on when testing
 // configuration binding
@@ -34,9 +35,11 @@ internal class RecConfigurationPropertiesTest {
             .hasSize(1)
             .first().satisfies {
                 Assertions.assertThat(it.name).isEqualTo("test-dataset")
+                Assertions.assertThat(it.source.role).isEqualTo(DataLoadRole.source)
                 Assertions.assertThat(it.source.dataSourceRef).isEqualTo("source")
                 Assertions.assertThat(it.source.query).contains("sourcedatacount")
                 Assertions.assertThat(it.source.dbOperations).isNotNull
+                Assertions.assertThat(it.target.role).isEqualTo(DataLoadRole.target)
                 Assertions.assertThat(it.target.dataSourceRef).isEqualTo("target")
                 Assertions.assertThat(it.target.query).contains("targetdatacount")
                 Assertions.assertThat(it.target.dbOperations).isNotNull
