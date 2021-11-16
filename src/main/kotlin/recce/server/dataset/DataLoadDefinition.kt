@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank
 
 class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val query: String) : PostConstructable {
     lateinit var dbOperations: R2dbcOperations
+    lateinit var role: DataLoadRole
 
     override fun populate(locator: BeanLocator) {
         dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(dataSourceRef))
@@ -27,3 +28,5 @@ class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val quer
         { it.close() }
     )
 }
+
+enum class DataLoadRole { source, target }

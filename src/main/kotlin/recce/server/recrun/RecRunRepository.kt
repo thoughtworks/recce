@@ -35,6 +35,12 @@ data class RecRun(
 
     @Embedded var sourceMeta: DatasetMeta = DatasetMeta()
     @Embedded var targetMeta: DatasetMeta = DatasetMeta()
+
+    fun withMetaData(source: DatasetMeta, target: DatasetMeta): RecRun {
+        sourceMeta = source
+        targetMeta = target
+        return this
+    }
 }
 
 @Embeddable

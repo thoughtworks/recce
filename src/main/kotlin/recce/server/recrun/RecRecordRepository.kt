@@ -25,7 +25,7 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
         return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute() }
             .toFlux()
             .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
-            .reduce(MatchStatus()) { status, propSet -> propSet.invoke(status); status }
+            .reduce(MatchStatus()) { status, propSet -> propSet(status); status }
     }
 
     private fun matchStatusSetterFor(row: Row): (MatchStatus) -> Unit {
