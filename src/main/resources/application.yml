@@ -44,4 +44,4 @@ reconciliation:
   # may lead to R2DBC connection pool exhaustion/waits, and push excessive load to your Recce DB. In other words,
   # increasing concurrency beyond `r2dbc.datasources.default.options.maxSize` is unlikely to increase overall speed.
   defaultBatchConcurrency: 5
-  datasets: { }
+  datasets:
