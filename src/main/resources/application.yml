@@ -33,5 +33,15 @@ r2dbc:
 jackson:
   serialization:
     writeDatesAsTimestamps: false
-reconcililation:
+reconciliation:
+  # How many rows are bulk inserted/updated When bulk loading data from your source & target DBs into Recce's DB.
+  # When loading target data, note that this represents an upper limit of each batch, since rows must be split into
+  # updates (to an existing row's MigrationKey, loaded from the source) and inserts for rows that are missing in source.
+  defaultBatchSize: 1000
+  # Number of batches to potentially be saving in parallel when loading
+  # This imposes an upper limit on the number of Recce DB connections an individual dataset's reconciliation
+  # run can be using in order to batch-insert/save rows. Excessive batch concurrency relative to available DB connections
+  # may lead to R2DBC connection pool exhaustion/waits, and push excessive load to your Recce DB. In other words,
+  # increasing concurrency beyond `r2dbc.datasources.default.options.maxSize` is unlikely to increase overall speed.
+  defaultBatchConcurrency: 5
   datasets: { }
