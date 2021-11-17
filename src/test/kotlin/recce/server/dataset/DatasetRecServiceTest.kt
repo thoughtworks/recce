@@ -45,7 +45,7 @@ internal class DatasetRecServiceTest {
         on { save(any()) } doReturn Mono.just(testRecord)
         on { saveAll(anyList()) } doReturn Flux.just(testRecord)
         on { findByRecRunIdAndMigrationKeyIn(eq(testRecordKey.recRunId), anyList()) } doReturn Flux.just(testRecord)
-        on { updateByRecRunIdAndMigrationKey(eq(testRecordKey.recRunId), eq(testRecordKey.migrationKey), any()) } doReturn Mono.empty()
+        on { updateAll(anyList()) } doReturn Flux.just(testRecord)
     }
 
     @Test
@@ -163,7 +163,7 @@ internal class DatasetRecServiceTest {
 
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
         verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
-        verify(recordRepository).updateByRecRunIdAndMigrationKey(testRecordKey.recRunId, testRecordKey.migrationKey, targetData = "def")
+        verify(recordRepository).updateAll(listOf(testRecord))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }

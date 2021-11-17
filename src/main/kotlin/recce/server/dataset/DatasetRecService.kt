@@ -5,6 +5,7 @@ import jakarta.inject.Singleton
 import mu.KotlinLogging
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import recce.server.RecConfiguration
@@ -63,17 +64,14 @@ open class DatasetRecService(
 
     private fun saveTargetBatch(rows: List<HashedRow>, run: RecRun): Flux<LazyDatasetMeta> {
         val toPersist = rows.associateByTo(mutableMapOf()) { it.migrationKey }
-        val updatedRows = recordRepository
+        val updateExistingRecords = recordRepository
             .findByRecRunIdAndMigrationKeyIn(run.id!!, rows.map { it.migrationKey })
-            .flatMap { found ->
-                recordRepository.updateByRecRunIdAndMigrationKey(
-                    found.recRunId,
-                    found.migrationKey,
-                    targetData = toPersist.remove(found.migrationKey)?.hashedValue
-                ).then(Mono.just(found))
-            }
-        val newRows = Flux
-            .defer { if (toPersist.isEmpty()) Mono.empty() else Mono.just(toPersist.values) }
+            .map { it.apply { targetData = toPersist.remove(it.migrationKey)!!.hashedValue } }
+            .collectList()
+            .toFlux()
+            .flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.updateAll(it) }
+        val saveNewRecords = Flux
+            .defer { Mono.just(toPersist.values) }
             .map { hashedRows ->
                 hashedRows.map { row ->
                     RecRecord(
@@ -82,9 +80,9 @@ open class DatasetRecService(
                         targetData = row.hashedValue
                     )
                 }
-            }.flatMap(recordRepository::saveAll)
+            }.flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.saveAll(it) }
 
-        return updatedRows.concatWith(newRows).map { rows.first().lazyMeta() }
+        return updateExistingRecords.concatWith(saveNewRecords).map { rows.first().lazyMeta() }
     }
 }
 
