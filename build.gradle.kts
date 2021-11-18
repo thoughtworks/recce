@@ -1,3 +1,5 @@
+import com.github.gundy.semver4j.model.Version
+
 plugins {
     val kotlinVersion = "1.6.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
@@ -11,11 +13,16 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.1.4"
     id("com.github.ben-manes.versions") version "0.39.0"
     id("org.barfuin.gradle.taskinfo") version "1.3.1"
+    id("org.ajoberstar.reckon") version "0.13.0"
     jacoco
 }
 
-version = "0.1"
 group = "recce.server"
+
+reckon {
+    scopeFromProp()
+    stageFromProp("dev", "final")
+}
 
 // Workaround to allow dependabot to update versions of libraries together, since dependabot doesn't understand
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
@@ -160,8 +167,15 @@ jib {
         image = "eclipse-temurin:${depVersions["javaMajor"]}-jdk-alpine"
     }
     to {
+        val fullVersion = Version.fromString(project.version.toString())
+        val tagVersion = Version.builder()
+            .major(fullVersion.major)
+            .minor(fullVersion.minor)
+            .patch(fullVersion.patch)
+            .preReleaseIdentifiers(fullVersion.preReleaseIdentifiers.filterIndexed { i, _ -> i == 0 })
+            .build()
         image = "ghcr.io/$githubRepoOwner/$containerRepoName"
-        tags = setOf(version as String, "latest")
+        tags = setOf(tagVersion.toString(), "latest")
     }
     container {
         creationTime = "USE_CURRENT_TIMESTAMP"
