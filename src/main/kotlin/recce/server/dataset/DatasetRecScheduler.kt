@@ -1,6 +1,7 @@
 package recce.server.dataset
 
 import io.micronaut.context.event.ApplicationEventListener
+import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.runtime.server.event.ServerStartupEvent
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.TaskScheduler
@@ -26,10 +27,14 @@ class DatasetRecScheduler(
 
     private fun schedule(config: DatasetConfiguration) {
         config.schedule.cronExpression?.let { expr ->
-            logger.info { "Scheduling rec for [${config.name}] with cron ${config.schedule.summary}" }
-            scheduler.schedule(expr) {
-                logger.info { "Triggering scheduled reconciliation of [${config.name}]" }
-                runner.runFor(config.name).subscribe()
+            try {
+                logger.info { "Scheduling rec for [${config.name}] with cron ${config.schedule.summary}" }
+                scheduler.schedule(expr) {
+                    logger.info { "Triggering scheduled reconciliation of [${config.name}]" }
+                    runner.runFor(config.name).subscribe()
+                }
+            } catch (e: Exception) {
+                throw ConfigurationException("Schedule for [${config.name}] is invalid: ${e.message}", e)
             }
         }
     }

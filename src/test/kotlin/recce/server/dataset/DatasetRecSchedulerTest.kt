@@ -1,11 +1,12 @@
 package recce.server.dataset
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.scheduling.TaskScheduler
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
@@ -54,22 +55,16 @@ internal class DatasetRecSchedulerTest {
 
 internal class DatasetRecSchedulerIntegrationTest {
 
-    private lateinit var ctx: ApplicationContext
-
     private val everySecond = "* * * * * *"
+    private val items = mutableMapOf<String, Any>(
+        "reconciliation.datasets.test-dataset.schedule.cronExpression" to everySecond,
+        "reconciliation.datasets.test-dataset.source.dataSourceRef" to "default",
+        "reconciliation.datasets.test-dataset.source.query" to "select id as MigrationKey from reconciliation_run",
+        "reconciliation.datasets.test-dataset.target.dataSourceRef" to "default",
+        "reconciliation.datasets.test-dataset.target.query" to "select id as MigrationKey from reconciliation_run"
+    )
 
-    @BeforeEach
-    fun setup() {
-        ctx = ApplicationContext.run(
-            mapOf(
-                "reconciliation.datasets.test-dataset.schedule.cronExpression" to everySecond,
-                "reconciliation.datasets.test-dataset.source.dataSourceRef" to "default",
-                "reconciliation.datasets.test-dataset.source.query" to "select id as MigrationKey from reconciliation_run",
-                "reconciliation.datasets.test-dataset.target.dataSourceRef" to "default",
-                "reconciliation.datasets.test-dataset.target.query" to "select id as MigrationKey from reconciliation_run"
-            )
-        )
-    }
+    private lateinit var ctx: ApplicationContext
 
     @AfterEach
     fun tearDown() {
@@ -78,12 +73,28 @@ internal class DatasetRecSchedulerIntegrationTest {
 
     @Test
     fun `can run a scheduled reconciliation`() {
-        ctx.getBean(DatasetRecScheduler::class.java).onApplicationEvent(null)
+        runScheduler().onApplicationEvent(null)
 
         await().atMost(5, TimeUnit.SECONDS).untilAsserted {
             StepVerifier.create(ctx.getBean(DatasetRecRunController::class.java).get("test-dataset").collectList())
                 .assertNext { assertThat(it).hasSize(1) }
                 .verifyComplete()
         }
+    }
+
+    @Test
+    fun `fails startup on incorrect cron expression`() {
+        items["reconciliation.datasets.test-dataset.schedule.cronExpression"] = "bad-cron"
+
+        assertThatThrownBy { runScheduler().onApplicationEvent(null) }
+            .isExactlyInstanceOf(ConfigurationException::class.java)
+            .hasMessageContaining("Schedule for [test-dataset] is invalid")
+            .hasMessageContaining("Invalid cron expression [bad-cron]")
+            .hasCauseExactlyInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    private fun runScheduler(): DatasetRecScheduler {
+        ctx = ApplicationContext.run(items)
+        return ctx.getBean(DatasetRecScheduler::class.java)
     }
 }

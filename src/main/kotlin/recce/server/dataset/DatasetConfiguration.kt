@@ -30,7 +30,6 @@ class DatasetConfiguration(
 }
 
 data class Schedule(val cronExpression: String? = null) {
-    private val cron: CronExpression? = cronExpression?.let { CronExpression.create(it) }
     val summary: String
-        get() = if (cron == null) "" else "[$cronExpression], next run [${cron.nextTimeAfter(ZonedDateTime.now())}]"
+        get() = if (cronExpression == null) "" else "[$cronExpression], next run [${CronExpression.create(cronExpression).nextTimeAfter(ZonedDateTime.now())}]"
 }
