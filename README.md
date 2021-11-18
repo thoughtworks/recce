@@ -14,6 +14,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 * **Privacy** - no sensitive data stored or output by default. By default, Recce compares **hashes** of data.
 * Supports connectivity to **MySQL**, **Postgres**, **MSSQL**, **MariaDB**, **AWS Aurora RDS MySQL**, **Oracle** databases
 * **Database agnostic** when comparing database types - as long as it is coerced to a comparable JVM type consistently, it will be hashed identically
+* **Schedule** reconcilations for low-traffic periods against your data sources
 
 ## Getting Started
 
