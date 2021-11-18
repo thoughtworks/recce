@@ -1,10 +1,17 @@
 package recce.server.dataset
 
 import io.micronaut.context.BeanLocator
+import io.micronaut.core.bind.annotation.Bindable
+import io.micronaut.scheduling.cron.CronExpression
 import recce.server.PostConstructable
+import java.time.ZonedDateTime
 import javax.validation.constraints.NotNull
 
-class DatasetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val target: DataLoadDefinition) :
+class DatasetConfiguration(
+    @NotNull val source: DataLoadDefinition,
+    @NotNull val target: DataLoadDefinition,
+    @Bindable(defaultValue = "") val schedule: Schedule = Schedule()
+) :
     PostConstructable {
     lateinit var name: String
     override fun populate(locator: BeanLocator) {
@@ -20,4 +27,10 @@ class DatasetConfiguration(@NotNull val source: DataLoadDefinition, @NotNull val
     override fun toString(): String {
         return name
     }
+}
+
+data class Schedule(val cronExpression: String? = null) {
+    private val cron: CronExpression? = cronExpression?.let { CronExpression.create(it) }
+    val summary: String
+        get() = if (cron == null) "" else "[$cronExpression], next run [${cron.nextTimeAfter(ZonedDateTime.now())}]"
 }

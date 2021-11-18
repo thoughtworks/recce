@@ -187,6 +187,7 @@ Datasets are groupings of data which
 * point to source and target **datasources** configured above
 * express queries against source and target that will should produce identical output if the datasets are to be considered **reconciled**
 * can use **normal SQL** to express an equivalent data representation between source and target schemas which accounts for intended differences in the way data has been structured and migrated
+* can be scheduled to run on regular intervals
 
 ```yaml
 reconciliation:
@@ -206,7 +207,14 @@ reconciliation:
         query: >
           SELECT pet.id as MigrationKey, category.name as category, pet.name, status
           FROM pet INNER JOIN category ON pet.category_id = category.id
+      # Optional scheduling of regular or one-of reconciliations
+      schedule:
+        # Must adhere to format https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html
+        # or https://crontab.guru/ (without seconds)
+        cronExpression: 0 0 * * *
 ```
+Fuller example Recce-specific configuration is [available here](src/main/resources/application.yml).
+
 
 ### Writing queries
 

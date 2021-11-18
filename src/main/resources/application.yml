@@ -45,3 +45,21 @@ reconciliation:
   # increasing concurrency beyond `r2dbc.datasources.default.options.maxSize` is unlikely to increase overall speed.
   defaultBatchConcurrency: 5
   datasets:
+#    my-data-set: # Name your datasets however you would like
+#      source:
+#        # Reference to a datasource defined in `r2dbc.datasources`
+#        dataSourceRef: my-source-db
+#        # Any SQL query to evaluate against the source DB
+#        query: >
+#          SELECT id as MigrationKey, * FROM my-table
+#      target:
+#        # Reference to a datasource defined in `r2dbc.datasources`
+#        dataSourceRef: my-target-db
+#        # Any SQL query to evaluate against the source DB
+#        query: >
+#          SELECT different_id as MigrationKey, * FROM my-table
+#      # Optional scheduling of regular or one-of reconciliations
+#      schedule:
+#        # Must adhere to format https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html
+#        # or https://crontab.guru/ (without seconds)
+#        cronExpression: 0 0 * * *
