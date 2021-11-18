@@ -77,7 +77,7 @@ internal class DatasetRecSchedulerIntegrationTest {
 
         await().atMost(5, TimeUnit.SECONDS).untilAsserted {
             StepVerifier.create(ctx.getBean(DatasetRecRunController::class.java).get("test-dataset").collectList())
-                .assertNext { assertThat(it).hasSize(1) }
+                .assertNext { assertThat(it).hasSizeGreaterThanOrEqualTo(1) }
                 .verifyComplete()
         }
     }
