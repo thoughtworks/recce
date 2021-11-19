@@ -82,7 +82,7 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.0")
     runtimeOnly("ch.qos.logback:logback-classic")
 
     // Core persistence support with Micronaut Data
