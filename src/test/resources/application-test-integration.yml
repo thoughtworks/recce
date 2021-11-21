@@ -1,21 +1,21 @@
 datasources:
-  source:
+  source-h2:
     url: jdbc:h2:mem:sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
     password: ''
-  target:
+  target-h2:
     url: jdbc:h2:mem:targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
     password: ''
 r2dbc:
   datasources:
-    source:
+    source-h2:
       url: r2dbc:pool:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
       username: sa
       password: ''
-    target:
+    target-h2:
       url: r2dbc:pool:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
       username: sa
       password: ''

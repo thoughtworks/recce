@@ -11,14 +11,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import javax.sql.DataSource
 
-abstract class DataSourceTest {
+abstract class AbstractDataSourceTest {
 
     @Inject
-    @field:Named("source")
+    @field:Named("source-h2")
     protected lateinit var sourceDataSource: DataSource
 
     @Inject
-    @field:Named("target")
+    @field:Named("target-h2")
     protected lateinit var targetDataSource: DataSource
 
     protected object TestData : Table() {

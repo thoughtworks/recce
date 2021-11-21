@@ -2,8 +2,8 @@ reconciliation:
   datasets:
     test-dataset:
       source:
-        dataSourceRef: source
+        dataSourceRef: source-h2
         query: select name as MigrationKey, name, value from testdata
       target:
-        dataSourceRef: target
+        dataSourceRef: target-h2
         query: select name as MigrationKey, name, value from testdata
