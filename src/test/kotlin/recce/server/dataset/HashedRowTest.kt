@@ -21,16 +21,15 @@ import java.time.Instant
 internal class HashedRowTest {
 
     private val migrationKeyIndex = 0
-    private val rowMetaWithTestCol = mockRowMetaWithColumnOf("test", String::class.java)
+    private val rowMetaWithTestCol = rowMetaWithColumnOf("test", String::class.java)
 
-    private fun <T> mockRowMetaWithColumnOf(colName: String, clazz: Class<T>): RowMetadata {
-        val cols = arrayListOf(
-            mock<ColumnMetadata> { on { name } doReturn migrationKeyColumnName; on { javaType } doReturn String::class.java },
-            mock { on { name } doReturn colName; on { javaType } doReturn clazz },
+    private fun <T> rowMetaWithColumnOf(colName: String, clazz: Class<T>): RowMetadata {
+        return TestR2dbcRowMetadata(
+            listOf(
+                TestR2dbcColumnMetadata(migrationKeyColumnName, String::class.java),
+                TestR2dbcColumnMetadata(colName, clazz)
+            )
         )
-        return mock {
-            on { columnMetadatas } doReturn cols
-        }
     }
 
     private fun mockSingleColumnRowReturning(input: Any?): Row {
@@ -82,7 +81,7 @@ internal class HashedRowTest {
 
     @Test
     fun `should throw on duplicate migration key column`() {
-        val meta = mockRowMetaWithColumnOf(migrationKeyColumnName, String::class.java)
+        val meta = rowMetaWithColumnOf(migrationKeyColumnName, String::class.java)
         val row = mockSingleColumnRowReturning("key")
         assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
@@ -101,7 +100,7 @@ internal class HashedRowTest {
     @Test
     fun `nulls of different defined column java types should be considered unequal`() {
         val row = mockSingleColumnRowReturning(null)
-        val intMeta = mockRowMetaWithColumnOf("test", Integer::class.java)
+        val intMeta = rowMetaWithColumnOf("test", Integer::class.java)
 
         val stringTypeRow = HashedRow.fromRow(row, rowMetaWithTestCol)
         val intTypeRow = HashedRow.fromRow(row, intMeta)
@@ -113,7 +112,7 @@ internal class HashedRowTest {
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
         val row = mockSingleColumnRowReturning(input)
-        val meta = mockRowMetaWithColumnOf("test", type)
+        val meta = rowMetaWithColumnOf("test", type)
         assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
     }
 

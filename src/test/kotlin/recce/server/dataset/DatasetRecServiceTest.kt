@@ -27,12 +27,10 @@ internal class DatasetRecServiceTest {
         on { runQuery() } doReturn Flux.empty()
     }
 
-    private val mockMeta = mock<RowMetadata> {
-        on { columnMetadatas } doReturn listOf(TestR2dbcColumnMetadata("col1", String::class.java))
-    }
+    private val testMeta = TestR2dbcRowMetadata(listOf(TestR2dbcColumnMetadata("col1", String::class.java)))
 
     private val singleRowResult = mock<io.r2dbc.spi.Result> {
-        on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.just(HashedRow("abc", "def", mockMeta))
+        on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.just(HashedRow("abc", "def", testMeta))
     }
 
     private val singleRowDataLoad = mock<DataLoadDefinition> {
