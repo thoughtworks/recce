@@ -11,6 +11,17 @@ import java.nio.ByteBuffer
 
 data class HashedRow(val migrationKey: String, val hashedValue: String, private val rowMeta: RowMetadata) {
     companion object {
+
+        /**
+         * We need a value to add to the hash to delineate each column value that is extremely unlikely to be included
+         * in the actual values from the database. This is to ensure that adjacent column values, when concatenated into
+         * the hashing function, lead to different hashes, even if when concatenated as binary would be equivalent.
+         *
+         * There is no perfect value to use here; but we should avoid using something commonly represented the same way
+         * in binary, e.g the NUL character or a zero
+         */
+        private const val HASH_FIELD_SEPARATOR = '\u2029'
+
         @Suppress("UnstableApiUsage")
         fun fromRow(row: Row, meta: RowMetadata): HashedRow {
             var migrationKey: String? = null
@@ -45,6 +56,7 @@ data class HashedRow(val migrationKey: String, val hashedValue: String, private 
                         col is ByteBuffer -> hash.putBytes(col)
                         else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$i]")
                     }
+                    hash.putChar(HASH_FIELD_SEPARATOR)
                 }
 
             return HashedRow(

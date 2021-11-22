@@ -1,7 +1,9 @@
 package recce.server.dataset
 
+import com.google.common.hash.HashCode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Condition
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -13,8 +15,19 @@ import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.Instant
 
-internal class HashedRowTest {
+val hexSha256Hash = Condition(::isHexSha256Hash, "is SHA56 hash encoded as hex")
 
+private fun isHexSha256Hash(value: String): Boolean {
+    val isSha256 = value.length == (256 / 8) * 2
+    try {
+        HashCode.fromString(value)
+    } catch (ignore: Exception) {
+        return false
+    }
+    return isSha256
+}
+
+internal class HashedRowTest {
     private val rowMetaWithTestCol = R2dbcFakeBuilder()
         .withCol("test", String::class.java)
 
@@ -95,6 +108,25 @@ internal class HashedRowTest {
         assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
     }
 
+    @Test
+    fun `consecutive fields should always lead to different hashes`() {
+
+        val (row, meta) = R2dbcFakeBuilder()
+            .withCol("first", String::class.java)
+            .withCol("second", String::class.java)
+            .withRowValues(1, "abc", "def")
+            .build()
+
+        val (row2, meta2) = R2dbcFakeBuilder()
+            .withCol("first", String::class.java)
+            .withCol("second", String::class.java)
+            .withRowValues(1, "ab", "cdef")
+            .build()
+
+        assertThat(HashedRow.fromRow(row, meta).hashedValue)
+            .isNotEqualTo(HashedRow.fromRow(row2, meta2).hashedValue)
+    }
+
     @ParameterizedTest
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
@@ -111,57 +143,57 @@ internal class HashedRowTest {
             Arguments.of(
                 String::class.java,
                 null,
-                "ca7f6cfcd4f417dbff9cea143b1071decb72f8ec40eb6aa33856224e0e07df7e"
+                "952d0be4c421a5d1884a1ad4eb793a8965f6a040213ec77912a44266031c0b06"
             ),
             Arguments.of(
                 Boolean::class.java,
                 true,
-                "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+                "682303176353229c2c632ce24265540f4463273d099811b69587dae97f7f0380"
             ),
             Arguments.of(
                 BigDecimal::class.java,
                 BigDecimal.TEN,
-                "596c0ad17b38f4bf6c899f6b02c82f9ee326cfb7ac2d9775f49a88163364882b"
+                "924936abed2b21ffb445cd2869d15df71fb68cd57aa6c69c3ad85c31db608500"
             ),
             Arguments.of(
                 Byte::class.java,
                 java.lang.Byte.valueOf(1),
-                "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+                "682303176353229c2c632ce24265540f4463273d099811b69587dae97f7f0380"
             ),
             Arguments.of(
                 Short::class.java,
                 Integer.valueOf(10).toShort(),
-                "102b51b9765a56a3e899f7cf0ee38e5251f9c503b357b330a49183eb7b155604"
+                "2a709cf5b3fd1c874eb74937f933bac5e4cefa26fdb399a32939303b627b4b7d"
             ),
             Arguments.of(
                 Integer::class.java,
                 Integer.valueOf(10),
-                "075de2b906dbd7066da008cab735bee896370154603579a50122f9b88545bd45"
+                "2719b104b28ab4c56f21aa222fe80072316fc35e1bb12959482395a292a06143"
             ),
             Arguments.of(
                 Long::class.java,
                 Integer.valueOf(10).toLong(),
-                "a111f275cc2e7588000001d300a31e76336d15b9d314cd1a1d8f3d3556975eed"
+                "eeba3b4843c0b0995034ddf5fefbf6e61ad0d29c8448203f648c4a00397066a5"
             ),
             Arguments.of(
                 Float::class.java,
                 Integer.valueOf(10).toFloat(),
-                "80c8a717ccd70c8809eb78e6a9591c003e11c721fe0ccaf62fd592abda1a5593"
+                "a543eb24da968356ffb9975711a0b48e424e896b883cdd98eb2dc2c6516a2a5e"
             ),
             Arguments.of(
                 Double::class.java,
                 Integer.valueOf(10).toDouble(),
-                "24b1f4ef66b650ff816e519b01742ff1753733d36e1b4c3e3b52743168915b1f"
+                "70fb748e70c976827972c5a7e6a0a5d245a064482fceecacefcbdabc7ae800c8"
             ),
             Arguments.of(
                 String::class.java,
                 "10",
-                "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5"
+                "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250"
             ),
             Arguments.of(
                 ByteBuffer::class.java,
                 ByteBuffer.wrap("10".toByteArray(Charsets.UTF_8)),
-                "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5"
+                "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250"
             ),
         )
     }
