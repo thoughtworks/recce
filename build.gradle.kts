@@ -109,7 +109,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${depVersions["mockito"]}")
     testImplementation("org.mockito:mockito-inline:${depVersions["mockito"]}")
     testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${depVersions["mockito"]}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("io.projectreactor:reactor-test:${depVersions["reactor"]}")
 
     testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
