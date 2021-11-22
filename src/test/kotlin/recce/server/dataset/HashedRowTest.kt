@@ -113,7 +113,8 @@ internal class HashedRowTest {
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
         val row = mockSingleColumnRowReturning(input)
-        assertThat(HashedRow.fromRow(row, rowMetaWithTestCol)).isEqualTo(HashedRow("key", expectedHash, rowMetaWithTestCol))
+        val meta = mockRowMetaWithColumnOf("test", type)
+        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
     }
 
     companion object {
