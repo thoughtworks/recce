@@ -51,7 +51,7 @@ internal class HashedRowTest {
             .withRowValues(null, "test-val")
             .build()
 
-        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+        assertThatThrownBy { HashingStrategy.TypeStrict.build(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("MigrationKey has null value somewhere in dataset")
     }
@@ -64,7 +64,7 @@ internal class HashedRowTest {
             .withRowValues("test-val")
             .build()
 
-        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+        assertThatThrownBy { HashingStrategy.TypeStrict.build(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("No column named MigrationKey found in dataset")
     }
@@ -76,7 +76,7 @@ internal class HashedRowTest {
             .withRowValues("key", "test-val", "key")
             .build()
 
-        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+        assertThatThrownBy { HashingStrategy.TypeStrict.build(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("More than one column named MigrationKey found in dataset")
     }
@@ -84,7 +84,7 @@ internal class HashedRowTest {
     @Test
     fun `should throw on unrecognized type`() {
         val (row, meta) = rowMetaWithTestCol.withRowValues("key", Instant.now()).build()
-        assertThatThrownBy { HashedRow.fromRow(row, meta) }
+        assertThatThrownBy { HashingStrategy.TypeStrict.build(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Instant")
             .hasMessageContaining("test")
@@ -102,8 +102,8 @@ internal class HashedRowTest {
             .withRowValues("key", null)
             .build()
 
-        val stringTypeRow = HashedRow.fromRow(stringRow, stringMeta)
-        val intTypeRow = HashedRow.fromRow(intRow, intMeta)
+        val stringTypeRow = HashingStrategy.TypeStrict.build(stringRow, stringMeta)
+        val intTypeRow = HashingStrategy.TypeStrict.build(intRow, intMeta)
 
         assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
     }
@@ -123,23 +123,50 @@ internal class HashedRowTest {
             .withRowValues(1, "ab", "cdef")
             .build()
 
-        assertThat(HashedRow.fromRow(row, meta).hashedValue)
-            .isNotEqualTo(HashedRow.fromRow(row2, meta2).hashedValue)
+        assertThat(HashingStrategy.TypeStrict.build(row, meta).hashedValue)
+            .isNotEqualTo(HashingStrategy.TypeStrict.build(row2, meta2).hashedValue)
     }
 
     @ParameterizedTest
-    @MethodSource("types")
+    @MethodSource("equivalentTypeExamples")
+    fun `should allow relaxed type equivalence strategy`(first: Any, second: Any) {
+        val (row, meta) = R2dbcFakeBuilder()
+            .withCol("test", first.javaClass)
+            .withRowValues("key", first)
+            .build()
+
+        val (row2, meta2) = R2dbcFakeBuilder()
+            .withCol("test", second.javaClass)
+            .withRowValues("key", second)
+            .build()
+
+        assertThat(HashingStrategy.TypeLenient.build(row, meta).hashedValue)
+            .describedAs("${first.javaClass}($first) should be equivalent to ${second.javaClass}($second)")
+            .isEqualTo(HashingStrategy.TypeLenient.build(row2, meta2).hashedValue)
+    }
+
+    @ParameterizedTest
+    @MethodSource("typeExamples")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
         val (row, meta) = R2dbcFakeBuilder()
             .withCol("test", type)
             .withRowValues("key", input)
             .build()
-        assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
+        assertThat(HashingStrategy.TypeStrict.build(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
     }
 
     companion object {
         @JvmStatic
-        fun types() = listOf(
+        fun equivalentTypeExamples() = listOf(
+            Arguments.of(true, java.lang.Byte.valueOf(1)),
+            Arguments.of(Integer.valueOf(10), java.lang.Long.valueOf(10)),
+            Arguments.of(Integer.valueOf(10), java.lang.Short.valueOf(10)),
+            Arguments.of(Integer.valueOf(10), java.lang.Byte.valueOf(10)),
+            Arguments.of(java.lang.Float.valueOf(10.0f), java.lang.Double.valueOf(10.0)),
+        )
+
+        @JvmStatic
+        fun typeExamples() = listOf(
             Arguments.of(
                 String::class.java,
                 null,
@@ -177,12 +204,12 @@ internal class HashedRowTest {
             ),
             Arguments.of(
                 Float::class.java,
-                Integer.valueOf(10).toFloat(),
+                java.lang.Float.valueOf(10.0f),
                 "a543eb24da968356ffb9975711a0b48e424e896b883cdd98eb2dc2c6516a2a5e"
             ),
             Arguments.of(
                 Double::class.java,
-                Integer.valueOf(10).toDouble(),
+                java.lang.Double.valueOf(10.0),
                 "70fb748e70c976827972c5a7e6a0a5d245a064482fceecacefcbdabc7ae800c8"
             ),
             Arguments.of(
