@@ -1,16 +1,11 @@
 package recce.server.dataset
 
-import io.r2dbc.spi.ColumnMetadata
-import io.r2dbc.spi.Row
-import io.r2dbc.spi.RowMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
 import recce.server.recrun.ColMeta
 import recce.server.recrun.DatasetMeta
@@ -20,29 +15,12 @@ import java.time.Instant
 
 internal class HashedRowTest {
 
-    private val migrationKeyIndex = 0
-    private val rowMetaWithTestCol = rowMetaWithColumnOf("test", String::class.java)
-
-    private fun <T> rowMetaWithColumnOf(colName: String, clazz: Class<T>): RowMetadata {
-        return TestR2dbcRowMetadata(
-            listOf(
-                TestR2dbcColumnMetadata(migrationKeyColumnName, String::class.java),
-                TestR2dbcColumnMetadata(colName, clazz)
-            )
-        )
-    }
-
-    private fun mockSingleColumnRowReturning(input: Any?): Row {
-        val row = mock<Row> {
-            on { get(migrationKeyIndex) } doReturn "key"
-            on { get(1) } doReturn input
-        }
-        return row
-    }
+    private val rowMetaWithTestCol = R2dbcFakeBuilder()
+        .withCol("test", String::class.java)
 
     @Test
     fun `should dynamically convert row metadata`() {
-        val row = HashedRow("test", "test", rowMetaWithTestCol)
+        val row = HashedRow("test", "test", rowMetaWithTestCol.buildMeta())
 
         val expectedMeta = DatasetMeta(
             listOf(
@@ -55,34 +33,36 @@ internal class HashedRowTest {
 
     @Test
     fun `should throw on null migration key`() {
-        val row = mock<Row> {
-            on { get(migrationKeyIndex) } doReturn null
-        }
-        assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithTestCol) }
+
+        val (row, meta) = rowMetaWithTestCol
+            .withRowValues(null, "test-val")
+            .build()
+
+        assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("MigrationKey has null value somewhere in dataset")
     }
 
     @Test
     fun `should throw on missing migration key column`() {
-        val cols = arrayListOf(
-            mock<ColumnMetadata> { on { name } doReturn "test"; on { javaType } doReturn String::class.java },
-        )
-        val rowMetaWithNoMigrationKey = mock<RowMetadata> {
-            on { columnMetadatas } doReturn cols
-        }
-        val row = mock<Row> {
-            on { get(0) } doReturn "test-val"
-        }
-        assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithNoMigrationKey) }
+        val (row, meta) = R2dbcFakeBuilder()
+            .noMigrationKey()
+            .withCol("test", String::class.java)
+            .withRowValues("test-val")
+            .build()
+
+        assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("No column named MigrationKey found in dataset")
     }
 
     @Test
     fun `should throw on duplicate migration key column`() {
-        val meta = rowMetaWithColumnOf(migrationKeyColumnName, String::class.java)
-        val row = mockSingleColumnRowReturning("key")
+        val (row, meta) = rowMetaWithTestCol
+            .withCol(migrationKeyColumnName, String::class.java)
+            .withRowValues("key", "test-val", "key")
+            .build()
+
         assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("More than one column named MigrationKey found in dataset")
@@ -90,8 +70,8 @@ internal class HashedRowTest {
 
     @Test
     fun `should throw on unrecognized type`() {
-        val row = mockSingleColumnRowReturning(Instant.now())
-        assertThatThrownBy { HashedRow.fromRow(row, rowMetaWithTestCol) }
+        val (row, meta) = rowMetaWithTestCol.withRowValues("key", Instant.now()).build()
+        assertThatThrownBy { HashedRow.fromRow(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Instant")
             .hasMessageContaining("test")
@@ -99,11 +79,18 @@ internal class HashedRowTest {
 
     @Test
     fun `nulls of different defined column java types should be considered unequal`() {
-        val row = mockSingleColumnRowReturning(null)
-        val intMeta = rowMetaWithColumnOf("test", Integer::class.java)
+        val (stringRow, stringMeta) = R2dbcFakeBuilder()
+            .withCol("test", String::class.java)
+            .withRowValues("key", null)
+            .build()
 
-        val stringTypeRow = HashedRow.fromRow(row, rowMetaWithTestCol)
-        val intTypeRow = HashedRow.fromRow(row, intMeta)
+        val (intRow, intMeta) = R2dbcFakeBuilder()
+            .withCol("test", Integer::class.java)
+            .withRowValues("key", null)
+            .build()
+
+        val stringTypeRow = HashedRow.fromRow(stringRow, stringMeta)
+        val intTypeRow = HashedRow.fromRow(intRow, intMeta)
 
         assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
     }
@@ -111,8 +98,10 @@ internal class HashedRowTest {
     @ParameterizedTest
     @MethodSource("types")
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
-        val row = mockSingleColumnRowReturning(input)
-        val meta = rowMetaWithColumnOf("test", type)
+        val (row, meta) = R2dbcFakeBuilder()
+            .withCol("test", type)
+            .withRowValues("key", input)
+            .build()
         assertThat(HashedRow.fromRow(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
     }
 

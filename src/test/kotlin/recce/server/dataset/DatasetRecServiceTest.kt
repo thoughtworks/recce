@@ -27,7 +27,7 @@ internal class DatasetRecServiceTest {
         on { runQuery() } doReturn Flux.empty()
     }
 
-    private val testMeta = TestR2dbcRowMetadata(listOf(TestR2dbcColumnMetadata("col1", String::class.java)))
+    private val testMeta = FakeRowMetadata(listOf(FakeColumnMetadata("col1", String::class.java)))
 
     private val singleRowResult = mock<io.r2dbc.spi.Result> {
         on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.just(HashedRow("abc", "def", testMeta))
