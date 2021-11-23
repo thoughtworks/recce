@@ -5,15 +5,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Condition
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
+import org.junit.jupiter.params.provider.EnumSource
 import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
 import recce.server.recrun.ColMeta
 import recce.server.recrun.DatasetMeta
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.Instant
+import java.util.stream.Stream
 
 val hexSha256Hash = Condition(::isHexSha256Hash, "is SHA56 hash encoded as hex")
 
@@ -128,8 +132,8 @@ internal class HashedRowTest {
     }
 
     @ParameterizedTest
-    @MethodSource("equivalentTypeExamples")
-    fun `should allow relaxed type equivalence strategy`(first: Any, second: Any) {
+    @ArgumentsSource(EquivalentTypeExamples::class)
+    fun `lenient type equivalence strategy should consider similar types equal`(first: Any, second: Any) {
         val (row, meta) = R2dbcFakeBuilder()
             .withCol("test", first.javaClass)
             .withRowValues("key", first)
@@ -145,8 +149,20 @@ internal class HashedRowTest {
             .isEqualTo(HashingStrategy.TypeLenient.build(row2, meta2).hashedValue)
     }
 
+    class EquivalentTypeExamples: ArgumentsProvider {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+            return listOf(
+                Arguments.of(true, java.lang.Byte.valueOf(1)),
+                Arguments.of(Integer.valueOf(10), java.lang.Long.valueOf(10)),
+                Arguments.of(Integer.valueOf(10), java.lang.Short.valueOf(10)),
+                Arguments.of(Integer.valueOf(10), java.lang.Byte.valueOf(10)),
+                Arguments.of(java.lang.Float.valueOf(10.0f), java.lang.Double.valueOf(10.0)),
+            ).stream()
+        }
+    }
+
     @ParameterizedTest
-    @MethodSource("typeExamples")
+    @ArgumentsSource(TypeExamples::class)
     fun `should hash all column types`(type: Class<Any>, input: Any?, expectedHash: String) {
         val (row, meta) = R2dbcFakeBuilder()
             .withCol("test", type)
@@ -155,73 +171,65 @@ internal class HashedRowTest {
         assertThat(HashingStrategy.TypeStrict.build(row, meta)).isEqualTo(HashedRow("key", expectedHash, meta))
     }
 
-    companion object {
-        @JvmStatic
-        fun equivalentTypeExamples() = listOf(
-            Arguments.of(true, java.lang.Byte.valueOf(1)),
-            Arguments.of(Integer.valueOf(10), java.lang.Long.valueOf(10)),
-            Arguments.of(Integer.valueOf(10), java.lang.Short.valueOf(10)),
-            Arguments.of(Integer.valueOf(10), java.lang.Byte.valueOf(10)),
-            Arguments.of(java.lang.Float.valueOf(10.0f), java.lang.Double.valueOf(10.0)),
-        )
-
-        @JvmStatic
-        fun typeExamples() = listOf(
-            Arguments.of(
-                String::class.java,
-                null,
-                "952d0be4c421a5d1884a1ad4eb793a8965f6a040213ec77912a44266031c0b06"
-            ),
-            Arguments.of(
-                Boolean::class.java,
-                true,
-                "682303176353229c2c632ce24265540f4463273d099811b69587dae97f7f0380"
-            ),
-            Arguments.of(
-                BigDecimal::class.java,
-                BigDecimal.TEN,
-                "924936abed2b21ffb445cd2869d15df71fb68cd57aa6c69c3ad85c31db608500"
-            ),
-            Arguments.of(
-                Byte::class.java,
-                java.lang.Byte.valueOf(1),
-                "682303176353229c2c632ce24265540f4463273d099811b69587dae97f7f0380"
-            ),
-            Arguments.of(
-                Short::class.java,
-                Integer.valueOf(10).toShort(),
-                "2a709cf5b3fd1c874eb74937f933bac5e4cefa26fdb399a32939303b627b4b7d"
-            ),
-            Arguments.of(
-                Integer::class.java,
-                Integer.valueOf(10),
-                "2719b104b28ab4c56f21aa222fe80072316fc35e1bb12959482395a292a06143"
-            ),
-            Arguments.of(
-                Long::class.java,
-                Integer.valueOf(10).toLong(),
-                "eeba3b4843c0b0995034ddf5fefbf6e61ad0d29c8448203f648c4a00397066a5"
-            ),
-            Arguments.of(
-                Float::class.java,
-                java.lang.Float.valueOf(10.0f),
-                "a543eb24da968356ffb9975711a0b48e424e896b883cdd98eb2dc2c6516a2a5e"
-            ),
-            Arguments.of(
-                Double::class.java,
-                java.lang.Double.valueOf(10.0),
-                "70fb748e70c976827972c5a7e6a0a5d245a064482fceecacefcbdabc7ae800c8"
-            ),
-            Arguments.of(
-                String::class.java,
-                "10",
-                "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250"
-            ),
-            Arguments.of(
-                ByteBuffer::class.java,
-                ByteBuffer.wrap("10".toByteArray(Charsets.UTF_8)),
-                "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250"
-            ),
-        )
+    class TypeExamples: ArgumentsProvider {
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+            return listOf(
+                Arguments.of(
+                    String::class.java,
+                    null,
+                    "952d0be4c421a5d1884a1ad4eb793a8965f6a040213ec77912a44266031c0b06"
+                ),
+                Arguments.of(
+                    Boolean::class.java,
+                    true,
+                    "682303176353229c2c632ce24265540f4463273d099811b69587dae97f7f0380"
+                ),
+                Arguments.of(
+                    BigDecimal::class.java,
+                    BigDecimal.TEN,
+                    "924936abed2b21ffb445cd2869d15df71fb68cd57aa6c69c3ad85c31db608500"
+                ),
+                Arguments.of(
+                    Byte::class.java,
+                    java.lang.Byte.valueOf(1),
+                    "682303176353229c2c632ce24265540f4463273d099811b69587dae97f7f0380"
+                ),
+                Arguments.of(
+                    Short::class.java,
+                    Integer.valueOf(10).toShort(),
+                    "2a709cf5b3fd1c874eb74937f933bac5e4cefa26fdb399a32939303b627b4b7d"
+                ),
+                Arguments.of(
+                    Integer::class.java,
+                    Integer.valueOf(10),
+                    "2719b104b28ab4c56f21aa222fe80072316fc35e1bb12959482395a292a06143"
+                ),
+                Arguments.of(
+                    Long::class.java,
+                    Integer.valueOf(10).toLong(),
+                    "eeba3b4843c0b0995034ddf5fefbf6e61ad0d29c8448203f648c4a00397066a5"
+                ),
+                Arguments.of(
+                    Float::class.java,
+                    java.lang.Float.valueOf(10.0f),
+                    "a543eb24da968356ffb9975711a0b48e424e896b883cdd98eb2dc2c6516a2a5e"
+                ),
+                Arguments.of(
+                    Double::class.java,
+                    java.lang.Double.valueOf(10.0),
+                    "70fb748e70c976827972c5a7e6a0a5d245a064482fceecacefcbdabc7ae800c8"
+                ),
+                Arguments.of(
+                    String::class.java,
+                    "10",
+                    "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250"
+                ),
+                Arguments.of(
+                    ByteBuffer::class.java,
+                    ByteBuffer.wrap("10".toByteArray(Charsets.UTF_8)),
+                    "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250"
+                ),
+            ).stream()
+        }
     }
 }
