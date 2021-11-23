@@ -44,7 +44,7 @@ open class DatasetRecService(
     ): Mono<DatasetMeta> =
         def.runQuery()
             .doOnNext { logger.info { "${def.role} query completed; streaming to Recce DB" } }
-            .flatMap { result -> result.map(HashingStrategy.TypeStrict::build) }
+            .flatMap { result -> result.map(HashingStrategy.TypeStrict::hash) }
             .buffer(config.defaultBatchSize)
             .zipWith(run.repeat())
             .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaultBatchConcurrency)

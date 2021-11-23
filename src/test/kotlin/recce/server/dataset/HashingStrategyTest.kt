@@ -41,7 +41,7 @@ internal class HashingStrategyTest {
             .withRowValues(null, "test-val")
             .build()
 
-        assertThatThrownBy { strat.build(row, meta) }
+        assertThatThrownBy { strat.hash(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("MigrationKey has null value somewhere in dataset")
     }
@@ -55,7 +55,7 @@ internal class HashingStrategyTest {
             .withRowValues("test-val")
             .build()
 
-        assertThatThrownBy { strat.build(row, meta) }
+        assertThatThrownBy { strat.hash(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("No column named MigrationKey found in dataset")
     }
@@ -68,7 +68,7 @@ internal class HashingStrategyTest {
             .withRowValues("key", "test-val", "key")
             .build()
 
-        assertThatThrownBy { HashingStrategy.TypeStrict.build(row, meta) }
+        assertThatThrownBy { strat.hash(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("More than one column named MigrationKey found in dataset")
     }
@@ -77,29 +77,10 @@ internal class HashingStrategyTest {
     @EnumSource(HashingStrategy::class)
     fun `should throw on unrecognized type`(strat: HashingStrategy) {
         val (row, meta) = rowMetaWithTestCol.withRowValues("key", Instant.now()).build()
-        assertThatThrownBy { HashingStrategy.TypeStrict.build(row, meta) }
+        assertThatThrownBy { strat.hash(row, meta) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Instant")
             .hasMessageContaining("test")
-    }
-
-    @ParameterizedTest
-    @EnumSource(HashingStrategy::class)
-    fun `nulls of different defined column java types should be considered unequal`(strat: HashingStrategy) {
-        val (stringRow, stringMeta) = R2dbcFakeBuilder()
-            .withCol("test", String::class.java)
-            .withRowValues("key", null)
-            .build()
-
-        val (intRow, intMeta) = R2dbcFakeBuilder()
-            .withCol("test", Integer::class.java)
-            .withRowValues("key", null)
-            .build()
-
-        val stringTypeRow = HashingStrategy.TypeStrict.build(stringRow, stringMeta)
-        val intTypeRow = HashingStrategy.TypeStrict.build(intRow, intMeta)
-
-        assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
     }
 
     @ParameterizedTest
@@ -118,8 +99,30 @@ internal class HashingStrategyTest {
             .withRowValues(1, "ab", "cdef")
             .build()
 
-        assertThat(strat.build(row, meta).hashedValue)
-            .isNotEqualTo(strat.build(row2, meta2).hashedValue)
+        assertThat(strat.hash(row, meta).hashedValue)
+            .isNotEqualTo(strat.hash(row2, meta2).hashedValue)
+    }
+
+    @ParameterizedTest
+    @EnumSource(HashingStrategy::class)
+    fun `strategy should dictate whether nulls of different defined column java types should be considered unequal `(strat: HashingStrategy) {
+        val (stringRow, stringMeta) = R2dbcFakeBuilder()
+            .withCol("test", String::class.java)
+            .withRowValues("key", null)
+            .build()
+
+        val (intRow, intMeta) = R2dbcFakeBuilder()
+            .withCol("test", Integer::class.java)
+            .withRowValues("key", null)
+            .build()
+
+        val stringTypeRow = strat.hash(stringRow, stringMeta)
+        val intTypeRow = strat.hash(intRow, intMeta)
+
+        when (strat) {
+            HashingStrategy.TypeStrict -> assertThat(stringTypeRow.hashedValue).isNotEqualTo(intTypeRow.hashedValue)
+            HashingStrategy.TypeLenient -> assertThat(stringTypeRow.hashedValue).isEqualTo(intTypeRow.hashedValue)
+        }
     }
 
     @ParameterizedTest
@@ -135,9 +138,9 @@ internal class HashingStrategyTest {
             .withRowValues("key", second)
             .build()
 
-        assertThat(HashingStrategy.TypeLenient.build(row, meta).hashedValue)
+        assertThat(HashingStrategy.TypeLenient.hash(row, meta).hashedValue)
             .describedAs("lenient hash should be equal between ${first.javaClass}($first) and ${second.javaClass}($second)")
-            .isEqualTo(HashingStrategy.TypeLenient.build(row2, meta2).hashedValue)
+            .isEqualTo(HashingStrategy.TypeLenient.hash(row2, meta2).hashedValue)
     }
 
     class EquivalentTypeExamples : ArgumentsProvider {
@@ -164,7 +167,7 @@ internal class HashingStrategyTest {
             .withCol("test", type)
             .withRowValues("key", inputSupplier())
             .build()
-        assertThat(HashingStrategy.TypeStrict.build(row, meta))
+        assertThat(HashingStrategy.TypeStrict.hash(row, meta))
             .describedAs("strict hash not as expected")
             .isEqualTo(HashedRow("key", expectedStrictHash, meta))
 
@@ -172,7 +175,7 @@ internal class HashingStrategyTest {
             .withCol("test", type)
             .withRowValues("key", inputSupplier())
             .build()
-        assertThat(HashingStrategy.TypeLenient.build(row2, meta2))
+        assertThat(HashingStrategy.TypeLenient.hash(row2, meta2))
             .describedAs("lenient hash not as expected")
             .isEqualTo(HashedRow("key", expectedLenientHash.orElse(expectedStrictHash), meta2))
     }
@@ -184,7 +187,7 @@ internal class HashingStrategyTest {
                     String::class.java,
                     { null },
                     "952d0be4c421a5d1884a1ad4eb793a8965f6a040213ec77912a44266031c0b06",
-                    Optional.empty<String>()
+                    Optional.of("54495118679cfbbc950dbdd9d103fc8f30d61224e30a743a7c3053628a60a943")
                 ),
                 Arguments.of(
                     Boolean::class.java,

@@ -12,54 +12,53 @@ import java.nio.ByteBuffer
 @Suppress("UnstableApiUsage")
 enum class HashingStrategy {
     TypeLenient {
-        override fun put(hash: Hasher, col: Any?, colMeta: ColumnMetadata, index: Int) {
+        override fun hashCol(hasher: Hasher, index: Int, colMeta: ColumnMetadata, col: Any?) {
             when (col) {
-                null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
-                is Boolean -> hash.putLong(if (col) 1 else 0)
-                is Byte -> hash.putLong(col.toLong())
-                is Short -> hash.putLong(col.toLong())
-                is Int -> hash.putLong(col.toLong())
-                is Long -> hash.putLong(col)
-                is Float -> hash.putDouble(col.toDouble())
-                is Double -> hash.putDouble(col)
+                null -> {}
+                is Boolean -> hasher.putLong(if (col) 1 else 0)
+                is Byte -> hasher.putLong(col.toLong())
+                is Short -> hasher.putLong(col.toLong())
+                is Int -> hasher.putLong(col.toLong())
+                is Long -> hasher.putLong(col)
+                is Float -> hasher.putDouble(col.toDouble())
+                is Double -> hasher.putDouble(col)
                 is BigDecimal -> {
-                    hash.putLong(col.unscaledValue().toLong())
-                    hash.putInt(col.scale())
+                    hasher.putLong(col.unscaledValue().toLong())
+                    hasher.putInt(col.scale())
                 }
-                is String -> hash.putString(col, Charsets.UTF_8)
-                is ByteBuffer -> hash.putBytes(col)
-                else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$index]")
+                is String -> hasher.putString(col, Charsets.UTF_8)
+                is ByteBuffer -> hasher.putBytes(col)
+                else -> throw IllegalArgumentException("$this hasher does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$index]")
             }
         }
     },
     TypeStrict {
-        override fun put(hash: Hasher, col: Any?, colMeta: ColumnMetadata, index: Int) {
+        override fun hashCol(hasher: Hasher, index: Int, colMeta: ColumnMetadata, col: Any?) {
             when (col) {
-                null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
-                is Boolean -> hash.putBoolean(col)
-                is Byte -> hash.putByte(col)
-                is Short -> hash.putShort(col)
-                is Int -> hash.putInt(col)
-                is Long -> hash.putLong(col)
-                is Float -> hash.putFloat(col)
-                is Double -> hash.putDouble(col)
+                null -> hasher.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
+                is Boolean -> hasher.putBoolean(col)
+                is Byte -> hasher.putByte(col)
+                is Short -> hasher.putShort(col)
+                is Int -> hasher.putInt(col)
+                is Long -> hasher.putLong(col)
+                is Float -> hasher.putFloat(col)
+                is Double -> hasher.putDouble(col)
                 is BigDecimal -> {
-                    hash.putLong(col.unscaledValue().toLong())
-                    hash.putInt(col.scale())
+                    hasher.putLong(col.unscaledValue().toLong())
+                    hasher.putInt(col.scale())
                 }
-                is String -> hash.putString(col, Charsets.UTF_8)
-                is ByteBuffer -> hash.putBytes(col)
-                else -> throw IllegalArgumentException("Does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$index]")
+                is String -> hasher.putString(col, Charsets.UTF_8)
+                is ByteBuffer -> hasher.putBytes(col)
+                else -> throw IllegalArgumentException("$this hasher does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$index]")
             }
         }
     };
 
-    @Suppress("UnstableApiUsage")
-    abstract fun put(hash: Hasher, col: Any?, colMeta: ColumnMetadata, index: Int)
+    protected abstract fun hashCol(hasher: Hasher, index: Int, colMeta: ColumnMetadata, col: Any?)
 
-    fun build(row: Row, meta: RowMetadata): HashedRow {
+    fun hash(row: Row, meta: RowMetadata): HashedRow {
         var migrationKey: String? = null
-        val hash = Hashing.sha256().newHasher()
+        val hasher = Hashing.sha256().newHasher()
 
         fun trySetMigrationKey(col: Any?) {
             when {
@@ -71,19 +70,18 @@ enum class HashingStrategy {
 
         meta.columnMetadatas
             .forEachIndexed { i, colMeta ->
-                val col = row[i]
                 if (colMeta.name.equals(migrationKeyColumnName, ignoreCase = true)) {
-                    trySetMigrationKey(col)
+                    trySetMigrationKey(row[i])
                 } else {
-                    put(hash, col, colMeta, i)
+                    hashCol(hasher, i, colMeta, row[i])
                 }
 
-                hash.putChar(HASH_FIELD_SEPARATOR)
+                hasher.putChar(HASH_FIELD_SEPARATOR)
             }
 
         return HashedRow(
             migrationKey ?: throw IllegalArgumentException("No column named $migrationKeyColumnName found in dataset"),
-            hash.hash().toString(),
+            hasher.hash().toString(),
             meta
         )
     }
