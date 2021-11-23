@@ -4,7 +4,6 @@ import com.google.common.hash.HashCode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Condition
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -12,8 +11,6 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.EnumSource
 import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
-import recce.server.recrun.ColMeta
-import recce.server.recrun.DatasetMeta
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.Instant
@@ -32,22 +29,9 @@ private fun isHexSha256Hash(value: String): Boolean {
     return isSha256
 }
 
-internal class HashedRowTest {
+internal class HashingStrategyTest {
     private val rowMetaWithTestCol = R2dbcFakeBuilder()
         .withCol("test", String::class.java)
-
-    @Test
-    fun `should dynamically convert row metadata`() {
-        val row = HashedRow("test", "test", rowMetaWithTestCol.buildMeta())
-
-        val expectedMeta = DatasetMeta(
-            listOf(
-                ColMeta(migrationKeyColumnName, "String"),
-                ColMeta("test", "String")
-            )
-        )
-        assertThat(row.lazyMeta()()).usingRecursiveComparison().isEqualTo(expectedMeta)
-    }
 
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)

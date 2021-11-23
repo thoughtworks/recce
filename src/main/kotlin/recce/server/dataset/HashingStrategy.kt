@@ -6,8 +6,6 @@ import io.r2dbc.spi.ColumnMetadata
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
-import recce.server.recrun.ColMeta
-import recce.server.recrun.DatasetMeta
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 
@@ -102,10 +100,3 @@ enum class HashingStrategy {
         private const val HASH_FIELD_SEPARATOR = '\u2029'
     }
 }
-
-data class HashedRow(val migrationKey: String, val hashedValue: String, private val rowMeta: RowMetadata) {
-    fun lazyMeta(): LazyDatasetMeta =
-        { DatasetMeta(rowMeta.columnMetadatas.map { dbMeta -> ColMeta(dbMeta.name, dbMeta.javaType.simpleName) }) }
-}
-
-typealias LazyDatasetMeta = () -> DatasetMeta
