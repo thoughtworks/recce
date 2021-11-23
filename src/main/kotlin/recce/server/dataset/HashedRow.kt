@@ -17,7 +17,7 @@ enum class HashingStrategy {
         override fun put(hash: Hasher, col: Any?, colMeta: ColumnMetadata, index: Int) {
             when (col) {
                 null -> hash.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
-                is Boolean -> hash.putBoolean(col)
+                is Boolean -> hash.putLong(if (col) 1 else 0)
                 is Byte -> hash.putLong(col.toLong())
                 is Short -> hash.putLong(col.toLong())
                 is Int -> hash.putLong(col.toLong())
