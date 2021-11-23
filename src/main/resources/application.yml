@@ -58,6 +58,8 @@ reconciliation:
 #        # Any SQL query to evaluate against the source DB
 #        query: >
 #          SELECT different_id as MigrationKey, * FROM my-table
+#      # Optional strategy for determining equivalence of column values
+#      hashingStrategy: TypeLenient
 #      # Optional scheduling of regular or one-of reconciliations
 #      schedule:
 #        # Must adhere to format https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html

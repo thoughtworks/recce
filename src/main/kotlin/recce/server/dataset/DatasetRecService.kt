@@ -31,20 +31,21 @@ open class DatasetRecService(
 
         val recRun = runService.start(datasetId)
 
-        return loadFrom(datasetConfig.source, recRun, this::saveSourceBatch)
-            .zipWhen { loadFrom(datasetConfig.target, recRun, this::saveTargetBatch) }
+        return loadFrom(datasetConfig.source, datasetConfig.hashingStrategy, recRun, this::saveSourceBatch)
+            .zipWhen { loadFrom(datasetConfig.target, datasetConfig.hashingStrategy, recRun, this::saveTargetBatch) }
             .flatMap { (source, target) -> recRun.map { it.withMetaData(source, target) } }
             .flatMap { run -> runService.complete(run) }
     }
 
     private fun loadFrom(
         def: DataLoadDefinition,
+        hashingStrategy: HashingStrategy,
         run: Mono<RecRun>,
         batchSaver: (List<HashedRow>, RecRun) -> Flux<LazyDatasetMeta>
     ): Mono<DatasetMeta> =
         def.runQuery()
             .doOnNext { logger.info { "${def.role} query completed; streaming to Recce DB" } }
-            .flatMap { result -> result.map(HashingStrategy.TypeStrict::hash) }
+            .flatMap { result -> result.map(hashingStrategy::hash) }
             .buffer(config.defaultBatchSize)
             .zipWith(run.repeat())
             .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaultBatchConcurrency)

@@ -10,10 +10,12 @@ import javax.validation.constraints.NotNull
 class DatasetConfiguration(
     @NotNull val source: DataLoadDefinition,
     @NotNull val target: DataLoadDefinition,
-    @Bindable(defaultValue = "") val schedule: Schedule = Schedule()
-) :
-    PostConstructable {
+    @Bindable(defaultValue = "") val schedule: Schedule = Schedule(),
+    @Bindable(defaultValue = "TypeLenient") val hashingStrategy: HashingStrategy = HashingStrategy.TypeLenient
+) : PostConstructable {
+
     lateinit var name: String
+
     override fun populate(locator: BeanLocator) {
         source.role = DataLoadRole.source
         source.populate(locator)
