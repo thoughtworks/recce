@@ -31,10 +31,6 @@ val depDescriptors = mapOf(
     "exposed" to "org.jetbrains.exposed:exposed-core:0.36.2",
     "restAssured" to "io.rest-assured:rest-assured:4.4.0",
 
-    // Required so IntelliJ knows the right version to run tests with. Seems to not understand Micronaut's version control
-    // which causes it to run with its "default platform", causing classpath issues.
-    "junit" to "org.junit:junit-bom:5.8.1", // Be careful about bumping major versions. Needs to be compatible with Micronaut BOM.
-
     // Unfortunately not all Mockito or Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
     "mockito" to "org.mockito:mockito-core:4.1.0", // Needs to be compatible with Micronaut BOM.
     "reactor" to "io.projectreactor:reactor-core:3.4.12" // Needs to be compatible with Micronaut BOM.
@@ -103,7 +99,6 @@ dependencies {
     runtimeOnly("org.mariadb:r2dbc-mariadb")
     runtimeOnly("com.oracle.database.r2dbc:oracle-r2dbc")
 
-    testImplementation(platform(depDescriptors["junit"]!!))
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.mockito:mockito-core:${depVersions["mockito"]}")
