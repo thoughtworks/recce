@@ -41,7 +41,7 @@ These options require only JDK 11+ and Docker installed locally.
         -e DATABASE_HOST=host.docker.internal \
         -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mysql://host.docker.internal:8000/db \
         -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mysql://host.docker.internal:8001/db \
-        ghcr.io/ThoughtWorks-SEA/recce-server:latest
+        ghcr.io/thoughtworks-sea/recce-server:latest
     ```
 * **Synchronously trigger** a run, waiting for to complete
     ```shell
@@ -132,7 +132,7 @@ touch my-dataset-configs/config1.yml my-dataset-configs/config2.yml
 docker run -p 8080:8080 \
   -v $(pwd)/my-dataset-configs:/config \
   -e MICRONAUT_CONFIG_FILES=/config/config1.yml,/config/config2.yml \
-  ghcr.io/ThoughtWorks-SEA/recce-server:latest
+  ghcr.io/thoughtworks-sea/recce-server:latest
 ```
 
 ### Configuring datasources
