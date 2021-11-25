@@ -154,7 +154,7 @@ tasks.jacocoTestReport {
     dependsOn(tasks.test)
 }
 
-val githubRepoOwner = "ThoughtWorks-SEA"
+val githubRepoOwner = "thoughtworks-sea"
 val containerRepoName = "recce-server"
 jib {
     from {
