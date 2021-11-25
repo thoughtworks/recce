@@ -81,7 +81,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
 
     // Core persistence support with Micronaut Data
-    compileOnly("jakarta.persistence:jakarta.persistence-api:2.2.3")
+    compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
