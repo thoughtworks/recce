@@ -27,6 +27,9 @@ class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val quer
         { it.createStatement(query).execute() },
         { it.close() }
     )
+
+    val datasourceDescriptor: String
+        get() = "$role(ref=$dataSourceRef)"
 }
 
 enum class DataLoadRole { source, target }

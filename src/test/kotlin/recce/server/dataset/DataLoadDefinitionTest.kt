@@ -28,7 +28,7 @@ internal class DataLoadDefinitionTest {
 
     @BeforeEach
     fun setUp() {
-        definition = DataLoadDefinition(testSourceName, testQuery)
+        definition = DataLoadDefinition(testSourceName, testQuery).apply { role = DataLoadRole.source }
     }
 
     @Test
@@ -41,6 +41,11 @@ internal class DataLoadDefinitionTest {
         definition.populate(beanLocator)
 
         assertThat(definition.dbOperations).isEqualTo(operations)
+    }
+
+    @Test
+    fun `should produce short descriptor with role`() {
+        assertThat(definition.datasourceDescriptor).isEqualTo("source(ref=source1)")
     }
 
     @Test

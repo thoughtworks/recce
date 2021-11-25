@@ -44,16 +44,16 @@ open class DatasetRecService(
         batchSaver: (List<HashedRow>, RecRun) -> Flux<LazyDatasetMeta>
     ): Mono<DatasetMeta> =
         def.runQuery()
-            .doOnNext { logger.info { "${def.role} query completed; streaming to Recce DB" } }
+            .doOnNext { logger.info { "${def.datasourceDescriptor} query completed; streaming to Recce DB" } }
             .flatMap { result -> result.map(hashingStrategy::hash) }
             .buffer(config.defaultBatchSize)
             .zipWith(run.repeat())
             .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaultBatchConcurrency)
-            .onErrorMap { DataLoadException("Failed to load data from ${def.role} [${def.dataSourceRef}]: ${it.message}", it) }
+            .onErrorMap { DataLoadException("Failed to load data from ${def.datasourceDescriptor}: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
             .last()
             .map { meta -> meta() }
-            .doOnNext { logger.info { "Load from ${def.role} completed" } }
+            .doOnNext { logger.info { "Load from ${def.datasourceDescriptor} completed" } }
 
     private fun saveSourceBatch(rows: List<HashedRow>, run: RecRun): Flux<LazyDatasetMeta> {
         val records = rows.map { RecRecord(key = RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
