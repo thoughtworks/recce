@@ -65,6 +65,15 @@ micronaut {
     }
 }
 
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("junit:junit"))
+            .using(module("io.quarkus:quarkus-junit4-mock:2.5.0.Final"))
+            .because("We don't want JUnit 4; but is an unneeded transitive of testcontainers. " +
+                "See https://github.com/testcontainers/testcontainers-java/issues/970")
+    }
+}
+
 dependencies {
     kapt("io.micronaut:micronaut-http-validation")
     kapt("io.micronaut.data:micronaut-data-processor")
