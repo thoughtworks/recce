@@ -1,5 +1,6 @@
 package recce.server.dataset.datasource
 
+import com.google.common.collect.Sets
 import io.micronaut.context.ApplicationContext
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.inject.qualifiers.Qualifiers
@@ -9,10 +10,14 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.MSSQLServerContainer
 import org.testcontainers.containers.MySQLContainer
@@ -21,6 +26,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import java.util.stream.Stream
 
 @Testcontainers
 @Tag("requires-docker")
@@ -45,9 +51,6 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
             "mssql" to mssql
         )
 
-        @JvmStatic
-        fun testDatabases() = databases.keys
-
         private lateinit var ctx: ApplicationContext
 
         @JvmStatic
@@ -60,7 +63,8 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
                         "r2dbc.datasources.$name.username" to container.username,
                         "r2dbc.datasources.$name.password" to container.password
                     )
-                }.toMap()
+                }.toMap(),
+                "test"
             )
         }
 
@@ -102,17 +106,40 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
         }
     }
 
+    class DatabaseCombinations : ArgumentsProvider {
+        @Suppress("UnstableApiUsage")
+        override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
+            return Sets.combinations(databases.keys, 2)
+                .map { Arguments.of(*it.toTypedArray()) }.stream()
+        }
+    }
+
+    @AfterEach
+    fun `wipe databases`() {
+        databases.forEach { transaction(connectToJdbc(it.value)) { SchemaUtils.drop(TestData) } }
+    }
+
     @ParameterizedTest
-    @MethodSource("testDatabases")
-    fun `should load data with r2dbc`(database: String) {
+    @ArgumentsSource(DatabaseCombinations::class)
+    fun `should run rec between source and target`(sourceDatabase: String, targetDatabase: String) {
 
         createTestData(
             connectToJdbc(
-                databases[database] ?: throw IllegalArgumentException("Cannot find db type [$database].")
+                databases[sourceDatabase] ?: throw IllegalArgumentException("Cannot find db type [$sourceDatabase].")
             )
         )
 
-        StepVerifier.create(getCount(database))
+        createTestData(
+            connectToJdbc(
+                databases[targetDatabase] ?: throw IllegalArgumentException("Cannot find db type [$targetDatabase].")
+            )
+        )
+
+        StepVerifier.create(getCount(sourceDatabase))
+            .expectNext(4)
+            .verifyComplete()
+
+        StepVerifier.create(getCount(targetDatabase))
             .expectNext(4)
             .verifyComplete()
     }
