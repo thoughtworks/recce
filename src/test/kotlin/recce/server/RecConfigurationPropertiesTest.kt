@@ -26,14 +26,37 @@ internal class RecConfigurationPropertiesTest {
     )
 
     @Test
-    fun `should parse from properties`() {
+    fun `can override defaults from config`() {
+        with(ApplicationContext.run(properties)) {
+            val configuration = getBean(RecConfiguration::class.java)
+            assertThat(configuration.defaults.batchSize).isEqualTo(1000)
+            assertThat(configuration.defaults.batchConcurrency).isEqualTo(5)
+            assertThat(configuration.defaults.hashingStrategy).isEqualTo(HashingStrategy.TypeLenient)
+            assertThat(getBean(DefaultsProvider::class.java).hashingStrategy).isEqualTo(HashingStrategy.TypeLenient)
+        }
+
+        properties["reconciliation.defaults.batchSize"] = "3000"
+        properties["reconciliation.defaults.batchConcurrency"] = "10"
+        properties["reconciliation.defaults.hashingStrategy"] = "TypeStrict"
+
+        with(ApplicationContext.run(properties)) {
+            val configuration2 = getBean(RecConfiguration::class.java)
+            assertThat(configuration2.defaults.batchSize).isEqualTo(3000)
+            assertThat(configuration2.defaults.batchConcurrency).isEqualTo(10)
+            assertThat(configuration2.defaults.hashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
+            assertThat(getBean(DefaultsProvider::class.java).hashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
+        }
+    }
+
+    @Test
+    fun `should parse datasets with overrides from properties`() {
         val ctx = ApplicationContext.run(properties)
 
         assertThat(ctx.getBean(RecConfiguration::class.java).datasets.values)
             .hasSize(1)
             .first().satisfies {
                 assertThat(it.name).isEqualTo("test-dataset")
-                assertThat(it.hashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
+                assertThat(it.resolvedHashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
                 assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
                 assertThat(it.source.role).isEqualTo(DataLoadRole.source)
                 assertThat(it.source.dataSourceRef).isEqualTo("source")

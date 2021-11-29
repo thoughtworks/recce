@@ -7,6 +7,7 @@ import io.micronaut.context.annotation.Context
 import io.micronaut.core.bind.annotation.Bindable
 import mu.KotlinLogging
 import recce.server.dataset.DatasetConfiguration
+import recce.server.dataset.HashingStrategy
 import javax.annotation.PostConstruct
 
 private val logger = KotlinLogging.logger {}
@@ -20,8 +21,7 @@ interface PostConstructable {
 class RecConfiguration
 @ConfigurationInject constructor(
     val datasets: Map<String, DatasetConfiguration>,
-    @Bindable(defaultValue = "1000") val defaultBatchSize: Int = 1000,
-    @Bindable(defaultValue = "5") val defaultBatchConcurrency: Int = 5,
+    val defaults: DefaultsProvider = DefaultsProvider()
 ) : PostConstructable {
 
     @PostConstruct
@@ -35,4 +35,18 @@ class RecConfiguration
                 "${datasets.values.groupBy { it.datasourceDescriptor }.toSortedMap()} "
         }
     }
+}
+
+@Context
+@ConfigurationProperties("reconciliation.defaults")
+class DefaultsProvider @ConfigurationInject constructor(
+    @Bindable(defaultValue = "1000") val batchSize: Int,
+    @Bindable(defaultValue = "5") val batchConcurrency: Int,
+    @Bindable(defaultValue = "TypeLenient") val hashingStrategy: HashingStrategy
+) {
+    constructor() : this(
+        batchSize = 1000,
+        batchConcurrency = 5,
+        hashingStrategy = HashingStrategy.TypeLenient
+    )
 }

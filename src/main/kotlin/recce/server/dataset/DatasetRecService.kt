@@ -31,8 +31,8 @@ open class DatasetRecService(
 
         val recRun = runService.start(datasetId)
 
-        return loadFrom(datasetConfig.source, datasetConfig.hashingStrategy, recRun, this::saveSourceBatch)
-            .zipWhen { loadFrom(datasetConfig.target, datasetConfig.hashingStrategy, recRun, this::saveTargetBatch) }
+        return loadFrom(datasetConfig.source, datasetConfig.resolvedHashingStrategy, recRun, this::saveSourceBatch)
+            .zipWhen { loadFrom(datasetConfig.target, datasetConfig.resolvedHashingStrategy, recRun, this::saveTargetBatch) }
             .flatMap { (source, target) -> recRun.map { it.withMetaData(source, target) } }
             .flatMap { run -> runService.complete(run) }
     }
@@ -46,9 +46,9 @@ open class DatasetRecService(
         def.runQuery()
             .doOnNext { logger.info { "${def.datasourceDescriptor} query completed; streaming to Recce DB" } }
             .flatMap { result -> result.map(hashingStrategy::hash) }
-            .buffer(config.defaultBatchSize)
+            .buffer(config.defaults.batchSize)
             .zipWith(run.repeat())
-            .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaultBatchConcurrency)
+            .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaults.batchConcurrency)
             .onErrorMap { DataLoadException("Failed to load data from ${def.datasourceDescriptor}: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
             .last()

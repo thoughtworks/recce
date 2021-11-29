@@ -34,16 +34,35 @@ jackson:
   serialization:
     writeDatesAsTimestamps: false
 reconciliation:
-  # How many rows are bulk inserted/updated When bulk loading data from your source & target DBs into Recce's DB.
-  # When loading target data, note that this represents an upper limit of each batch, since rows must be split into
-  # updates (to an existing row's MigrationKey, loaded from the source) and inserts for rows that are missing in source.
-  defaultBatchSize: 1000
-  # Number of batches to potentially be saving in parallel when loading
-  # This imposes an upper limit on the number of Recce DB connections an individual dataset's reconciliation
-  # run can be using in order to batch-insert/save rows. Excessive batch concurrency relative to available DB connections
-  # may lead to R2DBC connection pool exhaustion/waits, and push excessive load to your Recce DB. In other words,
-  # increasing concurrency beyond `r2dbc.datasources.default.options.maxSize` is unlikely to increase overall speed.
-  defaultBatchConcurrency: 5
+  # Configuration that applies to all data set definitions by default. Some can be overridden dataset-by-dataset.
+  defaults:
+    # How many rows are bulk inserted/updated When bulk loading data from your source & target DBs into Recce's DB.
+    #
+    # When loading target data, note that this represents an upper limit of each batch, since rows must be split into
+    # updates (to an existing row's MigrationKey, loaded from the source) and inserts for rows that are missing in source.
+    batchSize: 1000
+
+    # Number of batches to potentially be saving in parallel when loading
+    #
+    # This imposes an upper limit on the number of Recce DB connections an individual dataset's reconciliation
+    # run can be using in order to batch-insert/save rows. Excessive batch concurrency relative to available DB connections
+    # may lead to R2DBC connection pool exhaustion/waits, and push excessive load to your Recce DB. In other words,
+    # increasing concurrency beyond `r2dbc.datasources.default.options.maxSize` is unlikely to increase overall speed.
+    batchConcurrency: 5
+
+    # Approach to hashing values from columns in source and target data sources.
+    #
+    # A `TypeStrict` strategy will generally consider numbers of different size different to one another depending
+    # on the type returned from the relevant database's driver. e.g if one datasource returns a 32-bit integer,
+    # and another returns a 64-bit long a strict strategy will consider these values different, even if they have the
+    # same numerical value.
+    # A `TypeLenient` strategy will generally consider these values equal regardless of the types, at the expense of
+    # coercing everything to it's largest size type when hashing. Note that this also means that a BOOLEAN of value 1
+    # will also generally be considered equal to an INTEGER or NUMBER of value 1. The lenient strategy is especially
+    # recommended when comparing databases of different types, since there are likely differences in how the drivers
+    # treat types, even ignoring the underlying differences in types specificed in tables.
+    hashingStrategy: TypeLenient
+
   datasets:
 #    my-data-set: # Name your datasets however you would like
 #      source:
