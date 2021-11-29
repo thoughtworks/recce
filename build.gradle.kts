@@ -134,6 +134,8 @@ dependencies {
     testRuntimeOnly("mysql:mysql-connector-java")
     testImplementation("org.testcontainers:mssqlserver")
     testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
+    testImplementation("org.testcontainers:mariadb")
+    testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")

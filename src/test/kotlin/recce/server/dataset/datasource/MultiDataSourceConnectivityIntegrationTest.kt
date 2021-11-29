@@ -17,10 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
-import org.testcontainers.containers.JdbcDatabaseContainer
-import org.testcontainers.containers.MSSQLServerContainer
-import org.testcontainers.containers.MySQLContainer
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.*
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
@@ -38,6 +35,10 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
 
         @JvmStatic
         @Container
+        protected val mariadb = MariaDBContainer<Nothing>("mariadb:10")
+
+        @JvmStatic
+        @Container
         protected val postgres = PostgreSQLContainer<Nothing>("postgres:13-alpine")
 
         @JvmStatic
@@ -47,6 +48,7 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
 
         private val databases = mapOf(
             "mysql" to mysql,
+            "mariadb" to mariadb,
             "postgres" to postgres,
             "mssql" to mssql
         )
