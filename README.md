@@ -243,7 +243,6 @@ reconciliation:
 ```
 Fuller example Recce-specific configuration is [available here](src/main/resources/application.yml).
 
-
 ## Writing dataset queries
 
 The general philosophy of Recce is that differences between source and target are **best handled by the developer** in SQL.
