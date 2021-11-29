@@ -4,7 +4,7 @@ import io.r2dbc.spi.ColumnMetadata
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 
-class FakeColumnMetadata(private val name: String, private val javaType: Class<*>) : ColumnMetadata {
+data class FakeColumnMetadata(private val name: String, private val javaType: Class<*>) : ColumnMetadata {
     override fun getName() = name
     override fun getJavaType() = javaType
 }
@@ -74,5 +74,9 @@ class R2dbcFakeBuilder {
 
     fun buildMeta(): RowMetadata {
         return FakeRowMetadata(cols)
+    }
+
+    fun buildColMetas(): Iterable<ColumnMetadata> {
+        return cols
     }
 }

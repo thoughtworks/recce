@@ -8,8 +8,8 @@ import recce.server.recrun.DatasetMeta
 internal class HashedRowTest {
     @Test
     fun `should dynamically convert row metadata`() {
-        val rowMeta = R2dbcFakeBuilder().withCol("test", String::class.java).buildMeta()
-        val row = HashedRow("test", "test", rowMeta)
+        val columnMetas = R2dbcFakeBuilder().withCol("test", String::class.java).buildColMetas()
+        val row = HashedRow("test", "test", columnMetas)
 
         val expectedMeta = DatasetMeta(
             listOf(

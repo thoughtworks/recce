@@ -68,7 +68,7 @@ enum class HashingStrategy {
             }
         }
 
-        meta.columnMetadatas
+        meta.columnMetadatasSanitized()
             .forEachIndexed { i, colMeta ->
                 if (colMeta.name.equals(migrationKeyColumnName, ignoreCase = true)) {
                     trySetMigrationKey(row[i])
@@ -82,7 +82,7 @@ enum class HashingStrategy {
         return HashedRow(
             migrationKey ?: throw IllegalArgumentException("No column named $migrationKeyColumnName found in dataset"),
             hasher.hash().toString(),
-            meta
+            meta.columnMetadatasSanitized()
         )
     }
 
@@ -96,5 +96,17 @@ enum class HashingStrategy {
          * in binary, e.g the NUL character or a zero
          */
         private const val HASH_FIELD_SEPARATOR = '\u2029'
+    }
+}
+
+/**
+ * Hack needed for MS SQL Server R2DBC driver < 0.8.8. See https://github.com/r2dbc/r2dbc-mssql/issues/235
+ */
+fun RowMetadata.columnMetadatasSanitized(): Iterable<ColumnMetadata> {
+    if (columnMetadatas is List<*>) {
+        @Suppress("UNCHECKED_CAST")
+        return (columnMetadatas as List<ColumnMetadata>).dropLastWhile { it.name == "ROWSTAT" }
+    } else {
+        throw UnsupportedOperationException("Cannot process non-list R2DBC metadata, type was ${columnMetadatas.javaClass.name}")
     }
 }
