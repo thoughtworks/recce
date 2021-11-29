@@ -36,7 +36,6 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 * [Development](#development)
 
 <!-- Added by: runner, at: Mon Nov 29 16:31:12 UTC 2021 -->
-
 <!--te-->
 
 # Getting Started
