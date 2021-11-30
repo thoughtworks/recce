@@ -28,7 +28,6 @@ reckon {
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.2.0",
-    "exposed" to "org.jetbrains.exposed:exposed-core:0.36.2",
     "restAssured" to "io.rest-assured:rest-assured:4.4.0",
 
     // Unfortunately not all Mockito or Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
@@ -117,9 +116,6 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("io.projectreactor:reactor-test:${depVersions["reactor"]}")
-
-    testImplementation("org.jetbrains.exposed:exposed-core:${depVersions["exposed"]}")
-    testImplementation("org.jetbrains.exposed:exposed-jdbc:${depVersions["exposed"]}")
 
     testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
     testImplementation("io.rest-assured:kotlin-extensions:${depVersions["restAssured"]}")

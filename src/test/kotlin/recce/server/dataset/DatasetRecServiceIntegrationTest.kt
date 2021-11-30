@@ -3,54 +3,60 @@ package recce.server.dataset
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
+import jakarta.inject.Named
 import org.assertj.core.api.Assertions.assertThat
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
 import reactor.util.function.Tuples
-import recce.server.dataset.datasource.AbstractDataSourceTest
+import recce.server.dataset.datasource.flywayCleanMigrate
 import recce.server.recrun.*
+import java.nio.file.Path
+import javax.sql.DataSource
 
 @MicronautTest(
     environments = arrayOf("test-integration"),
     propertySources = arrayOf("classpath:config/application-test-dataset.yml")
 )
-class DatasetRecServiceIntegrationTest : AbstractDataSourceTest() {
-    @Inject
-    lateinit var service: DatasetRecService
+class DatasetRecServiceIntegrationTest {
 
-    @Inject
-    lateinit var runRepository: RecRunRepository
+    @TempDir lateinit var tempDir: Path
+    @Inject @field:Named("source-h2") lateinit var sourceDataSource: DataSource
+    @Inject @field:Named("target-h2") lateinit var targetDataSource: DataSource
 
-    @Inject
-    lateinit var recordRepository: RecRecordRepository
+    @Inject lateinit var service: DatasetRecService
+    @Inject lateinit var runRepository: RecRunRepository
+    @Inject lateinit var recordRepository: RecRecordRepository
 
-    @AfterEach
-    override fun tearDown() {
-        super.tearDown()
-        runRepository.deleteAll().block()
+    @BeforeEach
+    fun setup() {
+        val createTable = """
+            CREATE TABLE TestData (
+                name VARCHAR(255) PRIMARY KEY NOT NULL,
+                value VARCHAR(255) NOT NULL
+            );
+        """.trimMargin()
+
+        val insertUser: (Int) -> String = { i ->
+            """
+            INSERT INTO TestData (name, value) 
+            VALUES ('Test$i', 'User$i');
+            """.trimIndent()
+        }
+
+        val sourceSql = createTable + (0..2).joinToString("\n", transform = insertUser)
+        val targetSql = createTable + ((0..1) + (3..4)).joinToString("\n", transform = insertUser)
+        flywayCleanMigrate(tempDir, sourceSql, sourceDataSource)
+        flywayCleanMigrate(tempDir, targetSql, targetDataSource)
     }
 
-    private fun checkPersistentFieldsFor(run: RecRun) {
-        assertThat(run.id).isNotNull
-        assertThat(run.datasetId).isEqualTo("test-dataset")
-        assertThat(run.createdTime).isNotNull
-        assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
-        assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
-        assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
-        val expectedMeta = DatasetMeta(
-            listOf(
-                ColMeta("MIGRATIONKEY", "String"),
-                ColMeta("NAME", "String"),
-                ColMeta("VALUE", "String")
-            )
-        )
-        assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
-        assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+    @AfterEach
+    fun tearDown() {
+        runRepository.deleteAll().block()
     }
 
     @Test
@@ -103,9 +109,27 @@ class DatasetRecServiceIntegrationTest : AbstractDataSourceTest() {
             .verifyComplete()
     }
 
+    private fun checkPersistentFieldsFor(run: RecRun) {
+        assertThat(run.id).isNotNull
+        assertThat(run.datasetId).isEqualTo("test-dataset")
+        assertThat(run.createdTime).isNotNull
+        assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
+        assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+        assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
+        val expectedMeta = DatasetMeta(
+            listOf(
+                ColMeta("MIGRATIONKEY", "String"),
+                ColMeta("NAME", "String"),
+                ColMeta("VALUE", "String")
+            )
+        )
+        assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+        assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+    }
+
     @Test
     fun `should emit error on bad source query`() {
-        transaction(sourceDb) { SchemaUtils.drop(TestData) }
+        flywayCleanMigrate(tempDir, "SELECT 1", sourceDataSource)
 
         StepVerifier.create(service.runFor("test-dataset"))
             .consumeErrorWith {
@@ -120,7 +144,7 @@ class DatasetRecServiceIntegrationTest : AbstractDataSourceTest() {
 
     @Test
     fun `should emit error on bad target query`() {
-        transaction(targetDb) { SchemaUtils.drop(TestData) }
+        flywayCleanMigrate(tempDir, "SELECT 1", targetDataSource)
 
         StepVerifier.create(service.runFor("test-dataset"))
             .consumeErrorWith {

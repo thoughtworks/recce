@@ -54,7 +54,6 @@ Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application 
 - At time of writing, Recce's own DB tests are tested against **H2 Database** rather than Postgres, for improved feedback, however this imposes some limitations and may need to be re-evaluated later
 - [Testcontainers](https://www.testcontainers.org/) are used for starting external DBs of various types to test against
 - [Rest-assured](https://rest-assured.io/) is used for API tests
-- Test data is set up in databases using the [Exposed framework](https://github.com/JetBrains/Exposed). Unfortunately this only allows JDBC style access, and thus requires regular JDBC drivers to be available for tests, in addition to the R2DBC drivers used at runtime
 
 ### Build
 - Gradle (Kotlin-style) is used to build
