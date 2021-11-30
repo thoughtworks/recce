@@ -1,6 +1,5 @@
 package recce.server.dataset.datasource
 
-import com.google.common.collect.Sets
 import io.micronaut.context.ApplicationContext
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
@@ -21,6 +20,9 @@ import recce.server.dataset.DatasetRecService
 import recce.server.recrun.MatchStatus
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.CompletableFuture.allOf
+import java.util.concurrent.CompletableFuture.runAsync
+import java.util.stream.IntStream
 import java.util.stream.Stream
 
 @Testcontainers
@@ -44,6 +46,9 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
         protected val mssql: MSSQLServerContainer<Nothing> =
             MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
 
+        /**
+         * Databases which we expect to produce matching hashes for values of similar types.
+         */
         private val databases = mapOf(
             "mysql" to mysql,
             "mariadb" to mariadb,
@@ -51,9 +56,28 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
             "mssql" to mssql
         )
 
-        @Suppress("UnstableApiUsage")
-        private val databaseCombinations = Sets.combinations(databases.keys, 2)
-        private fun containerFor(name: String) = databases[name] ?: throw IllegalArgumentException("Cannot find db type [$name].")
+        /**
+         * Types we want to test for each database combination
+         */
+        private val sqlTypesToValues = listOf(
+            "SMALLINT" to "1",
+            "INTEGER" to "1",
+            "BIGINT" to "1",
+            "VARCHAR(4)" to "'text'",
+            "TEXT" to "'text'",
+        )
+
+        /**
+         * Create pairs of databases to test against. We don't have to test against all possibly combinations
+         * because we can reasonably conclude that the matching is transitive, i.e if A==B and B==C then A==C.
+         */
+        private val databaseCombinations = IntStream
+            .range(1, databases.keys.size)
+            .mapToObj { databases.keys.toList()[it - 1] to databases.keys.toList()[it] }
+            .toList()
+
+        private fun containerFor(name: String) =
+            databases[name] ?: throw IllegalArgumentException("Cannot find db type [$name].")
 
         private lateinit var ctx: ApplicationContext
 
@@ -68,7 +92,7 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
                 )
             }.toMap()
 
-            val datasets = databaseCombinations.map { Pair(it.first(), it.last()) }.flatMap { (source, target) ->
+            val datasets = databaseCombinations.flatMap { (source, target) ->
                 listOf(
                     "reconciliation.datasets.$source-to-$target.source.dataSourceRef" to source,
                     "reconciliation.datasets.$source-to-$target.source.query" to "SELECT id as MigrationKey, value FROM TestData",
@@ -91,8 +115,9 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
     lateinit var tempDir: Path
 
     private fun createTestData(scenario: ScenarioConfig) {
+        val migrationsLoc = Files.createTempDirectory(tempDir, "scenario-")
         Files.writeString(
-            tempDir.resolve("V1__CREATE.sql"),
+            migrationsLoc.resolve("V1__SETUP_TESTDATA.sql"),
             """
             CREATE TABLE TestData
             (
@@ -106,19 +131,26 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
 
         val flyway = Flyway.configure()
             .dataSource(scenario.dbContainer.jdbcUrl, scenario.dbContainer.username, scenario.dbContainer.password)
-            .locations("filesystem:$tempDir")
+            .locations("filesystem:$migrationsLoc")
+            .cleanOnValidationError(true)
             .load()
-        flyway.clean()
-        flyway.migrate()
+        try {
+            flyway.migrate()
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to create test schema on [${scenario.db}] for $scenario", e)
+        }
     }
 
-    class DatabaseCombinations : ArgumentsProvider {
-        @Suppress("UnstableApiUsage")
+    private class TestScenarios : ArgumentsProvider {
         override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
-            return databaseCombinations.map { Arguments.of(
-                ScenarioConfig(db = it.first(), sqlType = "VARCHAR(255)", sqlValue = "'User0'"),
-                ScenarioConfig(db = it.last(), sqlType = "VARCHAR(255)", sqlValue = "'User0'")
-            ) }.stream()
+            return databaseCombinations
+                .flatMap { (source, target) ->
+                    sqlTypesToValues.map { (sqlType, sqlValue) ->
+                        ScenarioConfig(source, sqlType, sqlValue) to ScenarioConfig(target, sqlType, sqlValue)
+                    }
+                }
+                .map { (source, target) -> Arguments.of(source, target) }
+                .stream()
         }
     }
 
@@ -131,22 +163,22 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
     }
 
     @ParameterizedTest
-    @ArgumentsSource(DatabaseCombinations::class)
-    fun `should run rec between source and target`(source: ScenarioConfig, target: ScenarioConfig) {
+    @ArgumentsSource(TestScenarios::class)
+    fun `rows match between source and target`(source: ScenarioConfig, target: ScenarioConfig) {
 
-        createTestData(source)
-        createTestData(target)
+        allOf(
+            runAsync { createTestData(source) },
+            runAsync { createTestData(target) }
+        ).join()
 
         StepVerifier.create(ctx.getBean(DatasetRecService::class.java).runFor("${source.db}-to-${target.db}"))
             .assertNext { run ->
-                assertThat(run.summary).usingRecursiveComparison().isEqualTo(
-                    MatchStatus(
-                        sourceOnly = 0,
-                        targetOnly = 0,
-                        bothMatched = 1,
-                        bothMismatched = 0
+                assertThat(run.summary)
+                    .describedAs("Values between two DBs should match. sourceMeta=${run.sourceMeta} targetMeta=${run.targetMeta}")
+                    .usingRecursiveComparison()
+                    .isEqualTo(
+                        MatchStatus(bothMatched = 1)
                     )
-                )
             }
             .verifyComplete()
     }
