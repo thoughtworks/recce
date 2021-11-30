@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.testcontainers.containers.*
-import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecService
@@ -29,31 +28,14 @@ import java.util.stream.Stream
 @Tag("requires-docker")
 internal open class MultiDataSourceConnectivityIntegrationTest {
     companion object {
-        @JvmStatic
-        @Container
-        protected val mysql = MySQLContainer<Nothing>("mysql:8")
-
-        @JvmStatic
-        @Container
-        protected val mariadb = MariaDBContainer<Nothing>("mariadb:10.5")
-
-        @JvmStatic
-        @Container
-        protected val postgres = PostgreSQLContainer<Nothing>("postgres:13-alpine")
-
-        @JvmStatic
-        @Container
-        protected val mssql: MSSQLServerContainer<Nothing> =
-            MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
-
         /**
          * Databases which we expect to produce matching hashes for values of similar types.
          */
         private val databases = mapOf(
-            "mysql" to mysql,
-            "mariadb" to mariadb,
-            "postgres" to postgres,
-            "mssql" to mssql
+            "mysql" to MySQLContainer<Nothing>("mysql:8"),
+            "mariadb" to MariaDBContainer<Nothing>("mariadb:10.5"),
+            "postgres" to PostgreSQLContainer<Nothing>("postgres:13-alpine"),
+            "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
         )
 
         /**
@@ -80,6 +62,12 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
             databases[name] ?: throw IllegalArgumentException("Cannot find db type [$name].")
 
         private lateinit var ctx: ApplicationContext
+
+        @JvmStatic
+        @BeforeAll
+        fun startDatabases() {
+            databases.values.parallelStream().forEach { it.start() }
+        }
 
         @JvmStatic
         @BeforeAll
