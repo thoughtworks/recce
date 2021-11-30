@@ -35,7 +35,7 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
 
         @JvmStatic
         @Container
-        protected val mariadb = MariaDBContainer<Nothing>("mariadb:10")
+        protected val mariadb = MariaDBContainer<Nothing>("mariadb:10.5")
 
         @JvmStatic
         @Container
