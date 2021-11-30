@@ -2,7 +2,6 @@ package recce.server.dataset
 
 import io.micronaut.context.ApplicationContext
 import org.assertj.core.api.Assertions.assertThat
-import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -11,11 +10,15 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
-import org.testcontainers.containers.*
+import org.testcontainers.containers.MSSQLServerContainer
+import org.testcontainers.containers.MariaDBContainer
+import org.testcontainers.containers.MySQLContainer
+import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
+import recce.server.dataset.datasource.DbDescriptor
+import recce.server.dataset.datasource.flywayCleanMigrate
 import recce.server.recrun.MatchStatus
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture.allOf
 import java.util.concurrent.CompletableFuture.runAsync
@@ -101,10 +104,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
     lateinit var tempDir: Path
 
     private fun createTestData(scenario: ScenarioConfig) {
-        val migrationsLoc = Files.createTempDirectory(tempDir, "scenario-")
-        Files.writeString(
-            migrationsLoc.resolve("V1__SETUP_TESTDATA.sql"),
-            """
+        val sql = """
             CREATE TABLE TestData
             (
                 id             INT PRIMARY KEY,
@@ -112,16 +112,10 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             );
             
             INSERT INTO TestData (id, value) VALUES (1, ${scenario.sqlValue});
-            """.trimIndent()
-        )
+            """
 
-        val flyway = Flyway.configure()
-            .dataSource(scenario.dbContainer.jdbcUrl, scenario.dbContainer.username, scenario.dbContainer.password)
-            .locations("filesystem:$migrationsLoc")
-            .cleanOnValidationError(true)
-            .load()
         try {
-            flyway.migrate()
+            flywayCleanMigrate(tempDir, sql, scenario.dbDescriptor)
         } catch (e: Exception) {
             throw RuntimeException("Failed to create test schema on [${scenario.db}] for $scenario", e)
         }
@@ -145,7 +139,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         val sqlType: String,
         val sqlValue: String
     ) {
-        val dbContainer: JdbcDatabaseContainer<Nothing> by lazy { containerFor(db) }
+        val dbDescriptor by lazy { containerFor(db).let { DbDescriptor(it.jdbcUrl, it.username, it.password) } }
     }
 
     @ParameterizedTest
