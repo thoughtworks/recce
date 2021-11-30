@@ -71,9 +71,9 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
             val datasets = databaseCombinations.map { Pair(it.first(), it.last()) }.flatMap { (source, target) ->
                 listOf(
                     "reconciliation.datasets.$source-to-$target.source.dataSourceRef" to source,
-                    "reconciliation.datasets.$source-to-$target.source.query" to "SELECT id as MigrationKey, name, value FROM TestData",
+                    "reconciliation.datasets.$source-to-$target.source.query" to "SELECT id as MigrationKey, value FROM TestData",
                     "reconciliation.datasets.$source-to-$target.target.dataSourceRef" to target,
-                    "reconciliation.datasets.$source-to-$target.target.query" to "SELECT id as MigrationKey, name, value FROM TestData",
+                    "reconciliation.datasets.$source-to-$target.target.query" to "SELECT id as MigrationKey, value FROM TestData",
                 )
             }.toMap()
 
@@ -90,26 +90,22 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
     @TempDir
     lateinit var tempDir: Path
 
-    private fun createTestData(db: JdbcDatabaseContainer<Nothing>) {
+    private fun createTestData(scenario: ScenarioConfig) {
         Files.writeString(
             tempDir.resolve("V1__CREATE.sql"),
             """
             CREATE TABLE TestData
             (
                 id             INT PRIMARY KEY,
-                name           VARCHAR(255) NOT NULL,
-                value          VARCHAR(255) NOT NULL
+                value          ${scenario.sqlType}
             );
             
-            INSERT INTO TestData (id, name, value) VALUES (1, 'Test0', 'User0');
-            INSERT INTO TestData (id, name, value) VALUES (2, 'Test1', 'User1');
-            INSERT INTO TestData (id, name, value) VALUES (3, 'Test2', 'User2');
-            INSERT INTO TestData (id, name, value) VALUES (4, 'Test3', 'User3');
+            INSERT INTO TestData (id, value) VALUES (1, ${scenario.sqlValue});
             """.trimIndent()
         )
 
         val flyway = Flyway.configure()
-            .dataSource(db.jdbcUrl, db.username, db.password)
+            .dataSource(scenario.dbContainer.jdbcUrl, scenario.dbContainer.username, scenario.dbContainer.password)
             .locations("filesystem:$tempDir")
             .load()
         flyway.clean()
@@ -119,24 +115,35 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
     class DatabaseCombinations : ArgumentsProvider {
         @Suppress("UnstableApiUsage")
         override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
-            return databaseCombinations.map { Arguments.of(*it.toTypedArray()) }.stream()
+            return databaseCombinations.map { Arguments.of(
+                ScenarioConfig(db = it.first(), sqlType = "VARCHAR(255)", sqlValue = "'User0'"),
+                ScenarioConfig(db = it.last(), sqlType = "VARCHAR(255)", sqlValue = "'User0'")
+            ) }.stream()
         }
+    }
+
+    data class ScenarioConfig(
+        val db: String,
+        val sqlType: String,
+        val sqlValue: String
+    ) {
+        val dbContainer: JdbcDatabaseContainer<Nothing> by lazy { containerFor(db) }
     }
 
     @ParameterizedTest
     @ArgumentsSource(DatabaseCombinations::class)
-    fun `should run rec between source and target`(source: String, target: String) {
+    fun `should run rec between source and target`(source: ScenarioConfig, target: ScenarioConfig) {
 
-        createTestData(containerFor(source))
-        createTestData(containerFor(target))
+        createTestData(source)
+        createTestData(target)
 
-        StepVerifier.create(ctx.getBean(DatasetRecService::class.java).runFor("$source-to-$target"))
+        StepVerifier.create(ctx.getBean(DatasetRecService::class.java).runFor("${source.db}-to-${target.db}"))
             .assertNext { run ->
                 assertThat(run.summary).usingRecursiveComparison().isEqualTo(
                     MatchStatus(
                         sourceOnly = 0,
                         targetOnly = 0,
-                        bothMatched = 4,
+                        bothMatched = 1,
                         bothMismatched = 0
                     )
                 )
