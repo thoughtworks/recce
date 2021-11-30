@@ -1,4 +1,4 @@
-package recce.server.dataset.datasource
+package recce.server.dataset
 
 import io.micronaut.context.ApplicationContext
 import org.assertj.core.api.Assertions.assertThat
@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import org.testcontainers.containers.*
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
-import recce.server.dataset.DatasetRecService
 import recce.server.recrun.MatchStatus
 import java.nio.file.Files
 import java.nio.file.Path
@@ -24,7 +23,7 @@ import java.util.stream.IntStream
 import java.util.stream.Stream
 
 @Testcontainers(disabledWithoutDocker = true)
-internal open class MultiDataSourceConnectivityIntegrationTest {
+internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
     companion object {
         /**
          * Databases which we expect to produce matching hashes for values of similar types.
