@@ -3,16 +3,12 @@ package recce.server.dataset.datasource
 import com.google.common.collect.Sets
 import io.micronaut.context.ApplicationContext
 import org.assertj.core.api.Assertions.assertThat
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
@@ -23,6 +19,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecService
 import recce.server.recrun.MatchStatus
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.stream.Stream
 
 @Testcontainers
@@ -55,6 +53,7 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
 
         @Suppress("UnstableApiUsage")
         private val databaseCombinations = Sets.combinations(databases.keys, 2)
+        private fun containerFor(name: String) = databases[name] ?: throw IllegalArgumentException("Cannot find db type [$name].")
 
         private lateinit var ctx: ApplicationContext
 
@@ -86,39 +85,35 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
         fun stopApplication() {
             ctx.stop()
         }
-
-        private fun connectToJdbc(container: JdbcDatabaseContainer<Nothing>): Database {
-            return Database.connect(container.jdbcUrl, user = container.username, password = container.password)
-        }
     }
 
-    @AfterEach
-    fun `wipe databases`() {
-        databases.forEach { transaction(connectToJdbc(it.value)) { SchemaUtils.drop(TestData) } }
-    }
+    @TempDir
+    lateinit var tempDir: Path
 
-    protected object TestData : Table() {
-        val id = integer("id").autoIncrement()
-        val name = varchar("name", 255)
-        val value = varchar("value", 255)
+    private fun createTestData(db: JdbcDatabaseContainer<Nothing>) {
+        Files.writeString(
+            tempDir.resolve("V1__CREATE.sql"),
+            """
+            CREATE TABLE TestData
+            (
+                id             INT PRIMARY KEY,
+                name           VARCHAR(255) NOT NULL,
+                value          VARCHAR(255) NOT NULL
+            );
+            
+            INSERT INTO TestData (id, name, value) VALUES (1, 'Test0', 'User0');
+            INSERT INTO TestData (id, name, value) VALUES (2, 'Test1', 'User1');
+            INSERT INTO TestData (id, name, value) VALUES (3, 'Test2', 'User2');
+            INSERT INTO TestData (id, name, value) VALUES (4, 'Test3', 'User3');
+            """.trimIndent()
+        )
 
-        override val primaryKey = PrimaryKey(id)
-    }
-
-    private fun createTestData(db: Database) {
-        transaction(db) {
-            SchemaUtils.create(TestData)
-            insertUsers(4)
-        }
-    }
-
-    private fun insertUsers(num: Int) {
-        for (i in 0 until num) {
-            TestData.insert {
-                it[name] = "Test$i"
-                it[value] = "User$i"
-            }
-        }
+        val flyway = Flyway.configure()
+            .dataSource(db.jdbcUrl, db.username, db.password)
+            .locations("filesystem:$tempDir")
+            .load()
+        flyway.clean()
+        flyway.migrate()
     }
 
     class DatabaseCombinations : ArgumentsProvider {
@@ -132,17 +127,8 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
     @ArgumentsSource(DatabaseCombinations::class)
     fun `should run rec between source and target`(source: String, target: String) {
 
-        createTestData(
-            connectToJdbc(
-                databases[source] ?: throw IllegalArgumentException("Cannot find db type [$source].")
-            )
-        )
-
-        createTestData(
-            connectToJdbc(
-                databases[target] ?: throw IllegalArgumentException("Cannot find db type [$target].")
-            )
-        )
+        createTestData(containerFor(source))
+        createTestData(containerFor(target))
 
         StepVerifier.create(ctx.getBean(DatasetRecService::class.java).runFor("$source-to-$target"))
             .assertNext { run ->
