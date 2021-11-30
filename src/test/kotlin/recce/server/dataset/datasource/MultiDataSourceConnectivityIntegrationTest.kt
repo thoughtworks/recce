@@ -94,6 +94,7 @@ internal open class MultiDataSourceConnectivityIntegrationTest {
         @AfterAll
         fun stopApplication() {
             ctx.stop()
+            databases.values.parallelStream().forEach { it.stop() }
         }
     }
 
