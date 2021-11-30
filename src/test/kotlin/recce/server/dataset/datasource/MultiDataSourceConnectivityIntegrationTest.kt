@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,8 +23,7 @@ import java.util.concurrent.CompletableFuture.runAsync
 import java.util.stream.IntStream
 import java.util.stream.Stream
 
-@Testcontainers
-@Tag("requires-docker")
+@Testcontainers(disabledWithoutDocker = true)
 internal open class MultiDataSourceConnectivityIntegrationTest {
     companion object {
         /**

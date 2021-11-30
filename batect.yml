@@ -87,7 +87,7 @@ tasks:
     group: recce
     run:
       container: recce-gradle
-      command: ./gradlew build -PtestExcludeTags='requires-docker'
+      command: ./gradlew build
   run:
     description: Compile and run the Recce server within Gradle with a configured `example-scenario`
     group: recce

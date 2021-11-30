@@ -155,12 +155,9 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
 }
 
-val testExcludeTags: String? by project
 tasks.withType<Test>().configureEach {
     finalizedBy(tasks.jacocoTestReport)
-    useJUnitPlatform {
-        excludeTags(testExcludeTags ?: "none")
-    }
+    useJUnitPlatform()
 }
 
 tasks.jacocoTestReport {
