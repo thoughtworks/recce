@@ -50,7 +50,7 @@ These options require only JDK 11+ and Docker installed locally.
 1. **Run Recce** locally
    * Either **Build** locally with an [example](./examples) source and target database (More info at [DEVELOPMENT.md](./DEVELOPMENT.md)).
        ```shell
-       ./batect recce
+       ./batect run
        ```
    * **Or use pre-validated Docker image** locally, using this repository only for setting up a DB for Recce, and an example scenario.
        ```shell
