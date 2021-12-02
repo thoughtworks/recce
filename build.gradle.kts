@@ -151,9 +151,8 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
 }
 
-tasks.withType<Test>().configureEach {
+tasks.test {
     finalizedBy(tasks.jacocoTestReport)
-    useJUnitPlatform()
 }
 
 tasks.jacocoTestReport {
