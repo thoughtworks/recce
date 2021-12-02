@@ -32,10 +32,10 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
          * Databases which we expect to produce matching hashes for values of similar types.
          */
         private val databases = mapOf(
+            "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense(),
             "mysql" to MySQLContainer<Nothing>("mysql:8"),
             "mariadb" to MariaDBContainer<Nothing>("mariadb:10.5"),
             "postgres" to PostgreSQLContainer<Nothing>("postgres:13-alpine"),
-            "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
         )
 
         /**
