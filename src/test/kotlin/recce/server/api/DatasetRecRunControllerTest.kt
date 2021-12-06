@@ -13,8 +13,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.apache.http.HttpStatus
 import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.Matchers.closeTo
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -62,37 +61,53 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `incomplete runs don't have duration`() {
-        assertThat(DatasetRecRunController.RunApiModel(RecRun(1, "empty", Instant.now())).completedDuration)
+        assertThat(RunApiModel(RecRun(1, "empty", Instant.now())).completedDuration)
             .isNull()
     }
 
     @Test
     fun `can get run by id`() {
         StepVerifier.create(controller.get(testResults.id!!))
-            .assertNext {
-                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
-            }
+            .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
+    }
+
+    private fun assertThatModelMatchesTestResults(apiModel: RunApiModel) {
+        assertThat(apiModel.id).isEqualTo(testResults.id)
+        assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
+        assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
+        assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
+        assertThat(apiModel.summary).usingRecursiveComparison().isEqualTo(
+            Summary(
+                testResults.summary!!.total,
+                testResults.summary!!.bothMatched,
+                testResults.summary!!.bothMismatched,
+                IndividualDbResult(
+                    testResults.summary!!.sourceTotal,
+                    testResults.summary!!.sourceOnly,
+                    testResults.sourceMeta
+                ),
+                IndividualDbResult(
+                    testResults.summary!!.targetTotal,
+                    testResults.summary!!.targetOnly,
+                    testResults.targetMeta
+                )
+            )
+        )
     }
 
     @Test
     fun `can get runs by dataset id`() {
         StepVerifier.create(controller.get(testDataset))
-            .assertNext {
-                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
-            }
-            .assertNext {
-                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
-            }
+            .assertNext(::assertThatModelMatchesTestResults)
+            .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
     }
 
     @Test
     fun `create should delegate to service`() {
         StepVerifier.create(controller.create(DatasetRecRunController.RunCreationParams(eq(testDataset))))
-            .assertNext {
-                assertThat(it).usingRecursiveComparison().isEqualTo(testResults)
-            }
+            .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
     }
 }
@@ -145,22 +160,30 @@ internal class DatasetRecRunControllerApiTest {
         body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.createdTime)))
         body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.completedTime)))
         body("completedDurationSeconds", closeTo(testCompletedDuration.toSeconds().toDouble(), 0.00001))
-        body("sourceMeta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
-        body("targetMeta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
         body(
             "summary",
-            equalTo(
-                mapOf(
-                    "sourceOnly" to 1,
-                    "targetOnly" to 2,
-                    "bothMatched" to 3,
-                    "bothMismatched" to 4,
-                    "sourceTotal" to 8,
-                    "targetTotal" to 9,
-                    "total" to 10,
-                )
+            allOf(
+                hasEntry("totalRowCount", 10),
+                hasEntry("bothMatchedCount", 3),
+                hasEntry("bothMismatchedCount", 4),
             )
         )
+        body(
+            "summary.source",
+            allOf(
+                hasEntry("totalRowCount", 8),
+                hasEntry("onlyHereCount", 1),
+            )
+        )
+        body("summary.source.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
+        body(
+            "summary.target",
+            allOf(
+                hasEntry("totalRowCount", 9),
+                hasEntry("onlyHereCount", 2),
+            )
+        )
+        body("summary.target.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
     }
 
     @Test
