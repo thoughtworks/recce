@@ -56,8 +56,12 @@ private val runRepository = mock<RecRunRepository> {
     on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
 }
 
+private val recordRepository = mock<RecRecordRepository> {
+    on { findByRecRunId(testResults.id!!)} doReturn Flux.empty()
+}
+
 internal class DatasetRecRunControllerTest {
-    private val controller = DatasetRecRunController(service, runRepository)
+    private val controller = DatasetRecRunController(service, runRepository, recordRepository)
 
     @Test
     fun `incomplete runs don't have duration`() {

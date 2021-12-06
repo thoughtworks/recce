@@ -7,7 +7,10 @@ import jakarta.inject.Inject
 import mu.KotlinLogging
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import recce.server.dataset.DatasetRecRunner
+import recce.server.recrun.RecRecordRepository
 import recce.server.recrun.RecRunRepository
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -18,12 +21,16 @@ private val logger = KotlinLogging.logger {}
 @Controller("/runs")
 class DatasetRecRunController(
     @Inject private val runner: DatasetRecRunner,
-    private val runRepository: RecRunRepository
+    private val runRepository: RecRunRepository,
+    private val recordRepository: RecRecordRepository
 ) {
     @Get(uri = "/{runId}")
     fun get(runId: Int): Mono<RunApiModel> {
         logger.info { "Finding run [$runId]" }
-        return runRepository.findById(runId).map { RunApiModel(it) }
+        return Mono.zip(
+            runRepository.findById(runId),
+            recordRepository.findByRecRunId(runId).collectList().defaultIfEmpty(emptyList())
+        ).map { (run, _) -> RunApiModel(run) }
     }
 
     @Get
