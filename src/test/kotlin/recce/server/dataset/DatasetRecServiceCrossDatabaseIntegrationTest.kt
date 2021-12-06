@@ -10,10 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
-import org.testcontainers.containers.MSSQLServerContainer
-import org.testcontainers.containers.MariaDBContainer
-import org.testcontainers.containers.MySQLContainer
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.*
 import org.testcontainers.junit.jupiter.Testcontainers
 import reactor.test.StepVerifier
 import recce.server.dataset.datasource.DbDescriptor
@@ -31,11 +28,11 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         /**
          * Databases which we expect to produce matching hashes for values of similar types.
          */
-        private val databases = mapOf(
+        private val databases: Map<String, JdbcDatabaseContainer<Nothing>> = mapOf(
             "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense(),
-            "mysql" to MySQLContainer<Nothing>("mysql:8"),
-            "mariadb" to MariaDBContainer<Nothing>("mariadb:10.5"),
-            "postgres" to PostgreSQLContainer<Nothing>("postgres:13-alpine"),
+            "mysql" to MySQLContainer("mysql:8"),
+            "mariadb" to MariaDBContainer("mariadb:10.5"),
+            "postgres" to PostgreSQLContainer("postgres:13-alpine"),
         )
 
         /**
