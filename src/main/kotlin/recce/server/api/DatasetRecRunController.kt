@@ -13,9 +13,13 @@ import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.RecRecordRepository
 import recce.server.recrun.RecRunRepository
 import javax.validation.Valid
+import javax.validation.constraints.Max
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.PositiveOrZero
 
 private val logger = KotlinLogging.logger {}
+
+private const val maximumSampleKeys = 100L
 
 @Validated
 @Controller("/runs")
@@ -24,12 +28,21 @@ class DatasetRecRunController(
     private val runRepository: RecRunRepository,
     private val recordRepository: RecRecordRepository
 ) {
-    @Get(uri = "/{runId}")
-    fun get(runId: Int): Mono<RunApiModel> {
-        logger.info { "Finding run [$runId]" }
-        return Mono.zip(
-            runRepository.findById(runId),
-            recordRepository.findFirstByRecRunIdSplitByMatchStatus(runId, 10)
+    @Introspected
+    data class RunQueryParams(
+        @field:PathVariable val runId: Int,
+        @field:QueryValue(defaultValue = "0") @field:PositiveOrZero @field:Max(maximumSampleKeys) val includeSampleKeys: Int = 0
+    )
+
+    @Suppress("MnUnresolvedPathVariable")
+    @Get(uri = "/{runId}{?includeSampleKeys}")
+    fun get(@Valid @RequestBean params: RunQueryParams): Mono<RunApiModel> {
+        logger.info { "Finding $params" }
+
+        val findSampleRows = if (params.includeSampleKeys == 0) {
+            Mono.just(emptyMap())
+        } else {
+            recordRepository.findFirstByRecRunIdSplitByMatchStatus(params.runId, params.includeSampleKeys)
                 .map { it.matchStatus to it.migrationKey }
                 .collectList()
                 .defaultIfEmpty(emptyList())
@@ -37,12 +50,17 @@ class DatasetRecRunController(
                     records.groupBy { it.first }
                         .mapValues { entry -> entry.value.map { pair -> pair.second } }
                 }
-        ).map { (run, mismatchedRows) ->
-            RunApiModel
-                .Builder(run)
-                .migrationKeySamples(mismatchedRows)
-                .build()
         }
+
+        return runRepository
+            .findById(params.runId)
+            .zipWith(findSampleRows)
+            .map { (run, mismatchedRows) ->
+                RunApiModel
+                    .Builder(run)
+                    .migrationKeySamples(mismatchedRows)
+                    .build()
+            }
     }
 
     @Get

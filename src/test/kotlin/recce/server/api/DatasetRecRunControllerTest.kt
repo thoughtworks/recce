@@ -16,6 +16,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -29,8 +31,8 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-private val notFoundId = 0
-private val testDataset = "testDataset"
+private const val notFoundId = 0
+private const val testDataset = "testDataset"
 private val testCompletedDuration = Duration.ofMinutes(3).plusNanos(234)
 private val testResults = RecRun(
     id = 12,
@@ -56,31 +58,37 @@ private val runRepository = mock<RecRunRepository> {
     on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
 }
 
+private const val sampleKeysLimit = 3
+
 private fun recordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
-    on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, 10) } doReturn Flux.fromIterable(sampleRecords)
-    on { findFirstByRecRunIdSplitByMatchStatus(notFoundId, 10) } doReturn Flux.empty()
+    on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, sampleKeysLimit) } doReturn Flux.fromIterable(sampleRecords)
+    on { findFirstByRecRunIdSplitByMatchStatus(notFoundId, sampleKeysLimit) } doReturn Flux.empty()
 }
 
 internal class DatasetRecRunControllerTest {
-    private val controller = DatasetRecRunController(service, runRepository, recordRepository(emptyList()))
+    private val sampleRows =
+        List(1) { RecRecord(RecRecordKey(testResults.id!!, "source-$it"), sourceData = "set") } +
+            List(2) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
+            List(3) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
+
+    private val controller =
+        DatasetRecRunController(service, runRepository, recordRepository(sampleRows))
 
     @Test
     fun `can get run by id`() {
-        StepVerifier.create(controller.get(testResults.id!!))
-            .assertNext(::assertThatModelMatchesTestResults)
+        StepVerifier.create(controller.get(DatasetRecRunController.RunQueryParams(testResults.id!!)))
+            .assertNext {
+                assertThatModelMatchesTestResults(it)
+                assertThat(it.summary?.source?.onlyHereSampleKeys).isNull()
+                assertThat(it.summary?.target?.onlyHereSampleKeys).isNull()
+                assertThat(it.summary?.bothMismatchedSampleKeys).isNull()
+            }
             .verifyComplete()
     }
 
     @Test
-    fun `can get run by id with sample bad rows`() {
-        val sampleRows =
-            List(1) { RecRecord(RecRecordKey(testResults.id!!, "source-$it"), sourceData = "set") } +
-                List(2) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
-                List(3) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
-
-        val controller =
-            DatasetRecRunController(service, runRepository, recordRepository(sampleRows))
-        StepVerifier.create(controller.get(testResults.id!!))
+    fun `can get run by id with limited sample bad rows`() {
+        StepVerifier.create(controller.get(DatasetRecRunController.RunQueryParams(testResults.id!!, sampleKeysLimit)))
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).containsExactly("source-0")
@@ -140,7 +148,7 @@ internal class DatasetRecRunControllerApiTest {
         Given {
             spec(spec)
         } When {
-            get("/runs/${testResults.id!!}")
+            get("/runs/${testResults.id!!}?includeSampleKeys=$sampleKeysLimit")
         } Then {
             validateTestResultsAreReturned(expectSampleKeys = true)
         }
@@ -155,6 +163,20 @@ internal class DatasetRecRunControllerApiTest {
         } Then {
             statusCode(HttpStatus.SC_NOT_FOUND)
             body("message", equalTo("Not Found"))
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [-1, 200])
+    fun `get 400 on run by id when bad sample count supplied`(count: Int) {
+        Given {
+            spec(spec)
+        } When {
+            get("/runs/${testResults.id!!}?includeSampleKeys=$count")
+        } Then {
+            statusCode(HttpStatus.SC_BAD_REQUEST)
+            body("message", equalTo("Bad Request"))
+            body("_embedded.errors[0].message", startsWith("params.includeSampleKeys: must be"))
         }
     }
 
