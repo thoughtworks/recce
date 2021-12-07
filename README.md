@@ -94,7 +94,7 @@ These options require only JDK 11+ and Docker installed locally.
             ]
           },
           "onlyHereCount": 0,
-          "totalRowCount": 1
+          "totalCount": 1
         },
         "target": {
           "meta": {
@@ -110,9 +110,9 @@ These options require only JDK 11+ and Docker installed locally.
             ]
           },
           "onlyHereCount": 0,
-          "totalRowCount": 1
+          "totalCount": 1
         },
-        "totalRowCount": 1
+        "totalCount": 1
       }
     }
     ```

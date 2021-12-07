@@ -104,13 +104,13 @@ internal class DatasetRecRunControllerTest {
             assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
             assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
             assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
-            assertThat(apiModel.summary?.totalRowCount).isEqualTo(testResults.summary?.total)
+            assertThat(apiModel.summary?.totalCount).isEqualTo(testResults.summary?.total)
             assertThat(apiModel.summary?.bothMatchedCount).isEqualTo(testResults.summary?.bothMatched)
             assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
-            assertThat(apiModel.summary?.source?.totalRowCount).isEqualTo(testResults.summary?.sourceTotal)
+            assertThat(apiModel.summary?.source?.totalCount).isEqualTo(testResults.summary?.sourceTotal)
             assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
             assertThat(apiModel.summary?.source?.meta).isEqualTo(testResults.sourceMeta)
-            assertThat(apiModel.summary?.target?.totalRowCount).isEqualTo(testResults.summary?.targetTotal)
+            assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
             assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
             assertThat(apiModel.summary?.target?.meta).isEqualTo(testResults.targetMeta)
         }
@@ -202,7 +202,7 @@ internal class DatasetRecRunControllerApiTest {
         body(
             "summary",
             allOf(
-                hasEntry("totalRowCount", 10),
+                hasEntry("totalCount", 10),
                 hasEntry("bothMatchedCount", 3),
                 hasEntry("bothMismatchedCount", 4),
                 if (expectSampleKeys) hasEntry("bothMismatchedSampleKeys", listOf("both-0")) else not(hasKey("bothMismatchedSampleKeys"))
@@ -211,7 +211,7 @@ internal class DatasetRecRunControllerApiTest {
         body(
             "summary.source",
             allOf(
-                hasEntry("totalRowCount", 8),
+                hasEntry("totalCount", 8),
                 hasEntry("onlyHereCount", 1),
                 if (expectSampleKeys) hasEntry("onlyHereSampleKeys", listOf("source-0")) else not(hasKey("onlyHereSampleKeys"))
             )
@@ -220,7 +220,7 @@ internal class DatasetRecRunControllerApiTest {
         body(
             "summary.target",
             allOf(
-                hasEntry("totalRowCount", 9),
+                hasEntry("totalCount", 9),
                 hasEntry("onlyHereCount", 2),
                 if (expectSampleKeys) hasEntry("onlyHereSampleKeys", listOf("target-0")) else not(hasKey("onlyHereSampleKeys"))
             )

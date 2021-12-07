@@ -41,7 +41,7 @@ data class RunApiModel(
 }
 
 data class Summary(
-    val totalRowCount: Int,
+    val totalCount: Int,
     val bothMatchedCount: Int,
     val bothMismatchedCount: Int,
     var bothMismatchedSampleKeys: List<String>? = null,
@@ -80,7 +80,7 @@ data class Summary(
 
 data class IndividualDbResult(
     val meta: DatasetMeta?,
-    val totalRowCount: Int,
+    val totalCount: Int,
     val onlyHereCount: Int,
     var onlyHereSampleKeys: List<String>? = null,
 )
