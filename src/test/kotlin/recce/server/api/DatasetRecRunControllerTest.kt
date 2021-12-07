@@ -13,6 +13,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.apache.http.HttpStatus
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
@@ -24,7 +25,6 @@ import reactor.test.StepVerifier
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.*
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -44,6 +44,8 @@ private val testResults = RecRun(
     summary = MatchStatus(1, 2, 3, 4)
 }
 
+private val testRecRecord = RecRecord(RecRecordKey(testResults.id!!, "key"))
+
 private val service = mock<DatasetRecRunner> {
     on { runFor(eq(testDataset)) } doReturn Mono.just(testResults)
 }
@@ -56,18 +58,14 @@ private val runRepository = mock<RecRunRepository> {
     on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
 }
 
-private val recordRepository = mock<RecRecordRepository> {
-    on { findByRecRunId(testResults.id!!)} doReturn Flux.empty()
+private fun recordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
+    on { findFirst10ByRecRunIdAndSourceDataIsNull(testResults.id!!) } doReturn Flux.fromIterable(sampleRecords)
+    on { findFirst10ByRecRunIdAndTargetDataIsNull(testResults.id!!) } doReturn Flux.fromIterable(sampleRecords)
+    on { findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(testResults.id!!) } doReturn Flux.fromIterable(sampleRecords)
 }
 
 internal class DatasetRecRunControllerTest {
-    private val controller = DatasetRecRunController(service, runRepository, recordRepository)
-
-    @Test
-    fun `incomplete runs don't have duration`() {
-        assertThat(RunApiModel(RecRun(1, "empty", Instant.now())).completedDuration)
-            .isNull()
-    }
+    private val controller = DatasetRecRunController(service, runRepository, recordRepository(emptyList()))
 
     @Test
     fun `can get run by id`() {
@@ -76,28 +74,35 @@ internal class DatasetRecRunControllerTest {
             .verifyComplete()
     }
 
+    @Test
+    fun `can get run by id with sample bad rows`() {
+        val controller = DatasetRecRunController(service, runRepository, recordRepository(listOf(testRecRecord, testRecRecord)))
+        StepVerifier.create(controller.get(testResults.id!!))
+            .assertNext {
+                assertThatModelMatchesTestResults(it)
+                assertThat(it.summary?.source?.onlyMigrationKeySample).hasSize(2)
+                assertThat(it.summary?.target?.onlyMigrationKeySample).hasSize(2)
+                assertThat(it.summary?.bothMismatchedMigrationKeySample).hasSize(2)
+            }
+            .verifyComplete()
+    }
+
     private fun assertThatModelMatchesTestResults(apiModel: RunApiModel) {
-        assertThat(apiModel.id).isEqualTo(testResults.id)
-        assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
-        assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
-        assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
-        assertThat(apiModel.summary).usingRecursiveComparison().isEqualTo(
-            Summary(
-                testResults.summary!!.total,
-                testResults.summary!!.bothMatched,
-                testResults.summary!!.bothMismatched,
-                IndividualDbResult(
-                    testResults.summary!!.sourceTotal,
-                    testResults.summary!!.sourceOnly,
-                    testResults.sourceMeta
-                ),
-                IndividualDbResult(
-                    testResults.summary!!.targetTotal,
-                    testResults.summary!!.targetOnly,
-                    testResults.targetMeta
-                )
-            )
-        )
+        SoftAssertions.assertSoftly {
+            assertThat(apiModel.id).isEqualTo(testResults.id)
+            assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
+            assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
+            assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
+            assertThat(apiModel.summary?.totalRowCount).isEqualTo(testResults.summary?.total)
+            assertThat(apiModel.summary?.bothMatchedCount).isEqualTo(testResults.summary?.bothMatched)
+            assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
+            assertThat(apiModel.summary?.source?.totalRowCount).isEqualTo(testResults.summary?.sourceTotal)
+            assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
+            assertThat(apiModel.summary?.source?.meta).isEqualTo(testResults.sourceMeta)
+            assertThat(apiModel.summary?.target?.totalRowCount).isEqualTo(testResults.summary?.targetTotal)
+            assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
+            assertThat(apiModel.summary?.target?.meta).isEqualTo(testResults.targetMeta)
+        }
     }
 
     @Test

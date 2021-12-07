@@ -1,5 +1,6 @@
 package recce.server.recrun
 
+import io.micronaut.data.annotation.Query
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
@@ -17,6 +18,12 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
     abstract fun findByRecRunIdAndMigrationKeyIn(recRunId: Int, migrationKeys: List<String>): Flux<RecRecord>
 
     abstract fun findByRecRunId(recRunId: Int): Flux<RecRecord>
+
+    abstract fun findFirst10ByRecRunIdAndSourceDataIsNull(recRunId: Int): Flux<RecRecord>
+    abstract fun findFirst10ByRecRunIdAndTargetDataIsNull(recRunId: Int): Flux<RecRecord>
+
+    @Query("SELECT * FROM reconciliation_record r WHERE r.reconciliation_run_id = :recRunId AND r.source_data <> r.target_data LIMIT 10")
+    abstract fun findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(recRunId: Int): Flux<RecRecord>
 
     fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus> {
         return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute() }

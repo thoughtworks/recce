@@ -39,13 +39,9 @@ class RecRecordRepositoryTest {
                 List(3) { "test" to "test" } +
                 List(4) { "test" to "test3" }
 
-        val savedRecords = mutableListOf<RecRecord>()
-        StepVerifier.create(saveTestRecords(testRecordData))
-            .recordWith { savedRecords }
-            .expectNextCount(testRecordData.size.toLong())
-            .verifyComplete()
+        val recRunId = captureSavedTestRun(testRecordData)
 
-        StepVerifier.create(recordRepository.countMatchedByKeyRecRunId(savedRecords.last().key.recRunId))
+        StepVerifier.create(recordRepository.countMatchedByKeyRecRunId(recRunId))
             .assertNext {
                 assertThat(it).isEqualTo(MatchStatus(1, 2, 3, 4))
                 assertThat(it.sourceTotal).isEqualTo(8)
@@ -55,12 +51,84 @@ class RecRecordRepositoryTest {
             .verifyComplete()
     }
 
+    @Test
+    fun `should find source only examples`() {
+        val testRecordData = List(20) { null to "test" }
+        val recRunId = captureSavedTestRun(testRecordData)
+
+        mutableListOf<RecRecord>().let { results ->
+            StepVerifier.create(recordRepository.findFirst10ByRecRunIdAndSourceDataIsNull(recRunId))
+                .recordWith { results }
+                .expectNextCount(10)
+                .verifyComplete()
+
+            assertThat(results)
+                .allSatisfy {
+                    assertThat(it.sourceData).isNull()
+                    assertThat(it.targetData).isNotNull
+                }
+        }
+    }
+
+    @Test
+    fun `should find target only examples`() {
+        val testRecordData = List(20) { "test" to null }
+        val recRunId = captureSavedTestRun(testRecordData)
+        mutableListOf<RecRecord>().let { results ->
+            StepVerifier.create(recordRepository.findFirst10ByRecRunIdAndTargetDataIsNull(recRunId))
+                .recordWith { results }
+                .expectNextCount(10)
+                .verifyComplete()
+
+            assertThat(results)
+                .allSatisfy {
+                    assertThat(it.sourceData).isNotNull
+                    assertThat(it.targetData).isNull()
+                }
+        }
+    }
+
+    @Test
+    fun `should find mismatched examples`() {
+        val testRecordData = List(20) { "test" to "test2" }
+        val recRunId = captureSavedTestRun(testRecordData)
+        mutableListOf<RecRecord>().let { results ->
+            StepVerifier.create(recordRepository.findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(recRunId))
+                .recordWith { results }
+                .expectNextCount(10)
+                .verifyComplete()
+
+            assertThat(results)
+                .allSatisfy {
+                    assertThat(it.sourceData).isNotNull
+                    assertThat(it.targetData).isNotNull
+                    assertThat(it.sourceData).isNotEqualTo(it.targetData)
+                }
+        }
+    }
+
+    private fun captureSavedTestRun(testRecordData: List<Pair<String?, String?>>): Int {
+        val savedRecords = mutableListOf<RecRecord>()
+        StepVerifier.create(saveTestRecords(testRecordData))
+            .recordWith { savedRecords }
+            .expectNextCount(testRecordData.size.toLong())
+            .verifyComplete()
+
+        return savedRecords.last().key.recRunId
+    }
+
     private fun saveTestRecords(testRecordData: List<Pair<String?, String?>>): Flux<RecRecord> {
         return runRepository.save(RecRun("test-dataset")).toFlux().flatMap { run ->
             Flux.fromIterable(testRecordData)
                 .index()
                 .flatMap { (i, data) ->
-                    recordRepository.save(RecRecord(key = RecRecordKey(run.id!!, "${i + 1}"), sourceData = data.first, targetData = data.second))
+                    recordRepository.save(
+                        RecRecord(
+                            key = RecRecordKey(run.id!!, "${i + 1}"),
+                            sourceData = data.first,
+                            targetData = data.second
+                        )
+                    )
                 }
         }
     }
