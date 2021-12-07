@@ -44,8 +44,6 @@ private val testResults = RecRun(
     summary = MatchStatus(1, 2, 3, 4)
 }
 
-private val testRecRecord = RecRecord(RecRecordKey(testResults.id!!, "key"))
-
 private val service = mock<DatasetRecRunner> {
     on { runFor(eq(testDataset)) } doReturn Mono.just(testResults)
 }
@@ -59,9 +57,8 @@ private val runRepository = mock<RecRunRepository> {
 }
 
 private fun recordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
-    on { findFirst10ByRecRunIdAndSourceDataIsNull(testResults.id!!) } doReturn Flux.fromIterable(sampleRecords)
-    on { findFirst10ByRecRunIdAndTargetDataIsNull(testResults.id!!) } doReturn Flux.fromIterable(sampleRecords)
-    on { findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(testResults.id!!) } doReturn Flux.fromIterable(sampleRecords)
+    on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, 10) } doReturn Flux.fromIterable(sampleRecords)
+    on { findFirstByRecRunIdSplitByMatchStatus(notFoundId, 10) } doReturn Flux.empty()
 }
 
 internal class DatasetRecRunControllerTest {
@@ -76,13 +73,19 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id with sample bad rows`() {
-        val controller = DatasetRecRunController(service, runRepository, recordRepository(listOf(testRecRecord, testRecRecord)))
+        val sampleRows =
+            List(1) { RecRecord(RecRecordKey(testResults.id!!, "source-$it"), sourceData = "set") } +
+                List(2) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
+                List(3) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
+
+        val controller =
+            DatasetRecRunController(service, runRepository, recordRepository(sampleRows))
         StepVerifier.create(controller.get(testResults.id!!))
             .assertNext {
                 assertThatModelMatchesTestResults(it)
-                assertThat(it.summary?.source?.onlyMigrationKeySample).hasSize(2)
-                assertThat(it.summary?.target?.onlyMigrationKeySample).hasSize(2)
-                assertThat(it.summary?.bothMismatchedMigrationKeySample).hasSize(2)
+                assertThat(it.summary?.source?.onlyHereSampleKeys).containsExactly("source-0")
+                assertThat(it.summary?.target?.onlyHereSampleKeys).containsExactly("target-0", "target-1")
+                assertThat(it.summary?.bothMismatchedSampleKeys).containsExactly("both-0", "both-1", "both-2")
             }
             .verifyComplete()
     }
@@ -124,6 +127,11 @@ internal class DatasetRecRunControllerTest {
 @MicronautTest
 internal class DatasetRecRunControllerApiTest {
 
+    val sampleRows =
+        List(1) { RecRecord(RecRecordKey(testResults.id!!, "source-$it"), sourceData = "set") } +
+            List(1) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
+            List(1) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
+
     @Inject
     lateinit var spec: RequestSpecification
 
@@ -134,7 +142,7 @@ internal class DatasetRecRunControllerApiTest {
         } When {
             get("/runs/${testResults.id!!}")
         } Then {
-            validateTestResultsAreReturned()
+            validateTestResultsAreReturned(expectSampleKeys = true)
         }
     }
 
@@ -162,7 +170,7 @@ internal class DatasetRecRunControllerApiTest {
         }
     }
 
-    private fun ValidatableResponse.validateTestResultsAreReturned() {
+    private fun ValidatableResponse.validateTestResultsAreReturned(expectSampleKeys: Boolean = false) {
         statusCode(HttpStatus.SC_OK)
         body("datasetId", equalTo(testDataset))
         body("id", equalTo(testResults.id))
@@ -175,6 +183,7 @@ internal class DatasetRecRunControllerApiTest {
                 hasEntry("totalRowCount", 10),
                 hasEntry("bothMatchedCount", 3),
                 hasEntry("bothMismatchedCount", 4),
+                if (expectSampleKeys) hasEntry("bothMismatchedSampleKeys", listOf("both-0")) else not(hasKey("bothMismatchedSampleKeys"))
             )
         )
         body(
@@ -182,6 +191,7 @@ internal class DatasetRecRunControllerApiTest {
             allOf(
                 hasEntry("totalRowCount", 8),
                 hasEntry("onlyHereCount", 1),
+                if (expectSampleKeys) hasEntry("onlyHereSampleKeys", listOf("source-0")) else not(hasKey("onlyHereSampleKeys"))
             )
         )
         body("summary.source.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
@@ -190,6 +200,7 @@ internal class DatasetRecRunControllerApiTest {
             allOf(
                 hasEntry("totalRowCount", 9),
                 hasEntry("onlyHereCount", 2),
+                if (expectSampleKeys) hasEntry("onlyHereSampleKeys", listOf("target-0")) else not(hasKey("onlyHereSampleKeys"))
             )
         )
         body("summary.target.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
@@ -226,7 +237,13 @@ internal class DatasetRecRunControllerApiTest {
 
     @Replaces(H2RecRunRepository::class)
     @Singleton
-    fun recRepository(): RecRunRepository {
+    fun runRepository(): RecRunRepository {
         return runRepository
+    }
+
+    @Replaces(H2RecRecordRepository::class)
+    @Singleton
+    fun recordRepository(): RecRecordRepository {
+        return recordRepository(sampleRows)
     }
 }

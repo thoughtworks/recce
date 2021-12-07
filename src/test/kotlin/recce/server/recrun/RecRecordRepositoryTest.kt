@@ -3,6 +3,7 @@ package recce.server.recrun
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Flux
@@ -52,58 +53,39 @@ class RecRecordRepositoryTest {
     }
 
     @Test
-    fun `should find source only examples`() {
-        val testRecordData = List(20) { null to "test" }
-        val recRunId = captureSavedTestRun(testRecordData)
+    fun `should find examples`() {
+        val testRecordData =
+            List(11) { "test" to null } +
+                List(11) { null to "test" } +
+                List(11) { "test" to "test" } +
+                List(11) { "test" to "test3" }
 
-        mutableListOf<RecRecord>().let { results ->
-            StepVerifier.create(recordRepository.findFirst10ByRecRunIdAndSourceDataIsNull(recRunId))
-                .recordWith { results }
-                .expectNextCount(10)
-                .verifyComplete()
-
-            assertThat(results)
-                .allSatisfy {
-                    assertThat(it.sourceData).isNull()
-                    assertThat(it.targetData).isNotNull
-                }
-        }
-    }
-
-    @Test
-    fun `should find target only examples`() {
-        val testRecordData = List(20) { "test" to null }
         val recRunId = captureSavedTestRun(testRecordData)
         mutableListOf<RecRecord>().let { results ->
-            StepVerifier.create(recordRepository.findFirst10ByRecRunIdAndTargetDataIsNull(recRunId))
+            StepVerifier.create(recordRepository.findFirstByRecRunIdSplitByMatchStatus(recRunId))
                 .recordWith { results }
-                .expectNextCount(10)
+                .expectNextCount(30)
                 .verifyComplete()
 
-            assertThat(results)
-                .allSatisfy {
-                    assertThat(it.sourceData).isNotNull
-                    assertThat(it.targetData).isNull()
-                }
-        }
-    }
-
-    @Test
-    fun `should find mismatched examples`() {
-        val testRecordData = List(20) { "test" to "test2" }
-        val recRunId = captureSavedTestRun(testRecordData)
-        mutableListOf<RecRecord>().let { results ->
-            StepVerifier.create(recordRepository.findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(recRunId))
-                .recordWith { results }
-                .expectNextCount(10)
-                .verifyComplete()
-
-            assertThat(results)
-                .allSatisfy {
-                    assertThat(it.sourceData).isNotNull
-                    assertThat(it.targetData).isNotNull
-                    assertThat(it.sourceData).isNotEqualTo(it.targetData)
-                }
+            SoftAssertions.assertSoftly {
+                assertThat(results).hasSize(30)
+                assertThat(results.slice(0 until 10))
+                    .allSatisfy {
+                        assertThat(it.sourceData).isNotNull
+                        assertThat(it.targetData).isNull()
+                    }
+                assertThat(results.slice(11 until 20))
+                    .allSatisfy {
+                        assertThat(it.sourceData).isNull()
+                        assertThat(it.targetData).isNotNull
+                    }
+                assertThat(results.slice(21 until 30))
+                    .allSatisfy {
+                        assertThat(it.sourceData).isNotNull
+                        assertThat(it.targetData).isNotNull
+                        assertThat(it.sourceData).isNotEqualTo(it.targetData)
+                    }
+            }
         }
     }
 

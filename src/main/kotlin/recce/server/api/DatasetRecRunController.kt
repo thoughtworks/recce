@@ -9,8 +9,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import reactor.kotlin.core.util.function.component3
-import reactor.kotlin.core.util.function.component4
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.RecRecordRepository
 import recce.server.recrun.RecRunRepository
@@ -31,13 +29,18 @@ class DatasetRecRunController(
         logger.info { "Finding run [$runId]" }
         return Mono.zip(
             runRepository.findById(runId),
-            recordRepository.findFirst10ByRecRunIdAndTargetDataIsNull(runId).map { it.migrationKey }.collectList().defaultIfEmpty(emptyList()),
-            recordRepository.findFirst10ByRecRunIdAndSourceDataIsNull(runId).map { it.migrationKey }.collectList().defaultIfEmpty(emptyList()),
-            recordRepository.findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(runId).map { it.migrationKey }.collectList().defaultIfEmpty(emptyList())
-        ).map { (run, sourceOnlySampleRows, targetOnlySampleRows, mismatchedSampleRows) ->
+            recordRepository.findFirstByRecRunIdSplitByMatchStatus(runId, 10)
+                .map { it.matchStatus to it.migrationKey }
+                .collectList()
+                .defaultIfEmpty(emptyList())
+                .map { records ->
+                    records.groupBy { it.first }
+                        .mapValues { entry -> entry.value.map { pair -> pair.second } }
+                }
+        ).map { (run, mismatchedRows) ->
             RunApiModel
                 .Builder(run)
-                .migrationKeySamples(mapOf("source" to sourceOnlySampleRows, "target" to targetOnlySampleRows, "both" to mismatchedSampleRows))
+                .migrationKeySamples(mismatchedRows)
                 .build()
         }
     }
@@ -45,7 +48,8 @@ class DatasetRecRunController(
     @Get
     fun get(@NotBlank @QueryValue("datasetId") datasetId: String): Flux<RunApiModel> {
         logger.info { "Find runs for [$datasetId]" }
-        return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId).map { RunApiModel.Builder(it).build() }
+        return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId)
+            .map { RunApiModel.Builder(it).build() }
     }
 
     @Post

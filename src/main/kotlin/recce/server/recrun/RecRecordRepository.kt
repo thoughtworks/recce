@@ -10,22 +10,31 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import javax.persistence.*
+import kotlin.reflect.KMutableProperty1
+
+// Declared as an interface to make it possible to replace the bean with a mock in tests
+// The replacement doesn't seem to work with Micronaut Test with an abstract class
+interface RecRecordRepository : ReactorCrudRepository<RecRecord, Int> {
+    fun findByRecRunIdAndMigrationKeyIn(recRunId: Int, migrationKeys: List<String>): Flux<RecRecord>
+    fun findByRecRunId(recRunId: Int): Flux<RecRecord>
+
+    @Query(
+        """
+        (SELECT * FROM reconciliation_record r WHERE r.reconciliation_run_id = :recRunId AND r.target_data IS NULL LIMIT :limit)
+        UNION
+        (SELECT * FROM reconciliation_record r WHERE r.reconciliation_run_id = :recRunId AND r.source_data IS NULL LIMIT :limit)
+        UNION
+        (SELECT * FROM reconciliation_record r WHERE r.reconciliation_run_id = :recRunId AND r.source_data <> r.target_data LIMIT :limit)
+        """
+    )
+    fun findFirstByRecRunIdSplitByMatchStatus(recRunId: Int, limit: Int = 10): Flux<RecRecord>
+    fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus>
+}
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
-abstract class RecRecordRepository(private val operations: R2dbcOperations) :
-    ReactorCrudRepository<RecRecord, Int> {
+internal abstract class AbstractRecRecordRepository(private val operations: R2dbcOperations) : RecRecordRepository {
 
-    abstract fun findByRecRunIdAndMigrationKeyIn(recRunId: Int, migrationKeys: List<String>): Flux<RecRecord>
-
-    abstract fun findByRecRunId(recRunId: Int): Flux<RecRecord>
-
-    abstract fun findFirst10ByRecRunIdAndSourceDataIsNull(recRunId: Int): Flux<RecRecord>
-    abstract fun findFirst10ByRecRunIdAndTargetDataIsNull(recRunId: Int): Flux<RecRecord>
-
-    @Query("SELECT * FROM reconciliation_record r WHERE r.reconciliation_run_id = :recRunId AND r.source_data <> r.target_data LIMIT 10")
-    abstract fun findFirst10ByRecRunIdAndSourceDataNotEqualsTargetData(recRunId: Int): Flux<RecRecord>
-
-    fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus> {
+    override fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus> {
         return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute() }
             .toFlux()
             .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
@@ -36,13 +45,8 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
         val count = row.get(countColumnName, Number::class.java)?.toInt()
             ?: throw IllegalArgumentException("Missing [$countColumnName] column!")
 
-        return when (val status = row.get(statusColumnName)) {
-            MatchStatus::sourceOnly.name -> { st -> st.sourceOnly = count }
-            MatchStatus::targetOnly.name -> { st -> st.targetOnly = count }
-            MatchStatus::bothMatched.name -> { st -> st.bothMatched = count }
-            MatchStatus::bothMismatched.name -> { st -> st.bothMismatched = count }
-            else -> throw IllegalArgumentException("Invalid $statusColumnName [$status]")
-        }
+        val recordMatchStatus = RecordMatchStatus.valueOf(row.get(statusColumnName, String::class.java) ?: throw IllegalArgumentException("Missing [$statusColumnName] column!"))
+        return { st -> recordMatchStatus.setter(st, count) }
     }
 
     companion object {
@@ -54,10 +58,10 @@ abstract class RecRecordRepository(private val operations: R2dbcOperations) :
                 WITH matching_data AS 
                     (SELECT migration_key,
                         CASE 
-                            WHEN target_data IS NULL       THEN '${MatchStatus::sourceOnly.name}'
-                            WHEN source_data IS NULL       THEN '${MatchStatus::targetOnly.name}'
-                            WHEN source_data = target_data THEN '${MatchStatus::bothMatched.name}'
-                            ELSE                                '${MatchStatus::bothMismatched.name}'
+                            WHEN target_data IS NULL       THEN '${RecordMatchStatus.SourceOnly}'
+                            WHEN source_data IS NULL       THEN '${RecordMatchStatus.TargetOnly}'
+                            WHEN source_data = target_data THEN '${RecordMatchStatus.BothMatched}'
+                            ELSE                                '${RecordMatchStatus.BothMismatched}'
                         END AS $statusColumnName
                     FROM reconciliation_record
                     WHERE reconciliation_run_id = $1)
@@ -82,6 +86,26 @@ data class RecRecord(
 
     @Transient
     val key = RecRecordKey(recRunId, migrationKey)
+
+    @get:Transient
+    val matchStatus: RecordMatchStatus
+        get() = RecordMatchStatus.from(this)
+}
+
+enum class RecordMatchStatus(val setter: KMutableProperty1.Setter<MatchStatus, Int>) {
+    SourceOnly(MatchStatus::sourceOnly.setter),
+    TargetOnly(MatchStatus::targetOnly.setter),
+    BothMatched(MatchStatus::bothMatched.setter),
+    BothMismatched(MatchStatus::bothMismatched.setter);
+
+    companion object {
+        fun from(record: RecRecord) = when {
+            record.targetData == null -> SourceOnly
+            record.sourceData == null -> TargetOnly
+            record.sourceData == record.targetData -> BothMatched
+            else -> BothMismatched
+        }
+    }
 }
 
 data class RecRecordKey(val recRunId: Int, val migrationKey: String)

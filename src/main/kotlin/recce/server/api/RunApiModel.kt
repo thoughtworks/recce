@@ -5,6 +5,7 @@ import io.micronaut.core.annotation.Introspected
 import recce.server.recrun.DatasetMeta
 import recce.server.recrun.MatchStatus
 import recce.server.recrun.RecRun
+import recce.server.recrun.RecordMatchStatus
 import java.time.Duration
 import java.time.Instant
 
@@ -24,8 +25,7 @@ data class RunApiModel(
         private val run: RecRun,
         private val summaryBuilder: Summary.Builder = Summary.Builder().matchStatus(run.summary)
     ) {
-
-        fun migrationKeySamples(migrationKeySamples: Map<String, List<String>>) = apply { summaryBuilder.migrationKeySamples(migrationKeySamples) }
+        fun migrationKeySamples(migrationKeySamples: Map<RecordMatchStatus, List<String>>) = apply { summaryBuilder.migrationKeySamples(migrationKeySamples) }
 
         fun build() = RunApiModel(
             id = run.id!!,
@@ -44,34 +44,34 @@ data class Summary(
     val totalRowCount: Int,
     val bothMatchedCount: Int,
     val bothMismatchedCount: Int,
+    var bothMismatchedSampleKeys: List<String>? = null,
     val source: IndividualDbResult,
-    val target: IndividualDbResult,
-    var bothMismatchedMigrationKeySample: List<String>? = null
+    val target: IndividualDbResult
 ) {
     data class Builder(
         private var matchStatus: MatchStatus? = null,
         private var sourceMeta: DatasetMeta? = null,
         private var targetMeta: DatasetMeta? = null,
 
-        private var migrationKeySamples: Map<String, List<String>>? = null
+        private var migrationKeySamples: Map<RecordMatchStatus, List<String>>? = null
     ) {
         fun matchStatus(matchStatus: MatchStatus?) = apply { this.matchStatus = matchStatus }
         fun sourceMeta(sourceMeta: DatasetMeta) = apply { this.sourceMeta = sourceMeta }
         fun targetMeta(targetMeta: DatasetMeta) = apply { this.targetMeta = targetMeta }
-        fun migrationKeySamples(migrationKeySamples: Map<String, List<String>>) = apply { this.migrationKeySamples = migrationKeySamples }
+        fun migrationKeySamples(migrationKeySamples: Map<RecordMatchStatus, List<String>>) = apply { this.migrationKeySamples = migrationKeySamples }
 
         fun build() = matchStatus?.let {
             Summary(
                 matchStatus!!.total,
                 matchStatus!!.bothMatched,
                 matchStatus!!.bothMismatched,
-                IndividualDbResult(matchStatus!!.sourceTotal, matchStatus!!.sourceOnly, sourceMeta),
-                IndividualDbResult(matchStatus!!.targetTotal, matchStatus!!.targetOnly, targetMeta),
+                source = IndividualDbResult(sourceMeta, matchStatus!!.sourceTotal, matchStatus!!.sourceOnly),
+                target = IndividualDbResult(targetMeta, matchStatus!!.targetTotal, matchStatus!!.targetOnly),
             ).apply {
                 migrationKeySamples?.let {
-                    bothMismatchedMigrationKeySample = migrationKeySamples!!["both"]
-                    source.onlyMigrationKeySample = migrationKeySamples!!["source"]
-                    target.onlyMigrationKeySample = migrationKeySamples!!["target"]
+                    source.onlyHereSampleKeys = migrationKeySamples!![RecordMatchStatus.SourceOnly]
+                    target.onlyHereSampleKeys = migrationKeySamples!![RecordMatchStatus.TargetOnly]
+                    bothMismatchedSampleKeys = migrationKeySamples!![RecordMatchStatus.BothMismatched]
                 }
             }
         }
@@ -79,8 +79,8 @@ data class Summary(
 }
 
 data class IndividualDbResult(
+    val meta: DatasetMeta?,
     val totalRowCount: Int,
     val onlyHereCount: Int,
-    val meta: DatasetMeta?,
-    var onlyMigrationKeySample: List<String>? = null,
+    var onlyHereSampleKeys: List<String>? = null,
 )
