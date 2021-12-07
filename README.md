@@ -72,49 +72,57 @@ These options require only JDK 11+ and Docker installed locally.
       ``` 
     ```json
     {
-      "id": 29,
+      "completedDurationSeconds": 0.736356642,
+      "completedTime": "2021-12-07T10:37:35.469576795Z",
+      "createdTime": "2021-12-07T10:37:34.733220153Z",
       "datasetId": "categories",
-      "createdTime": "2021-11-08T07:47:59.297424348Z",
-      "completedTime": "2021-11-08T07:48:01.149510476Z",
-      "sourceMeta": {
-        "cols": [
-          {
-            "name": "MigrationKey",
-            "javaType": "String"
-          },
-          {
-            "name": "count(distinct category)",
-            "javaType": "Long"
-          }
-        ]
-      },
-      "targetMeta": {
-        "cols": [
-          {
-            "name": "MigrationKey",
-            "javaType": "String"
-          },
-          {
-            "name": "count(*)",
-            "javaType": "Long"
-          }
-        ]
-      },
+      "id": 35,
       "summary": {
-        "sourceOnly": 0,
-        "targetOnly": 0,
-        "bothMatched": 1,
-        "bothMismatched": 0,
-        "targetTotal": 1,
-        "sourceTotal": 1,
-        "total": 1
-      },
-      "completedDurationSeconds": 1.852086128
+        "bothMatchedCount": 1,
+        "bothMismatchedCount": 0,
+        "source": {
+          "meta": {
+            "cols": [
+              {
+                "javaType": "String",
+                "name": "MigrationKey"
+              },
+              {
+                "javaType": "Long",
+                "name": "count(distinct category)"
+              }
+            ]
+          },
+          "onlyHereCount": 0,
+          "totalRowCount": 1
+        },
+        "target": {
+          "meta": {
+            "cols": [
+              {
+                "javaType": "String",
+                "name": "MigrationKey"
+              },
+              {
+                "javaType": "Long",
+                "name": "count(*)"
+              }
+            ]
+          },
+          "onlyHereCount": 0,
+          "totalRowCount": 1
+        },
+        "totalRowCount": 1
+      }
     }
     ```
 3. **Retrieve details** of an individual run by ID for a dataset
       ```shell
-      curl 'http://localhost:8080/runs/1'
+      curl 'http://localhost:8080/runs/35'
+      ```
+      You can also include up to `100` sample Migration Keys that are not matched.
+      ```shell
+      curl 'http://localhost:8080/runs/35?includeSampleKeys=10'
       ```
 4. **Retrieve details** of recent runs for a dataset
       ```shell
