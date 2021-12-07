@@ -1,6 +1,11 @@
 micronaut:
   application:
     name: recce
+logger:
+  levels:
+    io.micronaut.context.env: DEBUG # Log by default how properties are being loaded at startup
+    io.micronaut.data: INFO # Increase logging level to see what is happening on Recce's own DB
+    io.r2dbc.pool: INFO # Increase logging level to monitor connection usage from pools
 database:
   host: localhost
   port: 9000

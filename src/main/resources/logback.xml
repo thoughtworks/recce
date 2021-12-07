@@ -9,10 +9,6 @@
         </encoder>
     </appender>
 
-    <logger name="io.micronaut.context.env" level="debug"/>
-    <logger name="io.micronaut.data" level="info"/>
-    <logger name="io.r2dbc.pool" level="info"/>
-
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

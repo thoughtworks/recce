@@ -10,8 +10,6 @@
         </encoder>
     </appender>
 
-    <logger name="io.micronaut.data" level="trace"/>
-
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
