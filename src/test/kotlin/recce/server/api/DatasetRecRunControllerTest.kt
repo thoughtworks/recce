@@ -41,8 +41,8 @@ private val testResults = RecRun(
 ).apply {
     completedTime = createdTime?.plusNanos(testCompletedDuration.toNanos())
     updatedTime = completedTime?.plusSeconds(10)
-    sourceMeta = DatasetMeta(listOf(ColMeta("test1", "String")))
-    targetMeta = DatasetMeta(listOf(ColMeta("test1", "String")))
+    sourceMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
+    targetMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
     summary = MatchStatus(1, 2, 3, 4)
 }
 
@@ -71,8 +71,7 @@ internal class DatasetRecRunControllerTest {
             List(2) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
             List(3) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
 
-    private val controller =
-        DatasetRecRunController(service, runRepository, recordRepository(sampleRows))
+    private val controller = DatasetRecRunController(service, runRepository, recordRepository(sampleRows))
 
     @Test
     fun `can get run by id`() {
@@ -109,10 +108,10 @@ internal class DatasetRecRunControllerTest {
             assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
             assertThat(apiModel.summary?.source?.totalCount).isEqualTo(testResults.summary?.sourceTotal)
             assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
-            assertThat(apiModel.summary?.source?.meta).isEqualTo(testResults.sourceMeta)
+            assertThat(apiModel.summary?.source?.meta).usingRecursiveComparison().isEqualTo(testResults.sourceMeta)
             assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
             assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
-            assertThat(apiModel.summary?.target?.meta).isEqualTo(testResults.targetMeta)
+            assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison().isEqualTo(testResults.targetMeta)
         }
     }
 

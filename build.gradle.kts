@@ -64,6 +64,16 @@ micronaut {
     }
 }
 
+kapt {
+    arguments {
+        val props = mapOf(
+            "rapidoc.enabled" to true,
+            "rapidoc.theme" to "dark"
+        )
+        arg("micronaut.openapi.views.spec", props.entries.map { "${it.key}=${it.value}" }.joinToString(","))
+    }
+}
+
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("junit:junit"))
@@ -89,6 +99,9 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.15")
     runtimeOnly("ch.qos.logback:logback-classic")
+
+    kapt("io.micronaut.openapi:micronaut-openapi:3.2.0")
+    implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
     compileOnly("jakarta.persistence:jakarta.persistence-api:2.2.3")
@@ -138,7 +151,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("recce.server.RecceServerKt")
+    mainClass.set("recce.server.RecceServer")
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
