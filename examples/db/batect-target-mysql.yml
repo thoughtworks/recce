@@ -14,7 +14,7 @@ containers:
         name: target-db-mysql
         container: /var/lib/mysql
   target-flyway-mysql:
-    image: flyway/flyway:7-alpine
+    image: flyway/flyway:8-alpine
     environment:
       FLYWAY_URL: jdbc:mysql://target-db:3306/<{db-name}
       FLYWAY_USER: <{db-user}
