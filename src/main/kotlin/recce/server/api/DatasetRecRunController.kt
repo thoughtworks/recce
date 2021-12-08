@@ -45,7 +45,8 @@ class DatasetRecRunController(
     @Operation(
         operationId = "get-runs",
         summary = "Retrieve details of an individual run by ID for a dataset",
-        tags = ["Reconciliation Runs"])
+        tags = ["Reconciliation Runs"]
+    )
     fun get(@Valid @RequestBean params: RunQueryParams): Mono<RunApiModel> {
         logger.info { "Finding $params" }
 
@@ -78,7 +79,8 @@ class DatasetRecRunController(
         operationId = "get-run-by-id",
         summary = "Retrieve details of recent runs for a dataset",
         description = "Gets the last 10 runs (whether completed or not) for a given dataset.",
-        tags = ["Reconciliation Runs"])
+        tags = ["Reconciliation Runs"]
+    )
     fun get(@NotBlank @QueryValue("datasetId") datasetId: String): Flux<RunApiModel> {
         logger.info { "Find runs for [$datasetId]" }
         return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(datasetId)
@@ -90,7 +92,8 @@ class DatasetRecRunController(
         operationId = "trigger-run",
         summary = "Trigger a reconciliation run for a dataset",
         description = "Synchronously triggers a reconciliation run for a dataset; returning only on its completion.",
-        tags = ["Reconciliation Runs"])
+        tags = ["Reconciliation Runs"]
+    )
     fun create(@Body @Valid params: RunCreationParams): Mono<RunApiModel> {
         logger.info { "Received request to create run for $params" }
         return runner.runFor(params.datasetId).map { RunApiModel.Builder(it).build() }
