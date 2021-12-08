@@ -16,7 +16,7 @@ containers:
   source-flyway-mysql:
     image: flyway/flyway:8-alpine
     environment:
-      FLYWAY_URL: jdbc:mysql://source-db:3306/<{db-name}
+      FLYWAY_URL: jdbc:mysql://source-db:3306/<{db-name}?allowPublicKeyRetrieval=true
       FLYWAY_USER: <{db-user}
       FLYWAY_PASSWORD: <{db-password}
       FLYWAY_CONNECT_RETRIES: 60
