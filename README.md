@@ -332,7 +332,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md) to get started.
 
 **Why is this project called Recce?** 
 
-It's a play on "rec", short for "reconciliation" and the colloquial British English word "[recce](https://www.dictionary.com/browse/recce)" which is short for "reconnaissance". Recce helps you 
+It's a play on "rec", short for "reconciliation" and the colloquial British English word "[recce](https://www.dictionary.com/browse/recce)" which is short for "reconnaissance". Recce helps you reconcile data sources by doing query-based reconnaissance.
 
 **How do I pronounce it?**
 
