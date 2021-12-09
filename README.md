@@ -129,11 +129,11 @@ These options require only JDK 11+ and Docker installed locally.
         ```
      </details>
    
-    * **Retrieve details** of an individual run by ID for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs/-runId-), _or_
+    * **Retrieve details of an individual run** by ID for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs/-runId-), _or_
       ```shell
       curl 'http://localhost:8080/runs/35'
       ```
-    * *Retrieve details* of recent runs for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs), _or_
+    * **Retrieve details of recent runs** for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs), _or_
       ```shell
       curl 'http://localhost:8080/runs?datasetId=categories'
       ```
