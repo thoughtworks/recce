@@ -349,7 +349,7 @@ Probably not when doing row-by-row, column-by-column comparisons, but It Depends
 
 You might want to consider doing row-by-row reconciliations for a subset of data, delimited by time, or domain (subset of), or using aggregate SQL queries to compare, say, counts of #s of rows, grouped by important domain attributes.
 
-**Does Recce scale to millions of rows**
+**Does Recce scale to millions of rows?**
 
 Sure, but it might be slower than you would like. This will mostly depend on the nature of the databases you are reconciling (and their operational transaction load if you do not either have a reporting DB/read-only replica, or ability to work against a snapshot) as well as Recce's own database spec.
 
