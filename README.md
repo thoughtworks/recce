@@ -36,7 +36,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
       * [Handling differences](README.md#handling-differences)
 * [Development](README.md#development)
 
-<!-- Added by: runner, at: Thu Dec  9 08:27:52 UTC 2021 -->
+<!-- Added by: runner, at: Thu Dec  9 08:29:32 UTC 2021 -->
 
 <!--te-->
 

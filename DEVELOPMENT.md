@@ -1,6 +1,5 @@
 <!-- ToC auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
-* [Table of contents](DEVELOPMENT.md#table-of-contents)
 * [Pre-requisites](DEVELOPMENT.md#pre-requisites)
 * [Getting Started](DEVELOPMENT.md#getting-started)
 * [Setting up new folks for access](DEVELOPMENT.md#setting-up-new-folks-for-access)
@@ -14,7 +13,7 @@
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
 
-<!-- Added by: runner, at: Thu Dec  9 08:27:52 UTC 2021 -->
+<!-- Added by: runner, at: Thu Dec  9 08:29:32 UTC 2021 -->
 
 <!--te-->
 
