@@ -156,7 +156,7 @@ To make it easier to configure Recce's own DB, some dedicated properties are res
 including connection pooling.
 
 | Env value         | Default     | Description                                      |
-| ----------------- | ----------- | ------------------------------------------------ |
+|-------------------|-------------|--------------------------------------------------|
 | DATABASE_HOST     | `localhost` | Host your Postgres DB is on                      |
 | DATABASE_PORT     | `9000`      | Port your Postgres DB is on                      |
 | DATABASE_NAME     | `db`        | The name of the logical database within Postgres |
