@@ -49,83 +49,88 @@ However, it also requires a Postgres database and to be practically useful, you 
 These options require only JDK 11+ and Docker installed locally.
 
 1. **Run Recce** locally
-   * Either **Build** locally with an [example](./examples) source and target database (More info at [DEVELOPMENT.md](./DEVELOPMENT.md)).
-       ```shell
-       ./batect run
-       ```
-   * **Or use pre-validated Docker image** locally, using this repository only for setting up a DB for Recce, and an example scenario.
-       ```shell
-       # Run in one shell - starts a DB for Recce, and an example scenario
-       ./batect run-deps
+    * Either **Build** locally with an [example](./examples) source and target database (More info at [DEVELOPMENT.md](./DEVELOPMENT.md)).
+    ```shell
+    ./batect run
+    ```
+    * **Or use pre-validated Docker image** locally, using this repository only for setting up a DB for Recce, and an example scenario.
+    ```shell
+    # Run in one shell - starts a DB for Recce, and an example scenario
+    ./batect run-deps
+  
+    # Run in another shell - runs Recce
+    docker run -p 8080:8080 \
+      -v $(pwd)/examples/scenario/petshop-mysql:/config \
+      -e MICRONAUT_CONFIG_FILES=/config/application-petshop-mysql.yml \
+      -e DATABASE_HOST=host.docker.internal \
+      -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mysql://host.docker.internal:8000/db \
+      -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mysql://host.docker.internal:8001/db \
+      ghcr.io/thoughtworks-sea/recce-server:latest
+    ```
     
-       # Run in another shell - runs Recce
-       docker run -p 8080:8080 \
-         -v $(pwd)/examples/scenario/petshop-mysql:/config \
-         -e MICRONAUT_CONFIG_FILES=/config/application-petshop-mysql.yml \
-         -e DATABASE_HOST=host.docker.internal \
-         -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mysql://host.docker.internal:8000/db \
-         -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mysql://host.docker.internal:8001/db \
-         ghcr.io/thoughtworks-sea/recce-server:latest
-     ```
-2. **Synchronously trigger** a run, waiting for to complete
+2. **Explore** and trigger runs via Recce's APIs, accessible via interactive UI at http://localhost:8080/rapidoc. 
+    Some non-exhaustive examples are included below, but fuller documentation is available via the UI.  
+ 
+    * **Synchronously trigger** a run, waiting for it to complete via [UI](http://localhost:8080/rapidoc#post-/runs) _or_
       ```shell
       curl -X POST http://localhost:8080/runs -H 'Content-Type: application/json' -d '{ "datasetId": "categories" }'
       ``` 
-    ```json
-    {
-      "completedDurationSeconds": 0.736356642,
-      "completedTime": "2021-12-07T10:37:35.469576795Z",
-      "createdTime": "2021-12-07T10:37:34.733220153Z",
-      "datasetId": "categories",
-      "id": 35,
-      "summary": {
-        "bothMatchedCount": 1,
-        "bothMismatchedCount": 0,
-        "source": {
-          "meta": {
-            "cols": [
-              {
-                "javaType": "String",
-                "name": "MigrationKey"
+      <details>
+        <summary>Expand example results</summary>
+
+        ```json
+        {
+          "completedDurationSeconds": 0.736356642,
+          "completedTime": "2021-12-07T10:37:35.469576795Z",
+          "createdTime": "2021-12-07T10:37:34.733220153Z",
+          "datasetId": "categories",
+          "id": 35,
+          "summary": {
+            "bothMatchedCount": 1,
+            "bothMismatchedCount": 0,
+            "source": {
+              "meta": {
+                "cols": [
+                  {
+                    "javaType": "String",
+                    "name": "MigrationKey"
+                  },
+                  {
+                    "javaType": "Long",
+                    "name": "count(distinct category)"
+                  }
+                ]
               },
-              {
-                "javaType": "Long",
-                "name": "count(distinct category)"
-              }
-            ]
-          },
-          "onlyHereCount": 0,
-          "totalCount": 1
-        },
-        "target": {
-          "meta": {
-            "cols": [
-              {
-                "javaType": "String",
-                "name": "MigrationKey"
+              "onlyHereCount": 0,
+              "totalCount": 1
+            },
+            "target": {
+              "meta": {
+                "cols": [
+                  {
+                    "javaType": "String",
+                    "name": "MigrationKey"
+                  },
+                  {
+                    "javaType": "Long",
+                    "name": "count(*)"
+                  }
+                ]
               },
-              {
-                "javaType": "Long",
-                "name": "count(*)"
-              }
-            ]
-          },
-          "onlyHereCount": 0,
-          "totalCount": 1
-        },
-        "totalCount": 1
-      }
-    }
-    ```
-3. **Retrieve details** of an individual run by ID for a dataset
+              "onlyHereCount": 0,
+              "totalCount": 1
+            },
+            "totalCount": 1
+          }
+        }
+        ```
+     </details>
+   
+    * **Retrieve details** of an individual run by ID for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs/-runId-), _or_
       ```shell
       curl 'http://localhost:8080/runs/35'
       ```
-      You can also include up to `100` sample Migration Keys that are not matched.
-      ```shell
-      curl 'http://localhost:8080/runs/35?includeSampleKeys=10'
-      ```
-4. **Retrieve details** of recent runs for a dataset
+    * *Retrieve details* of recent runs for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs), _or_
       ```shell
       curl 'http://localhost:8080/runs?datasetId=categories'
       ```
