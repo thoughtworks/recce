@@ -17,6 +17,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 * **Schedule** reconciliations for low-traffic periods against your data sources
 
 ## Table of contents
+<!-- Auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
 * [Recce Server](#recce-server)
    * [Features](#features)
