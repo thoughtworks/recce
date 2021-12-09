@@ -25,6 +25,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 * [Getting Started](README.md#getting-started)
 * [Configuration](README.md#configuration)
    * [Configuring Recce itself](README.md#configuring-recce-itself)
+   * [Database configuration conveniences](README.md#database-configuration-conveniences)
    * [Adding additional configuration files](README.md#adding-additional-configuration-files)
    * [Configuring datasources](README.md#configuring-datasources)
       * [Driver/database specific configuration](README.md#driverdatabase-specific-configuration)
@@ -34,9 +35,11 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
       * [The MigrationKey](README.md#the-migrationkey)
       * [Ordering of columns](README.md#ordering-of-columns)
       * [Handling differences](README.md#handling-differences)
+      * [Huge datasets and aggregates](README.md#huge-datasets-and-aggregates)
 * [Development](README.md#development)
+* [FAQ](README.md#faq)
 
-<!-- Added by: runner, at: Thu Dec  9 08:29:32 UTC 2021 -->
+<!-- Added by: runner, at: Thu Dec  9 10:03:55 UTC 2021 -->
 
 <!--te-->
 
