@@ -17,14 +17,20 @@ interface DatasetRecRunner {
     fun runFor(datasetId: String): Mono<RecRun>
 }
 
+interface DatasetConfigProvider {
+    val availableDataSetIds: Collection<String>
+}
+
 @Singleton
 open class DatasetRecService(
     @Inject private val config: RecConfiguration,
     private val runService: RecRunService,
     private val recordRepository: RecRecordRepository
-) : DatasetRecRunner {
-    override fun runFor(datasetId: String): Mono<RecRun> {
+) : DatasetRecRunner, DatasetConfigProvider {
 
+    override val availableDataSetIds = config.datasets.keys
+
+    override fun runFor(datasetId: String): Mono<RecRun> {
         val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
 
         logger.info { "Starting reconciliation run for [$datasetId]..." }

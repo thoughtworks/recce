@@ -165,4 +165,11 @@ internal class DatasetRecServiceTest {
         verifyNoMoreInteractions(recordRepository)
         verify(runService).complete(recRun)
     }
+
+    @Test
+    fun `should be able to retrieve available datasets`() {
+        val datasetConfig = mapOf<String, DatasetConfiguration>("a" to mock(), "b" to mock(), "c" to mock())
+        assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock()).availableDataSetIds)
+            .hasSameElementsAs(listOf("a", "b", "c"))
+    }
 }

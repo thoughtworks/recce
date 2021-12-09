@@ -75,7 +75,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id`() {
-        StepVerifier.create(controller.get(DatasetRecRunController.RunQueryParams(testResults.id!!)))
+        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.RunQueryParams(testResults.id!!)))
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).isNull()
@@ -87,7 +87,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id with limited sample bad rows`() {
-        StepVerifier.create(controller.get(DatasetRecRunController.RunQueryParams(testResults.id!!, sampleKeysLimit)))
+        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.RunQueryParams(testResults.id!!, sampleKeysLimit)))
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).containsExactly("source-0")
@@ -117,15 +117,15 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get runs by dataset id`() {
-        StepVerifier.create(controller.get(testDataset))
+        StepVerifier.create(controller.retrieveRuns(testDataset))
             .assertNext(::assertThatModelMatchesTestResults)
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
     }
 
     @Test
-    fun `create should delegate to service`() {
-        StepVerifier.create(controller.create(DatasetRecRunController.RunCreationParams(eq(testDataset))))
+    fun `trigger should delegate to service`() {
+        StepVerifier.create(controller.triggerRun(DatasetRecRunController.RunCreationParams(eq(testDataset))))
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
     }
