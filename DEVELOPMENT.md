@@ -1,5 +1,4 @@
-# Table of contents
-<!-- Auto-populated via https://github.com/ekalinin/github-markdown-toc -->
+<!-- ToC auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
 * [Table of contents](DEVELOPMENT.md#table-of-contents)
 * [Pre-requisites](DEVELOPMENT.md#pre-requisites)
@@ -37,6 +36,7 @@ To get started working on Recce:
     ```shell
     ./batect run
     ```
+* **Explore** Recce's API (after running it) via http://localhost:8080/rapidoc
 * **Build a Docker image** locally and run it with an [example scenario](examples/README.md) a
     ```shell
     ./gradlew jibDockerBuild && ./batect run-docker-local
