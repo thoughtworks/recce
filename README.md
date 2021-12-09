@@ -145,7 +145,12 @@ You can manage configuration as multiple files; or one single file. They will be
 
 As a Micronaut application, much of Recce's configuration is open for hacking and can be [expressed in multiple ways](https://docs.micronaut.io/latest/guide/#propertySource).
 
-However some basic configuration to consider overriding from the [default config](src/main/resources/application.yml).
+Recce-specific configuration (as opposed to all possible generic Micronaut configuration) is documented within the [default config](src/main/resources/application.yml).
+
+## Database configuration conveniences
+
+To make it easier to configure Recce's own DB, some dedicated properties are respected to construct the appropriate URL
+including connection pooling.
 
 | Env value         | Default     | Description                                      |
 | ----------------- | ----------- | ------------------------------------------------ |
@@ -155,13 +160,19 @@ However some basic configuration to consider overriding from the [default config
 | DATABASE_USERNAME | `user`      | Username to connect with                         |
 | DATABASE_PASSWORD | `password`  | Password to connect with                         |
 
+In the normal Micronaut way, additional configuring can be configured using
+* `R2DBC_DATASOURCES_DEFAULT_*` environment variables, _or_
+* `r2dbc.datasource.default.*` system properties _or_
+* Merging in an additional YAML configuration file (see below)
+
 ## Adding additional configuration files
 
 As a Micronaut application, [configuration can be externalised](https://docs.micronaut.io/latest/guide/#propertySource) in many ways.
 
-However, the recommended way to add additional configuration for your own datasources
-and datasets to reconcile is to mount a volume with your configuration and set `MICRONAUT_CONFIG_FILES` to point Recce at your additional
-configuration which will be merged into the base configuration.
+However, the recommended way to add additional configuration **for your own datasources and datasets** to reconcile is to 
+mount a volume with your configuration and set `MICRONAUT_CONFIG_FILES` to point Recce at your additional configuration 
+which will be merged into the base configuration. This allows you to separate and manage configuration as appropriate
+for your environment.
 
 ```shell
 mkdir -p my-dataset-configs
@@ -297,6 +308,60 @@ SELECT id as MigrationKey, enumerated_text
 FROM my_table
 ```
 
+### Huge datasets and aggregates
+
+When reconciling very large data sets, it may not be feasible to do row-by-row, column-by-column comparisons. In such cases it may be sufficient to use aggregate queries to get an idea whether you have lost data. e.g
+
+```sql
+--- check #s of login audit records for a month of data by location and type
+SELECT user_location || user_type as MigrationKey, count(*) as Count
+FROM user_login_audit
+WHERE user_login_datetime >= timestamp('2021-11-01 00:00:00') AND
+    user_login_datetime < timestamp('2021-12-01 00:00:00')
+GROUP BY user_location, user_type
+```
+
 # Development
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md) to get started.
+
+# FAQ
+
+**Why is this project called Recce?** 
+
+It's a play on "rec", short for "reconciliation" and the colloquial British English word "[recce](https://www.dictionary.com/browse/recce)" which is short for "reconnaissance". Recce helps you 
+
+**How do I pronounce it?**
+
+IPA `/ ˈrɛk i /`
+Phonetic `[ rek-ee ]`
+
+**The name is silly. Can we change it?**
+
+Maybe? Please submit suggestions.
+
+**Does Recce scale to hundreds of millions of rows**
+
+Probably not when doing row-by-row, column-by-column comparisons, but It Depends. Would it be useful to try and reconcile row-for-row this much data? What will it tell you if there are 10,000 rows mismatched?
+
+You might want to consider doing row-by-row reconciliations for a subset of data, delimited by time, or domain (subset of), or using aggregate SQL queries to compare, say, counts of #s of rows, grouped by important domain attributes.
+
+**Does Recce scale to millions of rows**
+
+Sure, but it might be slower than you would like. This will mostly depend on the nature of the databases you are reconciling (and their operational transaction load if you do not either have a reporting DB/read-only replica, or ability to work against a snapshot) as well as Recce's own database spec.
+
+**I don't like SQL in YAML. Is there a better way?**
+
+Neither. And probably. It might be a good idea to allow Recce to load queries from files, either explicitly or based on a convention. Ideas welcome!
+
+**Shouldn't this be done with data pipelines and big data technology X?** 
+
+Maybe. Many common data migration and monolith-breaking projects on operational systems don't have these huge quantities of data. Furthermore, the migrations are normally done incrementally with one-way or two-way data synchronization of subsets of data as domain boundaries are gradually identified and implemented.
+
+This can mean there is a need to gain confidence that no data has been lost before the data from the old system can be rationalised or removed.
+
+**Why do I need to reconcile data if I use DB data dump + bulk load?**
+
+You possibly don't. This tool is intended for cases where a system, or part of its domain is fully or partially re-implemented. In these cases it is common to load/migrate subsets of data via API to ensure it is semantically valid with the new system. But how to gain additional confidence that no data was lost in the process? Expressing the intended differences and similarities between datasets is one approach to do this.
+
+Sometimes it can be useful to have a separate tool, intended to run with the real data, in a real environment, which is sensitive to the PII or confidentiality of that data - but still gives stakeholders additional confidence in the **completeness** of the migration, and the reliability of any synchronization that is running while systems run in parallel.
