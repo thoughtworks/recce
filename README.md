@@ -19,24 +19,24 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md).
 ## Table of contents
 <!-- Auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
-* [Recce Server](#recce-server)
-   * [Features](#features)
-   * [Table of contents](#table-of-contents)
-* [Getting Started](#getting-started)
-* [Configuration](#configuration)
-   * [Configuring Recce itself](#configuring-recce-itself)
-   * [Adding additional configuration files](#adding-additional-configuration-files)
-   * [Configuring datasources](#configuring-datasources)
-      * [Driver/database specific configuration](#driverdatabase-specific-configuration)
-      * [Customising datasource pooling](#customising-datasource-pooling)
-   * [Configuring datasets](#configuring-datasets)
-   * [Writing dataset queries](#writing-dataset-queries)
-      * [The MigrationKey](#the-migrationkey)
-      * [Ordering of columns](#ordering-of-columns)
-      * [Handling differences](#handling-differences)
-* [Development](#development)
+* [Recce Server](README.md#recce-server)
+   * [Features](README.md#features)
+   * [Table of contents](README.md#table-of-contents)
+* [Getting Started](README.md#getting-started)
+* [Configuration](README.md#configuration)
+   * [Configuring Recce itself](README.md#configuring-recce-itself)
+   * [Adding additional configuration files](README.md#adding-additional-configuration-files)
+   * [Configuring datasources](README.md#configuring-datasources)
+      * [Driver/database specific configuration](README.md#driverdatabase-specific-configuration)
+      * [Customising datasource pooling](README.md#customising-datasource-pooling)
+   * [Configuring datasets](README.md#configuring-datasets)
+   * [Writing dataset queries](README.md#writing-dataset-queries)
+      * [The MigrationKey](README.md#the-migrationkey)
+      * [Ordering of columns](README.md#ordering-of-columns)
+      * [Handling differences](README.md#handling-differences)
+* [Development](README.md#development)
 
-<!-- Added by: runner, at: Tue Dec  7 12:05:04 UTC 2021 -->
+<!-- Added by: runner, at: Thu Dec  9 08:27:52 UTC 2021 -->
 
 <!--te-->
 

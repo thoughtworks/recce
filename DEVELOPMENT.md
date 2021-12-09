@@ -1,6 +1,21 @@
 # Table of contents
 <!-- Auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
+* [Table of contents](DEVELOPMENT.md#table-of-contents)
+* [Pre-requisites](DEVELOPMENT.md#pre-requisites)
+* [Getting Started](DEVELOPMENT.md#getting-started)
+* [Setting up new folks for access](DEVELOPMENT.md#setting-up-new-folks-for-access)
+   * [Add user to GitHub org](DEVELOPMENT.md#add-user-to-github-org)
+   * [Pulling container images](DEVELOPMENT.md#pulling-container-images)
+* [Technical Overview](DEVELOPMENT.md#technical-overview)
+   * [Recce Database](DEVELOPMENT.md#recce-database)
+   * [External data sources for Reconciliation](DEVELOPMENT.md#external-data-sources-for-reconciliation)
+   * [Build](DEVELOPMENT.md#build)
+   * [Testing](DEVELOPMENT.md#testing)
+      * [Testing conventions](DEVELOPMENT.md#testing-conventions)
+      * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
+
+<!-- Added by: runner, at: Thu Dec  9 08:27:52 UTC 2021 -->
 
 <!--te-->
 
