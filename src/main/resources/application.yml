@@ -80,13 +80,13 @@ reconciliation:
 #    my-data-set: # Name your datasets however you would like
 #      source:
 #        # Reference to a datasource defined in `r2dbc.datasources`
-#        dataSourceRef: my-source-db
+#        datasourceRef: my-source-db
 #        # Any SQL query to evaluate against the source DB
 #        query: >
 #          SELECT id as MigrationKey, * FROM my-table
 #      target:
 #        # Reference to a datasource defined in `r2dbc.datasources`
-#        dataSourceRef: my-target-db
+#        datasourceRef: my-target-db
 #        # Any SQL query to evaluate against the source DB
 #        query: >
 #          SELECT different_id as MigrationKey, * FROM my-table

@@ -252,14 +252,14 @@ reconciliation:
     pets: # Name your datasets however you would like
       source:
         # Reference to a datasource defined in `r2dbc.datasources`
-        dataSourceRef: my-source-db
+        datasourceRef: my-source-db
         # Any SQL query to evaluate against the source DB
         query: >
           SELECT pet.id as MigrationKey, category, name, status
           FROM pet
       target:
         # Reference to a datasource defined in `r2dbc.datasources`  
-        dataSourceRef: my-target-db 
+        datasourceRef: my-target-db 
         # Any SQL query to evaluate against the source DB
         query: >
           SELECT pet.id as MigrationKey, category.name as category, pet.name, status

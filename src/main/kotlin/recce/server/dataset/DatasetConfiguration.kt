@@ -39,7 +39,7 @@ class DatasetConfiguration(
     }
 
     val datasourceDescriptor: String
-        get() = "(${source.dataSourceRef} -> ${target.dataSourceRef})"
+        get() = "(${source.datasourceRef} -> ${target.datasourceRef})"
 
     val resolvedHashingStrategy: HashingStrategy
         get() = hashingStrategy.orElseGet { defaults.hashingStrategy }

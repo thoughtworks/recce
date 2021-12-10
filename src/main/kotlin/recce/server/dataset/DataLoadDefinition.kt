@@ -9,13 +9,13 @@ import reactor.core.publisher.Flux
 import recce.server.PostConstructable
 import javax.validation.constraints.NotBlank
 
-class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val query: String) : PostConstructable {
+class DataLoadDefinition(@NotBlank val datasourceRef: String, @NotBlank val query: String) : PostConstructable {
     lateinit var dbOperations: R2dbcOperations
     lateinit var role: DataLoadRole
 
     override fun populate(locator: BeanLocator) {
-        dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(dataSourceRef))
-            .orElseThrow { ConfigurationException("Cannot locate ${R2dbcOperations::class.java.simpleName} named [$dataSourceRef] in configuration!") }
+        dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(datasourceRef))
+            .orElseThrow { ConfigurationException("Cannot locate ${R2dbcOperations::class.java.simpleName} named [$datasourceRef] in configuration!") }
     }
 
     companion object {
@@ -29,7 +29,7 @@ class DataLoadDefinition(@NotBlank val dataSourceRef: String, @NotBlank val quer
     )
 
     val datasourceDescriptor: String
-        get() = "$role(ref=$dataSourceRef)"
+        get() = "$role(ref=$datasourceRef)"
 }
 
 enum class DataLoadRole { source, target }

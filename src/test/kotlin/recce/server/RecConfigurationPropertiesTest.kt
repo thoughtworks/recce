@@ -19,9 +19,9 @@ internal class RecConfigurationPropertiesTest {
         "r2dbc.datasources.target.url" to "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
         "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
-        "reconciliation.datasets.test-dataset.source.dataSourceRef" to "source",
+        "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
         "reconciliation.datasets.test-dataset.source.query" to "select count(*) as sourcedatacount from testdata",
-        "reconciliation.datasets.test-dataset.target.dataSourceRef" to "target",
+        "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
         "reconciliation.datasets.test-dataset.target.query" to "select count(*) as targetdatacount from testdata",
     )
 
@@ -59,19 +59,19 @@ internal class RecConfigurationPropertiesTest {
                 assertThat(it.resolvedHashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
                 assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
                 assertThat(it.source.role).isEqualTo(DataLoadRole.source)
-                assertThat(it.source.dataSourceRef).isEqualTo("source")
+                assertThat(it.source.datasourceRef).isEqualTo("source")
                 assertThat(it.source.query).contains("sourcedatacount")
                 assertThat(it.source.dbOperations).isNotNull
                 assertThat(it.target.role).isEqualTo(DataLoadRole.target)
-                assertThat(it.target.dataSourceRef).isEqualTo("target")
+                assertThat(it.target.datasourceRef).isEqualTo("target")
                 assertThat(it.target.query).contains("targetdatacount")
                 assertThat(it.target.dbOperations).isNotNull
             }
     }
 
     @Test
-    fun `should fail load on incorrect dataSourceRef`() {
-        properties["reconciliation.datasets.test-dataset.source.dataSourceRef"] = "non-existent-datasource"
+    fun `should fail load on incorrect datasourceRef`() {
+        properties["reconciliation.datasets.test-dataset.source.datasourceRef"] = "non-existent-datasource"
 
         assertThatThrownBy { ApplicationContext.run(properties) }
             .isExactlyInstanceOf(BeanInstantiationException::class.java)

@@ -14,18 +14,18 @@ reconciliation:
   datasets:
     pets:
       source:
-        dataSourceRef: source
+        datasourceRef: source
         query: >
           select pet.id as MigrationKey, category, name, status
           from pet
       target:
-        dataSourceRef: target
+        datasourceRef: target
         query: >
           select pet.id as MigrationKey, category.name, pet.name, status
           from pet inner join category on pet.category_id = category.id
     order-status:
       source:
-        dataSourceRef: source
+        datasourceRef: source
         query: >
           select
             order_status.id as MigrationKey,
@@ -39,7 +39,7 @@ reconciliation:
             complete
           from order_status
       target:
-        dataSourceRef: target
+        datasourceRef: target
         query: >
           select
             order_status.id as MigrationKey,
@@ -50,10 +50,10 @@ reconciliation:
           from order_status inner join pet on order_status.pet_id = pet.id
     categories:
       source:
-        dataSourceRef: source
+        datasourceRef: source
         query: >
           select "# Categories" as MigrationKey, count(distinct category) from pet
       target :
-        dataSourceRef: target
+        datasourceRef: target
         query: >
           select "# Categories" as MigrationKey, count(*) from category
