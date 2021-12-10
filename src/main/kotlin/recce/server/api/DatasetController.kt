@@ -19,5 +19,7 @@ class DatasetController(
         description = "Retrieves all available datasets that have been pre-configured and loaded by the server",
         tags = ["Datasets"]
     )
-    fun getDatasets() = configProvider.availableDataSetIds.sorted()
+    fun getDatasets() = configProvider.availableDataSets
+        .map { DatasetApiModel(it) }
+        .sortedBy { it.id }
 }

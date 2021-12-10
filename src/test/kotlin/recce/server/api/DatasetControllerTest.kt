@@ -9,13 +9,33 @@ import io.restassured.specification.RequestSpecification
 import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Test
+import org.mockito.Answers
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import recce.server.dataset.DataLoadDefinition
 import recce.server.dataset.DatasetConfigProvider
+import recce.server.dataset.DatasetConfiguration
+import recce.server.dataset.Schedule
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 val configProvider = mock<DatasetConfigProvider> {
-    on { availableDataSetIds } doReturn setOf("lots", "of", "datasets")
+    on { availableDataSets } doReturn setOf(
+        DatasetConfiguration(
+            DataLoadDefinition("source1", ""),
+            DataLoadDefinition("target1", "")
+        ).apply { id = "two" },
+        DatasetConfiguration(
+            DataLoadDefinition("source2", ""),
+            DataLoadDefinition("target2", ""),
+            Schedule("0 0 0 ? * *")
+        ).apply { id = "datasets" },
+    )
 }
 
 internal class DatasetControllerTest {
@@ -23,13 +43,36 @@ internal class DatasetControllerTest {
     @Test
     fun `should retrieve empty dataset Ids`() {
         assertThat(DatasetController(mock()).getDatasets())
-            .isEqualTo(emptyList<String>())
+            .isEqualTo(emptyList<Any>())
     }
 
     @Test
-    fun `should retrieve sorted dataset Ids`() {
-        assertThat(DatasetController(configProvider).getDatasets())
-            .isEqualTo(listOf("datasets", "lots", "of"))
+    fun `should retrieve sorted datasets`() {
+        val testCurrentTime = ZonedDateTime.of(2021, 12, 20, 13, 14, 15, 0, ZoneId.of("UTC"))
+
+        mockStatic(ZonedDateTime::class.java, Answers.CALLS_REAL_METHODS).use { mockedTime ->
+            mockedTime.`when`<Any> { ZonedDateTime.now() }.thenReturn(testCurrentTime)
+
+            assertThat(DatasetController(configProvider).getDatasets())
+                .isEqualTo(
+                    listOf(
+                        DatasetApiModel(
+                            "datasets",
+                            DatasourceApiModel("source2"),
+                            DatasourceApiModel("target2"),
+                            ScheduleApiModel(
+                                "0 0 0 ? * *",
+                                ZonedDateTime.of(2021, 12, 21, 0, 0, 0, 0, ZoneId.of("UTC"))
+                            )
+                        ),
+                        DatasetApiModel(
+                            "two",
+                            DatasourceApiModel("source1"),
+                            DatasourceApiModel("target1")
+                        ),
+                    )
+                )
+        }
     }
 }
 
@@ -45,13 +88,22 @@ internal class DatasetControllerApiTest {
     }
 
     @Test
-    fun `can get dataset IDs`() {
+    fun `can get datasets`() {
         Given {
             spec(spec)
         } When {
             get("/datasets")
         } Then {
-            body(".", equalTo(listOf("datasets", "lots", "of")))
+            val expectedTriggerTime = ZonedDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS)
+            body(".", hasSize<Any>(2))
+            body("[0].id", equalTo("datasets"))
+            body("[0].source.ref", equalTo("source2"))
+            body("[0].target.ref", equalTo("target2"))
+            body("[0].schedule.cronExpression", equalTo("0 0 0 ? * *"))
+            body("[0].schedule.nextTriggerTime", equalTo(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(expectedTriggerTime)))
+            body("[1].id", equalTo("two"))
+            body("[1].source.ref", equalTo("source1"))
+            body("[1].target.ref", equalTo("target1"))
         }
     }
 }

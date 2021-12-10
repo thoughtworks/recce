@@ -168,8 +168,10 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `should be able to retrieve available datasets`() {
-        val datasetConfig = mapOf<String, DatasetConfiguration>("a" to mock(), "b" to mock(), "c" to mock())
-        assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock()).availableDataSetIds)
-            .hasSameElementsAs(listOf("a", "b", "c"))
+        val first = mock<DatasetConfiguration>()
+        val second = mock<DatasetConfiguration>()
+        val datasetConfig = mapOf("a" to first, "b" to second)
+        assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock()).availableDataSets)
+            .hasSameElementsAs(listOf(first, second))
     }
 }

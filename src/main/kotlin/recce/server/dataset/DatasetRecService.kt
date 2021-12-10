@@ -18,7 +18,7 @@ interface DatasetRecRunner {
 }
 
 interface DatasetConfigProvider {
-    val availableDataSetIds: Collection<String>
+    val availableDataSets: Collection<DatasetConfiguration>
 }
 
 @Singleton
@@ -28,7 +28,7 @@ open class DatasetRecService(
     private val recordRepository: RecRecordRepository
 ) : DatasetRecRunner, DatasetConfigProvider {
 
-    override val availableDataSetIds = config.datasets.keys
+    override val availableDataSets = config.datasets.values
 
     override fun runFor(datasetId: String): Mono<RecRun> {
         val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
