@@ -26,8 +26,8 @@ class RecConfiguration
 
     @PostConstruct
     override fun populate(locator: BeanLocator) {
-        for ((name, config) in datasets) {
-            config.name = name
+        for ((id, config) in datasets) {
+            config.id = id
             config.populate(locator)
         }
         logger.info {

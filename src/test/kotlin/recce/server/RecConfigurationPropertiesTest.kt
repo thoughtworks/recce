@@ -55,7 +55,7 @@ internal class RecConfigurationPropertiesTest {
         assertThat(ctx.getBean(RecConfiguration::class.java).datasets.values)
             .hasSize(1)
             .first().satisfies {
-                assertThat(it.name).isEqualTo("test-dataset")
+                assertThat(it.id).isEqualTo("test-dataset")
                 assertThat(it.resolvedHashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
                 assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
                 assertThat(it.source.role).isEqualTo(DataLoadRole.source)

@@ -28,13 +28,13 @@ class DatasetRecScheduler(
     private fun schedule(config: DatasetConfiguration) {
         config.schedule.cronExpression?.let { expr ->
             try {
-                logger.info { "Scheduling rec for [${config.name}] with cron ${config.schedule.summary}" }
+                logger.info { "Scheduling rec for [${config.id}] with cron ${config.schedule.summary}" }
                 scheduler.schedule(expr) {
-                    logger.info { "Triggering scheduled reconciliation of [${config.name}]" }
-                    runner.runFor(config.name).subscribe()
+                    logger.info { "Triggering scheduled reconciliation of [${config.id}]" }
+                    runner.runFor(config.id).subscribe()
                 }
             } catch (e: Exception) {
-                throw ConfigurationException("Schedule for [${config.name}] is invalid: ${e.message}", e)
+                throw ConfigurationException("Schedule for [${config.id}] is invalid: ${e.message}", e)
             }
         }
     }

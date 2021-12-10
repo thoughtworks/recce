@@ -36,7 +36,7 @@ internal class DatasetRecSchedulerTest {
     fun `schedules a single run`() {
         val cronExpression = "0 0 * * *"
         val datasetConfig = mock<DatasetConfiguration> {
-            on { name } doReturn testDataset
+            on { id } doReturn testDataset
             on { schedule } doReturn Schedule(cronExpression)
         }
 

@@ -18,7 +18,7 @@ class DatasetConfiguration(
     @Nullable val hashingStrategy: Optional<HashingStrategy> = Optional.empty()
 ) : PostConstructable {
 
-    lateinit var name: String
+    lateinit var id: String
     lateinit var defaults: DefaultsProvider
 
     @VisibleForTesting
@@ -35,7 +35,7 @@ class DatasetConfiguration(
     }
 
     override fun toString(): String {
-        return name
+        return id
     }
 
     val datasourceDescriptor: String
