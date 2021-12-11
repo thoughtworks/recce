@@ -4,6 +4,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.validation.Validated
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.inject.Inject
 import recce.server.dataset.DatasetConfigProvider
 
@@ -17,7 +18,8 @@ class DatasetController(
     @Operation(
         summary = "Retrieve pre-configured datasets",
         description = "Retrieves all available datasets that have been pre-configured and loaded by the server",
-        tags = ["Datasets"]
+        tags = ["Datasets"],
+        responses = [ApiResponse(responseCode = "200", description = "Dataset configurations found")]
     )
     fun getDatasets() = configProvider.availableDataSets
         .map { DatasetApiModel(it) }

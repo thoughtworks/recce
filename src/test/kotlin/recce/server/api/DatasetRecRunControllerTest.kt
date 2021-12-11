@@ -75,7 +75,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id`() {
-        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.RunQueryParams(testResults.id!!)))
+        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!)))
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).isNull()
@@ -87,7 +87,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id with limited sample bad rows`() {
-        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.RunQueryParams(testResults.id!!, sampleKeysLimit)))
+        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!, sampleKeysLimit)))
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).containsExactly("source-0")
@@ -117,7 +117,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get runs by dataset id`() {
-        StepVerifier.create(controller.retrieveRuns(testDataset))
+        StepVerifier.create(controller.retrieveRuns(DatasetRecRunController.RunQueryParams(testDataset)))
             .assertNext(::assertThatModelMatchesTestResults)
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()

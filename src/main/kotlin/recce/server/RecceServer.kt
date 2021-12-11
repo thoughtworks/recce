@@ -12,7 +12,7 @@ const val gitHubProject = "https://github.com/ThoughtWorks-SEA/recce"
 @OpenAPIDefinition(
     info = Info(
         title = "Recce Server",
-        description = "Server-based database reconciliation tool for developers ",
+        description = "Server-based database reconciliation tool for developers",
         contact = Contact(name = "Recce Community", url = "$gitHubProject/issues")
     ),
     externalDocs = ExternalDocumentation(description = "Server Docs", url = "$gitHubProject/README.md")
