@@ -53,7 +53,7 @@ reconciliation:
         datasourceRef: source
         query: >
           select "# Categories" as MigrationKey, count(distinct category) from pet
-      target :
+      target:
         datasourceRef: target
         query: >
           select "# Categories" as MigrationKey, count(*) from category

@@ -2,7 +2,7 @@ containers:
   source-db:
     image: mysql:8
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
       MYSQL_DATABASE: <{db-name}
       MYSQL_USER: <{db-user}
       MYSQL_PASSWORD: <{db-password}

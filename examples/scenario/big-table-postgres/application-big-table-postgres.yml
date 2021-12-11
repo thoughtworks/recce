@@ -61,7 +61,7 @@ reconciliation:
         datasourceRef: source
         query: >
           select 'Num rows' as MigrationKey, count(*) from big_table
-      target :
+      target:
         datasourceRef: target
         query: >
           select 'Num rows' as MigrationKey, count(*) from big_table

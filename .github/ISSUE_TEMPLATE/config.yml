@@ -1,11 +1,11 @@
 blank_issues_enabled: true
 contact_links:
   - name: Enhancement / Feature
-    about: Raise a new enhancement/feature request 
+    about: Raise a new enhancement/feature request
     url: https://github.com/ThoughtWorks-SEA/recce/issues/new?template=enhancement---feature.md&labels=enhancement&projects=ThoughtWorks-SEA%2Frecce%2F1
   - name: Bug report
-    about: Create a report to help us improve 
+    about: Create a report to help us improve
     url: https://github.com/ThoughtWorks-SEA/recce/issues/new?template=bug_report.md&labels=bug&projects=ThoughtWorks-SEA%2Frecce%2F1
   - name: Task / Chore
-    about: Add a technical task or chore 
+    about: Add a technical task or chore
     url: https://github.com/ThoughtWorks-SEA/recce/issues/new?template=task---chore.md&labels=task&projects=ThoughtWorks-SEA%2Frecce%2F1

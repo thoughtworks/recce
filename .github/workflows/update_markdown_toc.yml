@@ -1,7 +1,7 @@
 on:
   push:
-    branches: [ master ]
-    paths: [ 'README.md', 'DEVELOPMENT.md' ]
+    branches: [master]
+    paths: ["README.md", "DEVELOPMENT.md"]
 
 jobs:
   build:

@@ -2,13 +2,11 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
-    paths-ignore:
-      - "**.md"
+    branches: [master]
+    paths-ignore: ["**.md"]
   pull_request:
-    branches: [ master ]
-    paths-ignore:
-      - "**.md"
+    branches: [master]
+    paths-ignore: ["**.md"]
 
 jobs:
   build:
@@ -64,4 +62,3 @@ jobs:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: jib
-
