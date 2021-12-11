@@ -13,6 +13,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.39.0"
     id("org.barfuin.gradle.taskinfo") version "1.3.1"
     id("org.ajoberstar.reckon") version "0.13.1"
+    id("org.owasp.dependencycheck") version "6.5.0.1"
     jacoco
 }
 
@@ -142,7 +143,8 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly("org.postgresql:postgresql")
     testImplementation("org.testcontainers:mysql")
-    testRuntimeOnly("mysql:mysql-connector-java")
+    // Lock version to resolve CVE-2021-2471. Remove version when Micronaut has updated in io.micronaut:micronaut-sql-bom
+    testRuntimeOnly("mysql:mysql-connector-java:8.0.27")
     testImplementation("org.testcontainers:mssqlserver")
     testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
     testImplementation("org.testcontainers:mariadb")
@@ -150,6 +152,14 @@ dependencies {
 
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("io.r2dbc:r2dbc-h2")
+}
+
+dependencyCheck {
+    suppressionFile = "dependency-check-suppressions.xml"
+    skipTestGroups = false
+    // The kapt configurations cause false positives for some reason. See https://github.com/dependency-check/dependency-check-gradle/issues/239
+    skipConfigurations = listOf("_classStructurekaptKotlin", "_classStructurekaptTestKotlin")
+    analyzers.assemblyEnabled = false // Unneeded, and creares warning noise
 }
 
 application {
