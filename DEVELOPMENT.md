@@ -3,7 +3,6 @@
 * [Pre-requisites](DEVELOPMENT.md#pre-requisites)
 * [Getting Started](DEVELOPMENT.md#getting-started)
 * [IDE Setup](DEVELOPMENT.md#ide-setup)
-   * [COnfiur](DEVELOPMENT.md#confiur)
 * [Setting up new folks for access](DEVELOPMENT.md#setting-up-new-folks-for-access)
    * [Add user to GitHub org](DEVELOPMENT.md#add-user-to-github-org)
    * [Pulling container images](DEVELOPMENT.md#pulling-container-images)
@@ -15,7 +14,7 @@
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
 
-<!-- Added by: runner, at: Mon Dec 13 03:27:47 UTC 2021 -->
+<!-- Added by: runner, at: Mon Dec 13 07:01:41 UTC 2021 -->
 
 <!--te-->
 
