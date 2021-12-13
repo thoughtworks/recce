@@ -1,3 +1,5 @@
+@file:Suppress("GradlePackageUpdate")
+
 import com.github.gundy.semver4j.model.Version
 
 plugins {
@@ -73,7 +75,7 @@ kapt {
             "rapidoc.theme" to "dark",
             "rapidoc.render-style" to "view",
         )
-        arg("micronaut.openapi.views.spec", props.entries.map { "${it.key}=${it.value}" }.joinToString(","))
+        arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
 }
 
