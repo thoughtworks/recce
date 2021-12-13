@@ -3,10 +3,7 @@ package recce.server.api
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
 import io.swagger.v3.oas.annotations.media.Schema
-import recce.server.recrun.DatasetMeta
-import recce.server.recrun.MatchStatus
-import recce.server.recrun.RecRun
-import recce.server.recrun.RecordMatchStatus
+import recce.server.recrun.*
 import java.time.Duration
 import java.time.Instant
 
@@ -25,8 +22,11 @@ data class RunApiModel(
     @field:Schema(description = "Time when the run started")
     val createdTime: Instant,
 
-    @field:Schema(description = "Time when the run completeed")
+    @field:Schema(description = "Time when the run completed")
     val completedTime: Instant?,
+
+    @field:Schema(description = "Status of this run")
+    val status: RunStatus,
 
     @field:Schema(description = "Summary results from the run")
     val summary: RunSummary?
@@ -47,6 +47,7 @@ data class RunApiModel(
             datasetId = run.datasetId,
             createdTime = run.createdTime!!,
             completedTime = run.completedTime,
+            status = run.status,
             summary = summaryBuilder
                 .sourceMeta(run.sourceMeta)
                 .targetMeta(run.targetMeta)

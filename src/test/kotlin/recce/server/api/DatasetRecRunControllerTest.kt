@@ -40,6 +40,7 @@ private val testResults = RecRun(
     createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC),
 ).apply {
     completedTime = createdTime?.plusNanos(testCompletedDuration.toNanos())
+    status = RunStatus.Successful
     updatedTime = completedTime?.plusSeconds(10)
     sourceMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
     targetMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
@@ -198,6 +199,7 @@ internal class DatasetRecRunControllerApiTest {
         body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.createdTime)))
         body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.completedTime)))
         body("completedDurationSeconds", closeTo(testCompletedDuration.toSeconds().toDouble(), 0.00001))
+        body("status", equalTo("Successful"))
         body(
             "summary",
             allOf(
