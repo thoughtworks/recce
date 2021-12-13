@@ -67,19 +67,19 @@ class RecRecordRepositoryTest {
                 .expectNextCount(30)
                 .verifyComplete()
 
-            SoftAssertions.assertSoftly {
-                assertThat(results).hasSize(30)
-                assertThat(results.slice(0 until 10))
+            SoftAssertions.assertSoftly { softly ->
+                softly.assertThat(results).hasSize(30)
+                softly.assertThat(results.slice(0 until 10))
                     .allSatisfy {
                         assertThat(it.sourceData).isNotNull
                         assertThat(it.targetData).isNull()
                     }
-                assertThat(results.slice(11 until 20))
+                softly.assertThat(results.slice(11 until 20))
                     .allSatisfy {
                         assertThat(it.sourceData).isNull()
                         assertThat(it.targetData).isNotNull
                     }
-                assertThat(results.slice(21 until 30))
+                softly.assertThat(results.slice(21 until 30))
                     .allSatisfy {
                         assertThat(it.sourceData).isNotNull
                         assertThat(it.targetData).isNotNull

@@ -102,20 +102,22 @@ internal class DatasetRecRunControllerTest {
     }
 
     private fun assertThatModelMatchesTestResults(apiModel: RunApiModel) {
-        SoftAssertions.assertSoftly {
-            assertThat(apiModel.id).isEqualTo(testResults.id)
-            assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
-            assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
-            assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
-            assertThat(apiModel.summary?.totalCount).isEqualTo(testResults.summary?.total)
-            assertThat(apiModel.summary?.bothMatchedCount).isEqualTo(testResults.summary?.bothMatched)
-            assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
-            assertThat(apiModel.summary?.source?.totalCount).isEqualTo(testResults.summary?.sourceTotal)
-            assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
-            assertThat(apiModel.summary?.source?.meta).usingRecursiveComparison().isEqualTo(testResults.sourceMeta)
-            assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
-            assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
-            assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison().isEqualTo(testResults.targetMeta)
+        SoftAssertions.assertSoftly { softly ->
+            softly.assertThat(apiModel.id).isEqualTo(testResults.id)
+            softly.assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
+            softly.assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
+            softly.assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
+            softly.assertThat(apiModel.status).isEqualTo(testResults.status)
+            softly.assertThat(apiModel.failureCause).isNull()
+            softly.assertThat(apiModel.summary?.totalCount).isEqualTo(testResults.summary?.total)
+            softly.assertThat(apiModel.summary?.bothMatchedCount).isEqualTo(testResults.summary?.bothMatched)
+            softly.assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
+            softly.assertThat(apiModel.summary?.source?.totalCount).isEqualTo(testResults.summary?.sourceTotal)
+            softly.assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
+            softly.assertThat(apiModel.summary?.source?.meta).usingRecursiveComparison().isEqualTo(testResults.sourceMeta)
+            softly.assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
+            softly.assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
+            softly.assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison().isEqualTo(testResults.targetMeta)
         }
     }
 
