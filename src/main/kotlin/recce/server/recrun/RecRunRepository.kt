@@ -29,6 +29,7 @@ data class RecRun(
     @DateCreated val createdTime: Instant? = null,
     @DateUpdated var updatedTime: Instant? = null,
     var completedTime: Instant? = null,
+    @Enumerated(EnumType.STRING) var status: RunStatus = RunStatus.Pending,
     @Embedded var summary: MatchStatus? = null
 ) {
     constructor(datasetId: String) : this(null, datasetId)
@@ -41,6 +42,12 @@ data class RecRun(
         targetMeta = target
         return this
     }
+}
+
+enum class RunStatus {
+    Pending,
+    Successful,
+    Failed
 }
 
 @Embeddable

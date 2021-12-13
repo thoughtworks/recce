@@ -47,6 +47,7 @@ internal class RecRunServiceTest {
         StepVerifier.create(RecRunService(runRepository, recordRepository).complete(startedRun))
             .assertNext {
                 assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
+                assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.summary).isEqualTo(expectedMatchStatus)
             }
             .verifyComplete()

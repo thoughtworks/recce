@@ -115,6 +115,7 @@ class DatasetRecServiceIntegrationTest {
         assertThat(run.createdTime).isNotNull
         assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
         assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+        assertThat(run.status).isEqualTo(RunStatus.Successful)
         assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
         val expectedMeta = DatasetMeta(
             listOf(
