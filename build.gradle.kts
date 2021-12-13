@@ -155,7 +155,7 @@ dependencies {
 }
 
 dependencyCheck {
-    suppressionFile = "dependency-check-suppressions.xml"
+    suppressionFile = "build-config/dependency-check-suppressions.xml"
     skipTestGroups = false
     // The kapt configurations cause false positives for some reason. See https://github.com/dependency-check/dependency-check-gradle/issues/239
     skipConfigurations = listOf("_classStructurekaptKotlin", "_classStructurekaptTestKotlin")
