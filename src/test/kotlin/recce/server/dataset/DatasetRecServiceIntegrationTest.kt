@@ -63,7 +63,8 @@ class DatasetRecServiceIntegrationTest {
     fun `can run a simple reconciliation`() {
         StepVerifier.create(service.runFor("test-dataset"))
             .assertNext { run ->
-                checkPersistentFieldsFor(run)
+                checkCompleted(run)
+                checkSuccessful(run)
             }
             .verifyComplete()
 
@@ -74,7 +75,8 @@ class DatasetRecServiceIntegrationTest {
                 }
         )
             .assertNext { (run, record) ->
-                checkPersistentFieldsFor(run)
+                checkCompleted(run)
+                checkSuccessful(run)
                 assertThat(record.key.recRunId).isEqualTo(run.id)
                 assertThat(record.key.migrationKey).isEqualTo("Test0")
                 assertThat(record.sourceData).isEqualTo(record.targetData).`is`(hexSha256Hash)
@@ -109,12 +111,15 @@ class DatasetRecServiceIntegrationTest {
             .verifyComplete()
     }
 
-    private fun checkPersistentFieldsFor(run: RecRun) {
+    private fun checkCompleted(run: RecRun) {
         assertThat(run.id).isNotNull
         assertThat(run.datasetId).isEqualTo("test-dataset")
         assertThat(run.createdTime).isNotNull
         assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
         assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+    }
+
+    private fun checkSuccessful(run: RecRun) {
         assertThat(run.status).isEqualTo(RunStatus.Successful)
         assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
         val expectedMeta = DatasetMeta(
@@ -128,33 +133,65 @@ class DatasetRecServiceIntegrationTest {
         assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
     }
 
+    private fun checkFailed(run: RecRun) {
+        assertThat(run.status).isEqualTo(RunStatus.Failed)
+        assertThat(run.summary).satisfiesAnyOf(
+            { st -> assertThat(st).isNull() },
+            { st -> assertThat(st).isEqualTo(MatchStatus()) }
+        )
+        assertThat(run.sourceMeta).isEqualTo(DatasetMeta())
+        assertThat(run.targetMeta).isEqualTo(DatasetMeta())
+    }
+
     @Test
-    fun `should emit error on bad source query`() {
+    fun `should fail run on bad source query`() {
+        // Wipe the source DB
         flywayCleanMigrate(tempDir, "SELECT 1", sourceDataSource)
 
         StepVerifier.create(service.runFor("test-dataset"))
-            .consumeErrorWith {
-                assertThat(it)
+            .assertNext { run ->
+                checkCompleted(run)
+                checkFailed(run)
+                assertThat(run.failureCause)
                     .isExactlyInstanceOf(DataLoadException::class.java)
                     .hasMessageContaining("Failed to load data from source")
                     .hasMessageContaining("\"TESTDATA\" not found")
                     .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
             }
-            .verify()
+            .verifyComplete()
+
+        // Check persisted representation
+        StepVerifier.create(runRepository.findAll())
+            .assertNext { run ->
+                checkCompleted(run)
+                checkFailed(run)
+            }
+            .verifyComplete()
     }
 
     @Test
-    fun `should emit error on bad target query`() {
+    fun `should fail run on bad target query`() {
+        // Wipe the target DB
         flywayCleanMigrate(tempDir, "SELECT 1", targetDataSource)
 
         StepVerifier.create(service.runFor("test-dataset"))
-            .consumeErrorWith {
-                assertThat(it)
+            .assertNext { run ->
+                checkCompleted(run)
+                checkFailed(run)
+                assertThat(run.failureCause)
                     .isExactlyInstanceOf(DataLoadException::class.java)
                     .hasMessageContaining("Failed to load data from target")
                     .hasMessageContaining("\"TESTDATA\" not found")
                     .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
             }
-            .verify()
+            .verifyComplete()
+
+        // Check persisted representation
+        StepVerifier.create(runRepository.findAll())
+            .assertNext { run ->
+                checkCompleted(run)
+                checkFailed(run)
+            }
+            .verifyComplete()
     }
 }

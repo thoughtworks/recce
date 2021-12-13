@@ -7,6 +7,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import java.lang.IllegalArgumentException
 import java.time.Instant
 
 internal class RecRunServiceTest {
@@ -29,7 +30,7 @@ internal class RecRunServiceTest {
     }
 
     @Test
-    fun `complete should set completed time`() {
+    fun `should set successful run with match status`() {
         val expectedMatchStatus = MatchStatus(1, 1, 1, 1)
         val recordRepository = mock<RecRecordRepository> {
             on { countMatchedByKeyRecRunId(any()) } doReturn Mono.just(expectedMatchStatus)
@@ -44,11 +45,26 @@ internal class RecRunServiceTest {
             )
         }
 
-        StepVerifier.create(RecRunService(runRepository, recordRepository).complete(startedRun))
+        StepVerifier.create(RecRunService(runRepository, recordRepository).successful(startedRun))
             .assertNext {
                 assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.summary).isEqualTo(expectedMatchStatus)
+            }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `should set failed run`() {
+        val runRepository = mock<RecRunRepository> {
+            on { update(any()) } doReturn Mono.just(startedRun)
+        }
+
+        StepVerifier.create(RecRunService(runRepository, mock()).failed(startedRun, IllegalArgumentException("failed run!")))
+            .assertNext {
+                assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
+                assertThat(it.status).isEqualTo(RunStatus.Failed)
+                assertThat(it.summary).isNull()
             }
             .verifyComplete()
     }

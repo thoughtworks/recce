@@ -2,8 +2,7 @@ package recce.server.dataset
 
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.kotlin.*
@@ -20,7 +19,8 @@ internal class DatasetRecServiceTest {
 
     private val runService = mock<RecRunService> {
         on { start(testDataset) } doReturn Mono.just(recRun)
-        on { complete(recRun) } doReturn Mono.just(recRun)
+        on { successful(recRun) } doReturn Mono.just(recRun).map { recRun.asSuccessful(MatchStatus()) }
+        on { failed(eq(recRun), any()) } doReturn Mono.just(recRun).map { recRun.asFailed(IllegalArgumentException()) }
     }
 
     private val emptyDataLoad = mock<DataLoadDefinition> {
@@ -54,6 +54,74 @@ internal class DatasetRecServiceTest {
     }
 
     @Test
+    fun `mono should return failed run on failed data load`() {
+        val service = DatasetRecService(
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            runService,
+            mock()
+        )
+
+        val rootCause = IllegalArgumentException("Could not connect to database")
+        whenever(emptyDataLoad.runQuery()).thenReturn(Flux.error(rootCause))
+
+        StepVerifier.create(service.runFor(testDataset))
+            .assertNext {
+                assertThat(it.status).isEqualTo(RunStatus.Failed)
+            }
+            .verifyComplete()
+
+        val errorCaptor = argumentCaptor<Throwable>()
+        verify(runService).failed(eq(recRun), errorCaptor.capture())
+
+        assertThat(errorCaptor.firstValue)
+            .isInstanceOf(DataLoadException::class.java)
+            .hasCause(rootCause)
+            .hasMessageContaining("Failed to load data")
+            .hasMessageContaining(rootCause.message)
+    }
+
+    @Test
+    fun `mono should error on failed initial save`() {
+        val service = DatasetRecService(
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            runService,
+            mock()
+        )
+
+        whenever(runService.start(any())).thenReturn(Mono.error(IllegalArgumentException("failed!")))
+
+        StepVerifier.create(service.runFor(testDataset))
+            .expectErrorSatisfies {
+                assertThat(it)
+                    .isExactlyInstanceOf(IllegalArgumentException::class.java)
+                    .hasMessageContaining("failed!")
+            }
+            .verify()
+    }
+
+    @Test
+    fun `mono should error on failed save of failed run`() {
+        val service = DatasetRecService(
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            runService,
+            mock()
+        )
+
+        val rootCause = IllegalArgumentException("Could not connect to database")
+        whenever(emptyDataLoad.runQuery()).thenReturn(Flux.error(rootCause))
+
+        val failSaveCause = IllegalArgumentException("Could not save failure status")
+        whenever(runService.failed(any(), any())).thenReturn(Mono.error(failSaveCause))
+
+        StepVerifier.create(service.runFor(testDataset))
+            .expectErrorSatisfies {
+                assertThat(it)
+                    .isEqualTo(failSaveCause)
+            }
+            .verify()
+    }
+
+    @Test
     fun `should reconcile empty datasets without error`() {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
@@ -62,6 +130,7 @@ internal class DatasetRecServiceTest {
         )
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
+                assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isEmpty()
                 assertThat(it.targetMeta.cols).isEmpty()
             }
@@ -80,6 +149,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
+                assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isNotEmpty
                 assertThat(it.targetMeta.cols).isEmpty()
             }
@@ -87,7 +157,7 @@ internal class DatasetRecServiceTest {
 
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).complete(recRun)
+        verify(runService).successful(recRun)
     }
 
     @Test
@@ -103,6 +173,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
+                assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isEmpty()
                 assertThat(it.targetMeta.cols).isNotEmpty
             }
@@ -111,7 +182,7 @@ internal class DatasetRecServiceTest {
         verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, targetData = "def")))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).complete(recRun)
+        verify(runService).successful(recRun)
     }
 
     @Test
@@ -129,6 +200,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
+                assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isNotEmpty
                 assertThat(it.targetMeta.cols).isNotEmpty
             }
@@ -138,7 +210,7 @@ internal class DatasetRecServiceTest {
         verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, targetData = "def")))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).complete(recRun)
+        verify(runService).successful(recRun)
     }
 
     @Test
@@ -154,6 +226,7 @@ internal class DatasetRecServiceTest {
 
         StepVerifier.create(service.runFor(testDataset))
             .assertNext {
+                assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isNotEmpty
                 assertThat(it.targetMeta.cols).isNotEmpty
             }
@@ -163,7 +236,7 @@ internal class DatasetRecServiceTest {
         verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
         verify(recordRepository).updateAll(listOf(testRecord))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).complete(recRun)
+        verify(runService).successful(recRun)
     }
 
     @Test

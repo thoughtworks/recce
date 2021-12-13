@@ -3,7 +3,6 @@ package recce.server.recrun
 import jakarta.inject.Singleton
 import mu.KotlinLogging
 import reactor.core.publisher.Mono
-import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
@@ -17,16 +16,16 @@ open class RecRunService(
         .doOnNext { logger.info { "Starting reconciliation run for $it}..." } }
         .cache()
 
-    fun complete(run: RecRun): Mono<RecRun> {
+    fun successful(run: RecRun): Mono<RecRun> {
         logger.info { "Summarising results for $run" }
         return recordRepository.countMatchedByKeyRecRunId(run.id!!)
-            .map {
-                run.apply {
-                    completedTime = Instant.now(); summary = it
-                    status = RunStatus.Successful
-                }
-            }
+            .map { run.asSuccessful(it) }
             .flatMap(runRepository::update)
             .doOnNext { logger.info { "Run completed for $it" } }
+    }
+
+    fun failed(run: RecRun, cause: Throwable): Mono<RecRun> {
+        logger.info(cause) { "Recording failure for $run" }
+        return runRepository.update(run.asFailed(cause))
     }
 }

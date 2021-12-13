@@ -37,9 +37,25 @@ data class RecRun(
     @Embedded var sourceMeta: DatasetMeta = DatasetMeta()
     @Embedded var targetMeta: DatasetMeta = DatasetMeta()
 
+    @Transient var failureCause: Throwable? = null
+
     fun withMetaData(source: DatasetMeta, target: DatasetMeta): RecRun {
         sourceMeta = source
         targetMeta = target
+        return this
+    }
+
+    fun asSuccessful(summary: MatchStatus): RecRun {
+        this.summary = summary
+        completedTime = Instant.now()
+        status = RunStatus.Successful
+        return this
+    }
+
+    fun asFailed(cause: Throwable): RecRun {
+        this.failureCause = cause
+        completedTime = Instant.now()
+        status = RunStatus.Failed
         return this
     }
 }
