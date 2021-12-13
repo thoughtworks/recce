@@ -61,8 +61,6 @@ If using IntelliJ IDEA, you should be able to create the project from the clone 
 * *Gradle* > *Gradle Settings* > Set `Run Tests Using` to `IntelliJ IDEA`.
   * This will typically give you much faster feedback than waiting for the Gradle runner. Unfortunately at time of writing you cannot build using IntelliJ IDEA natively, because kapt annotation processing for Kotlin is [not supported outside of Gradle/Maven builds](https://youtrack.jetbrains.com/issue/KT-15040).
 
-## COnfiur
-
 # Setting up new folks for access
 
 While this remains an internal project there are some things to do
