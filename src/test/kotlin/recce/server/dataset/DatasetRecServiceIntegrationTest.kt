@@ -5,6 +5,7 @@ import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -113,35 +114,41 @@ class DatasetRecServiceIntegrationTest {
     }
 
     private fun checkCompleted(run: RecRun) {
-        assertThat(run.id).isNotNull
-        assertThat(run.datasetId).isEqualTo("test-dataset")
-        assertThat(run.createdTime).isNotNull
-        assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
-        assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+        SoftAssertions.assertSoftly { softly ->
+            softly.assertThat(run.id).isNotNull
+            softly.assertThat(run.datasetId).isEqualTo("test-dataset")
+            softly.assertThat(run.createdTime).isNotNull
+            softly.assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
+            softly.assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+        }
     }
 
     private fun checkSuccessful(run: RecRun) {
-        assertThat(run.status).isEqualTo(RunStatus.Successful)
-        assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
-        val expectedMeta = DatasetMeta(
-            listOf(
-                ColMeta("MIGRATIONKEY", "String"),
-                ColMeta("NAME", "String"),
-                ColMeta("VALUE", "String")
+        SoftAssertions.assertSoftly { softly ->
+            softly.assertThat(run.status).isEqualTo(RunStatus.Successful)
+            softly.assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
+            val expectedMeta = DatasetMeta(
+                listOf(
+                    ColMeta("MIGRATIONKEY", "String"),
+                    ColMeta("NAME", "String"),
+                    ColMeta("VALUE", "String")
+                )
             )
-        )
-        assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
-        assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+            softly.assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+            softly.assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
+        }
     }
 
     private fun checkFailed(run: RecRun) {
-        assertThat(run.status).isEqualTo(RunStatus.Failed)
-        assertThat(run.summary).satisfiesAnyOf(
-            { st -> assertThat(st).isNull() },
-            { st -> assertThat(st).isEqualTo(MatchStatus()) }
-        )
-        assertThat(run.sourceMeta).isEqualTo(DatasetMeta())
-        assertThat(run.targetMeta).isEqualTo(DatasetMeta())
+        SoftAssertions.assertSoftly { softly ->
+            softly.assertThat(run.status).isEqualTo(RunStatus.Failed)
+            softly.assertThat(run.summary).satisfiesAnyOf(
+                { st -> assertThat(st).isNull() },
+                { st -> assertThat(st).isEqualTo(MatchStatus()) }
+            )
+            softly.assertThat(run.sourceMeta).isEqualTo(DatasetMeta())
+            softly.assertThat(run.targetMeta).isEqualTo(DatasetMeta())
+        }
     }
 
     @Test
