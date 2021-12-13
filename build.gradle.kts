@@ -176,11 +176,6 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlinGradle {
         ktlint().userData(editorConfig)
     }
-    format("styling") {
-        target("*.yml", "src/**/*.yml", ".github/**/*.yml", "examples/**/*.yml")
-        // https://prettier.io/docs/en/configuration.html
-        prettier().config(mapOf("tabWidth" to 2))
-    }
 }
 
 tasks.test {
