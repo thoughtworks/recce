@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.micronaut.core.annotation.Introspected
 import io.swagger.v3.oas.annotations.media.Schema
 import recce.server.recrun.*
+import recce.server.util.ThrowableUtils.extractFailureCause
 import java.time.Duration
 import java.time.Instant
 
@@ -29,7 +30,10 @@ data class RunApiModel(
     val status: RunStatus,
 
     @field:Schema(description = "Summary results from the run")
-    val summary: RunSummary?
+    val summary: RunSummary?,
+
+    @field:Schema(description = "Reason for failure of the run")
+    val failureCause: String? = null,
 ) {
     @get:Schema(type = "number", format = "double", description = "How long the run took, in seconds")
     @get:JsonProperty("completedDurationSeconds")
@@ -51,7 +55,8 @@ data class RunApiModel(
             summary = summaryBuilder
                 .sourceMeta(run.sourceMeta)
                 .targetMeta(run.targetMeta)
-                .build()
+                .build(),
+            failureCause = run.failureCause?.run { extractFailureCause(this) }
         )
     }
 }

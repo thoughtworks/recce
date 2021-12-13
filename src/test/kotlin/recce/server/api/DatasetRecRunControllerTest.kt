@@ -21,9 +21,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import recce.server.dataset.DataLoadException
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.*
 import java.time.Duration
@@ -31,6 +33,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
+private const val sampleKeysLimit = 3
 private const val notFoundId = 0
 private const val testDataset = "testDataset"
 private val testCompletedDuration = Duration.ofMinutes(3).plusNanos(234)
@@ -47,11 +50,11 @@ private val testResults = RecRun(
     summary = MatchStatus(1, 2, 3, 4)
 }
 
-private val service = mock<DatasetRecRunner> {
+private fun mockService() = mock<DatasetRecRunner> {
     on { runFor(eq(testDataset)) } doReturn Mono.just(testResults)
 }
 
-private val runRepository = mock<RecRunRepository> {
+private fun mockRunRepository() = mock<RecRunRepository> {
     on { findById(testResults.id!!) } doReturn Mono.just(testResults)
     on { existsById(testResults.id!!) } doReturn Mono.just(true)
     on { findById(notFoundId) } doReturn Mono.empty()
@@ -59,9 +62,7 @@ private val runRepository = mock<RecRunRepository> {
     on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
 }
 
-private const val sampleKeysLimit = 3
-
-private fun recordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
+private fun mockRecordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
     on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, sampleKeysLimit) } doReturn Flux.fromIterable(sampleRecords)
     on { findFirstByRecRunIdSplitByMatchStatus(notFoundId, sampleKeysLimit) } doReturn Flux.empty()
 }
@@ -72,7 +73,9 @@ internal class DatasetRecRunControllerTest {
             List(2) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
             List(3) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
 
-    private val controller = DatasetRecRunController(service, runRepository, recordRepository(sampleRows))
+    private val service = mockService()
+    private val runRepository = mockRunRepository()
+    private val controller = DatasetRecRunController(service, runRepository, mockRecordRepository(sampleRows))
 
     @Test
     fun `can get run by id`() {
@@ -126,9 +129,33 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `trigger should delegate to service`() {
-        StepVerifier.create(controller.triggerRun(DatasetRecRunController.RunCreationParams(eq(testDataset))))
+        StepVerifier.create(controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset)))
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
+    }
+
+    @Test
+    fun `failed run should return with cause`() {
+        val failureCause = DataLoadException("Could not load data", IllegalArgumentException("Root Cause"))
+        val failedRun = RecRun(
+            id = testResults.id,
+            datasetId = testDataset,
+            createdTime = testResults.createdTime,
+        ).asFailed(failureCause)
+
+        whenever(service.runFor(testDataset)).doReturn(Mono.just(failedRun))
+
+        StepVerifier.create(controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset)))
+            .assertNext { apiModel ->
+                SoftAssertions.assertSoftly { softly ->
+                    softly.assertThat(apiModel.id).isEqualTo(testResults.id)
+                    softly.assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
+                    softly.assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
+                    softly.assertThat(apiModel.completedTime).isNotNull
+                    softly.assertThat(apiModel.status).isEqualTo(RunStatus.Failed)
+                    softly.assertThat(apiModel.failureCause).isEqualTo("Could not load data, rootCause=[Root Cause]")
+                }
+            }.verifyComplete()
     }
 }
 
@@ -255,18 +282,18 @@ internal class DatasetRecRunControllerApiTest {
 
     @MockBean(DatasetRecRunner::class)
     fun reconciliationService(): DatasetRecRunner {
-        return service
+        return mockService()
     }
 
     @Replaces(H2RecRunRepository::class)
     @Singleton
     fun runRepository(): RecRunRepository {
-        return runRepository
+        return mockRunRepository()
     }
 
     @Replaces(H2RecRecordRepository::class)
     @Singleton
     fun recordRepository(): RecRecordRepository {
-        return recordRepository(sampleRows)
+        return mockRecordRepository(sampleRows)
     }
 }
