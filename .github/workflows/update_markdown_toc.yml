@@ -1,3 +1,5 @@
+name: Update Markdown TOCs
+
 on:
   push:
     branches: [master]
