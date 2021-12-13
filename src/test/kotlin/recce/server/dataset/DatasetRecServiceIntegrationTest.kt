@@ -54,8 +54,9 @@ class DatasetRecServiceIntegrationTest {
         flywayCleanMigrate(tempDir, targetSql, targetDataSource)
     }
 
+    @BeforeEach
     @AfterEach
-    fun tearDown() {
+    fun wipeDb() {
         runRepository.deleteAll().block()
     }
 
