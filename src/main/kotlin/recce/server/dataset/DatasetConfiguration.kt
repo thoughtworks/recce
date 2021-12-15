@@ -28,9 +28,9 @@ class DatasetConfiguration(
 
     override fun populate(locator: BeanLocator) {
         defaults = locator.getBean(DefaultsProvider::class.java)
-        source.role = DataLoadRole.source
+        source.role = DataLoadRole.Source
         source.populate(locator)
-        target.role = DataLoadRole.target
+        target.role = DataLoadRole.Target
         target.populate(locator)
     }
 

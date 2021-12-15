@@ -32,4 +32,4 @@ class DataLoadDefinition(@NotBlank val datasourceRef: String, @NotBlank val quer
         get() = "$role(ref=$datasourceRef)"
 }
 
-enum class DataLoadRole { source, target }
+enum class DataLoadRole { Source, Target }

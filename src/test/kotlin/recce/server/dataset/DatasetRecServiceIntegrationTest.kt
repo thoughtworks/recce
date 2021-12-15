@@ -162,7 +162,7 @@ class DatasetRecServiceIntegrationTest {
                 checkFailed(run)
                 assertThat(run.failureCause)
                     .isExactlyInstanceOf(DataLoadException::class.java)
-                    .hasMessageContaining("Failed to load data from source")
+                    .hasMessageContaining("Failed to load data from Source(ref=source-h2)")
                     .hasMessageContaining("\"TESTDATA\" not found")
                     .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
             }
@@ -188,7 +188,7 @@ class DatasetRecServiceIntegrationTest {
                 checkFailed(run)
                 assertThat(run.failureCause)
                     .isExactlyInstanceOf(DataLoadException::class.java)
-                    .hasMessageContaining("Failed to load data from target")
+                    .hasMessageContaining("Failed to load data from Target(ref=target-h2)")
                     .hasMessageContaining("\"TESTDATA\" not found")
                     .hasCauseExactlyInstanceOf(R2dbcBadGrammarException::class.java)
             }
