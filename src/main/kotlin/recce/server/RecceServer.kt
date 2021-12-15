@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
 import reactor.tools.agent.ReactorDebugAgent
 
-const val gitHubProject = "https://github.com/ThoughtWorks-SEA/recce"
+private const val gitHubProject = "https://github.com/ThoughtWorks-SEA/recce"
 
 @OpenAPIDefinition(
     info = Info(
