@@ -102,7 +102,7 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:2.1.16")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.20")
     runtimeOnly("ch.qos.logback:logback-classic")
 
     kapt("io.micronaut.openapi:micronaut-openapi:3.2.0")
