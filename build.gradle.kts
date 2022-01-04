@@ -15,7 +15,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.40.0"
     id("org.barfuin.gradle.taskinfo") version "1.3.1"
     id("org.ajoberstar.reckon") version "0.13.1"
-    id("org.owasp.dependencycheck") version "6.5.1"
+    id("org.owasp.dependencycheck") version "6.5.2.1"
     jacoco
 }
 
