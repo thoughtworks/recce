@@ -7,9 +7,8 @@ where it includes sensitive or PII data which is unavailable for the development
 Furthermore, during such migrations it is common that
 
 * a monolithic service and database is being split into multiple services/databases, following Domain Driven Design
-    * thus there is no trivial approach to reconciliation, since parts of the source schema may be split across multiple
-      target schemas, sometimes with different keys
-* the teams performing the redesign and migration
+* there is no trivial approach to reconciliation, since parts of the source schema may be split across multiple target schemas, sometimes with different keys and owned by different teams/squads/streams aligned to different domains
+* the teams performing the redesign and migration are those responsible for ensuring the data for various domains is complete, accurate, and kept in sync (1-way or 2-way) between source and target schemas
 
 There is a lack of simple, flexible tools that allow reconciliation between datasets that treat data with the care that
 it deserves in a sensitive/PII environment, and are suitable for automation.
