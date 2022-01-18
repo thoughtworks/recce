@@ -146,7 +146,7 @@ dependencies {
     testRuntimeOnly("org.postgresql:postgresql")
     testImplementation("org.testcontainers:mysql")
     // Lock version to resolve CVE-2021-2471. Remove version when Micronaut has updated in io.micronaut:micronaut-sql-bom
-    testRuntimeOnly("mysql:mysql-connector-java:8.0.27")
+    testRuntimeOnly("mysql:mysql-connector-java:8.0.28")
     testImplementation("org.testcontainers:mssqlserver")
     testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
     testImplementation("org.testcontainers:mariadb")
