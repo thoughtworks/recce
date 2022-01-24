@@ -31,7 +31,7 @@ reckon {
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.2.7",
-    "restAssured" to "io.rest-assured:rest-assured:4.4.0",
+    "restAssured" to "io.rest-assured:rest-assured:4.5.0",
 
     // Unfortunately not all Mockito or Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
     "mockito" to "org.mockito:mockito-core:4.2.0", // Needs to be compatible with Micronaut BOM.
