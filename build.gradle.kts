@@ -105,7 +105,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    kapt("io.micronaut.openapi:micronaut-openapi:3.2.0")
+    kapt("io.micronaut.openapi:micronaut-openapi:4.0.0")
     implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
