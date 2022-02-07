@@ -48,7 +48,9 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 
 Recce is currently only published as a container image to a private GHCR repo.
 
-However, it also requires a Postgres database and to be practically useful, you want to configure it with connectivity to some data sources you wish to reconcile.
+However, it also
+* requires a Postgres database
+* ...and to be practically useful you will want to configure it with connectivity to some data sources you wish to reconcile.
 
 These options require only JDK 11+ and Docker installed locally.
 
