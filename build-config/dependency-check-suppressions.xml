@@ -5,4 +5,16 @@
         <packageUrl regex="true">^pkg:maven/org\.testcontainers/mysql@.*$</packageUrl>
         <cpe>cpe:/a:mysql:mysql</cpe>
     </suppress>
+    <suppress>
+        <notes>Suppressing false positive - the flyway mysql plugin is a different thing to the actual mysql database.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.flywaydb/flyway\-mysql@.*$</packageUrl>
+        <cpe>cpe:/a:mysql:mysql</cpe>
+    </suppress>
+    <suppress>
+        <notes>Recce is not subject to these H2 DB CVEs because we do not expose the H2 console or deploy H2 in the main application.</notes>
+        <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
+        <cve>CVE-2022-23221</cve>
+        <cve>CVE-2021-23463</cve>
+        <cve>CVE-2021-42392</cve>
+    </suppress>
 </suppressions>
