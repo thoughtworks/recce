@@ -30,12 +30,13 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.2.7",
+    "micronaut" to "io.micronaut:micronaut-core:3.3.0",
     "restAssured" to "io.rest-assured:rest-assured:4.5.0",
 
-    // Unfortunately not all Mockito or Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
+    // Unfortunately not all Mockito/Reactor/Flyway libs are in the Micronaut BOM, this allows us to keep versions consistent.
     "mockito" to "org.mockito:mockito-core:4.3.1", // Needs to be compatible with Micronaut BOM.
-    "reactor" to "io.projectreactor:reactor-core:3.4.14" // Needs to be compatible with Micronaut BOM.
+    "reactor" to "io.projectreactor:reactor-core:3.4.14", // Needs to be compatible with Micronaut BOM.
+    "flyway" to "org.flywaydb:flyway-core:8.4.4", // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17",
@@ -105,7 +106,8 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    kapt("io.micronaut.openapi:micronaut-openapi:3.2.0")
+    // Version locked due to https://github.com/micronaut-projects/micronaut-openapi/issues/656, should be fixed after Micronaut 4.0.0
+    kapt("io.micronaut.openapi:micronaut-openapi:3.2.0!!")
     implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
@@ -113,6 +115,7 @@ dependencies {
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
+    implementation("org.flywaydb:flyway-core:${depVersions["flyway"]}")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     runtimeOnly("org.postgresql:postgresql")
@@ -145,10 +148,11 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly("org.postgresql:postgresql")
     testImplementation("org.testcontainers:mysql")
-    // Lock version to resolve CVE-2021-2471. Remove version when Micronaut has updated in io.micronaut:micronaut-sql-bom
-    testRuntimeOnly("mysql:mysql-connector-java:8.0.28")
+    testRuntimeOnly("mysql:mysql-connector-java")
+    testRuntimeOnly("org.flywaydb:flyway-mysql:${depVersions["flyway"]}")
     testImplementation("org.testcontainers:mssqlserver")
     testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
+    testRuntimeOnly("org.flywaydb:flyway-sqlserver:${depVersions["flyway"]}")
     testImplementation("org.testcontainers:mariadb")
     testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
