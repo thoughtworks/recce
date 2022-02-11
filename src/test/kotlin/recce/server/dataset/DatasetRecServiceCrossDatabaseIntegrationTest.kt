@@ -4,6 +4,7 @@ import io.micronaut.context.ApplicationContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
@@ -22,6 +23,7 @@ import java.util.concurrent.CompletableFuture.runAsync
 import java.util.stream.IntStream
 import java.util.stream.Stream
 
+@Tag("slow")
 @Testcontainers(disabledWithoutDocker = true)
 internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
     companion object {

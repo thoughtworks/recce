@@ -190,6 +190,20 @@ tasks.jacocoTestReport {
     dependsOn(tasks.test)
 }
 
+tasks.register<Test>("slowTests") {
+    group = "verification"
+    useJUnitPlatform {
+        includeTags("slow")
+    }
+}
+
+tasks.register<Test>("fastTests") {
+    group = "verification"
+    useJUnitPlatform {
+        excludeTags("slow")
+    }
+}
+
 val githubRepoOwner = "thoughtworks-sea"
 val containerRepoName = "recce-server"
 jib {
