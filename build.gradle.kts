@@ -35,7 +35,7 @@ val depDescriptors = mapOf(
 
     // Unfortunately not all Mockito/Reactor/Flyway libs are in the Micronaut BOM, this allows us to keep versions consistent.
     "mockito" to "org.mockito:mockito-core:4.3.1", // Needs to be compatible with Micronaut BOM.
-    "reactor" to "io.projectreactor:reactor-core:3.4.14", // Needs to be compatible with Micronaut BOM.
+    "reactor" to "io.projectreactor:reactor-core:3.4.15", // Needs to be compatible with Micronaut BOM.
     "flyway" to "org.flywaydb:flyway-core:8.4.4", // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
