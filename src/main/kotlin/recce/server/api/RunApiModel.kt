@@ -34,6 +34,9 @@ data class RunApiModel(
 
     @field:Schema(description = "Reason for failure of the run")
     val failureCause: String? = null,
+
+    @field: Schema(description = "Metadata about the run")
+    val metadata: Map<String, String>
 ) {
     @get:Schema(type = "number", format = "double", description = "How long the run took, in seconds")
     @get:JsonProperty("completedDurationSeconds")
@@ -56,7 +59,8 @@ data class RunApiModel(
                 .sourceMeta(run.sourceMeta)
                 .targetMeta(run.targetMeta)
                 .build(),
-            failureCause = run.failureCause?.run { extractFailureCause(this) }
+            failureCause = run.failureCause?.run { extractFailureCause(this) },
+            metadata = run.metadata
         )
     }
 }

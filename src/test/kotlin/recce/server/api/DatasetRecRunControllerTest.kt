@@ -48,6 +48,7 @@ private val testResults = RecRun(
     sourceMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
     targetMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
     summary = MatchStatus(1, 2, 3, 4)
+    metadata = mapOf("sourceQuery" to "mockQuery", "targetQuery" to "mockQuery")
 }
 
 private fun mockService() = mock<DatasetRecRunner> {
@@ -118,6 +119,7 @@ internal class DatasetRecRunControllerTest {
             softly.assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
             softly.assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
             softly.assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison().isEqualTo(testResults.targetMeta)
+            softly.assertThat(apiModel.metadata).usingRecursiveComparison().isEqualTo(testResults.metadata)
         }
     }
 
@@ -256,6 +258,7 @@ internal class DatasetRecRunControllerApiTest {
             )
         )
         body("summary.target.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
+        body("metadata", equalTo(mapOf("sourceQuery" to "mockQuery", "targetQuery" to "mockQuery")))
     }
 
     @Test
