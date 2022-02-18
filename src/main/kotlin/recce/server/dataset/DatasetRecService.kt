@@ -27,7 +27,6 @@ open class DatasetRecService(
     private val runService: RecRunService,
     private val recordRepository: RecRecordRepository
 ) : DatasetRecRunner, DatasetConfigProvider {
-
     override val availableDataSets = config.datasets.values
 
     override fun runFor(datasetId: String): Mono<RecRun> {
@@ -35,7 +34,8 @@ open class DatasetRecService(
 
         logger.info { "Starting reconciliation run for [$datasetId]..." }
 
-        val recRun = runService.start(datasetId)
+        val metadata = generateMetadata(datasetConfig)
+        val recRun = runService.start(datasetId, metadata)
 
         return loadFrom(datasetConfig.source, datasetConfig.resolvedHashingStrategy, recRun, this::saveSourceBatch)
             .zipWhen { loadFrom(datasetConfig.target, datasetConfig.resolvedHashingStrategy, recRun, this::saveTargetBatch) }
@@ -91,6 +91,13 @@ open class DatasetRecService(
             }.flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.saveAll(it) }
 
         return updateExistingRecords.concatWith(saveNewRecords).map { rows.first().lazyMeta() }
+    }
+
+    private fun generateMetadata(datasetConfig: DatasetConfiguration): Map<String, String> {
+        return mapOf(
+            "sourceQuery" to datasetConfig.source.query,
+            "targetQuery" to datasetConfig.target.query,
+        )
     }
 }
 

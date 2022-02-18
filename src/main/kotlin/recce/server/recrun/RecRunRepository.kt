@@ -39,6 +39,10 @@ data class RecRun(
 
     @Transient var failureCause: Throwable? = null
 
+    @Suppress("JpaAttributeTypeInspection") // False positive
+    @field:TypeDef(type = DataType.JSON)
+    var metadata: Map<String, String> = emptyMap()
+
     fun withMetaData(source: DatasetMeta, target: DatasetMeta): RecRun {
         sourceMeta = source
         targetMeta = target

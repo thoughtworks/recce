@@ -18,7 +18,7 @@ internal class DatasetRecServiceTest {
     private val recRun = RecRun(1, testDataset)
 
     private val runService = mock<RecRunService> {
-        on { start(testDataset) } doReturn Mono.just(recRun)
+        on { start(eq(testDataset), any()) } doReturn Mono.just(recRun)
         on { successful(recRun) } doReturn Mono.just(recRun).map { recRun.asSuccessful(MatchStatus()) }
         on { failed(eq(recRun), any()) } doReturn Mono.just(recRun).map { recRun.asFailed(IllegalArgumentException()) }
     }
@@ -88,7 +88,7 @@ internal class DatasetRecServiceTest {
             mock()
         )
 
-        whenever(runService.start(any())).thenReturn(Mono.error(IllegalArgumentException("failed!")))
+        whenever(runService.start(any(), any())).thenReturn(Mono.error(IllegalArgumentException("failed!")))
 
         StepVerifier.create(service.runFor(testDataset))
             .expectErrorSatisfies {

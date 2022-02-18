@@ -22,7 +22,7 @@ internal class RecRunServiceTest {
             on { save(any()) } doReturn Mono.just(startedRun)
         }
 
-        val eventualRun = RecRunService(runRepository, mock()).start(datasetId)
+        val eventualRun = RecRunService(runRepository, mock()).start(datasetId, emptyMap())
 
         StepVerifier.create(eventualRun)
             .expectNext(startedRun)

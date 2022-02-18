@@ -1,5 +1,6 @@
 package recce.server.dataset
 
+import io.micronaut.context.ApplicationContext
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
@@ -14,6 +15,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
 import reactor.util.function.Tuples
+import recce.server.RecConfiguration
 import recce.server.dataset.datasource.flywayCleanMigrate
 import recce.server.recrun.*
 import java.nio.file.Path
@@ -29,6 +31,7 @@ class DatasetRecServiceIntegrationTest {
     @Inject @field:Named("source-h2") lateinit var sourceDataSource: DataSource
     @Inject @field:Named("target-h2") lateinit var targetDataSource: DataSource
 
+    @Inject lateinit var ctx: ApplicationContext
     @Inject lateinit var service: DatasetRecService
     @Inject lateinit var runRepository: RecRunRepository
     @Inject lateinit var recordRepository: RecRecordRepository
@@ -114,12 +117,20 @@ class DatasetRecServiceIntegrationTest {
     }
 
     private fun checkCompleted(run: RecRun) {
+        val datasetConfig = ctx.getBean(RecConfiguration::class.java).datasets["test-dataset"]
+
+        val expectedMeta = mapOf(
+            "sourceQuery" to datasetConfig?.source?.query,
+            "targetQuery" to datasetConfig?.target?.query,
+        )
+
         SoftAssertions.assertSoftly { softly ->
             softly.assertThat(run.id).isNotNull
             softly.assertThat(run.datasetId).isEqualTo("test-dataset")
             softly.assertThat(run.createdTime).isNotNull
             softly.assertThat(run.updatedTime).isAfterOrEqualTo(run.createdTime)
             softly.assertThat(run.completedTime).isAfterOrEqualTo(run.createdTime)
+            softly.assertThat(run.metadata).usingRecursiveComparison().isEqualTo(expectedMeta)
         }
     }
 
