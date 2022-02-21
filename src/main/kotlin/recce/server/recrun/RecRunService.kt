@@ -12,7 +12,7 @@ open class RecRunService(
     private val recordRepository: RecRecordRepository
 ) {
     fun start(datasetId: String, metadata: Map<String, String>): Mono<RecRun> = runRepository
-        .save(RecRun(datasetId).apply { this.metadata = metadata})
+        .save(RecRun(datasetId).apply { this.metadata = metadata })
         .doOnNext { logger.info { "Starting reconciliation run for $it}..." } }
         .cache()
 
