@@ -24,4 +24,3 @@ class R2dbcDatasource
 constructor(@param:Parameter val name: String) {
     lateinit var url: String
 }
-
