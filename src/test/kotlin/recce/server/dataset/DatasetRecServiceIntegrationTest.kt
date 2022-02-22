@@ -1,6 +1,7 @@
 package recce.server.dataset
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.inject.qualifiers.Qualifiers
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
@@ -15,6 +16,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
 import reactor.util.function.Tuples
+import recce.server.R2dbcDatasource
 import recce.server.RecConfiguration
 import recce.server.dataset.datasource.flywayCleanMigrate
 import recce.server.recrun.*
@@ -118,10 +120,14 @@ class DatasetRecServiceIntegrationTest {
 
     private fun checkCompleted(run: RecRun) {
         val datasetConfig = ctx.getBean(RecConfiguration::class.java).datasets["test-dataset"]
+        val sourceR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("source-h2"))
+        val targetR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("target-h2"))
 
         val expectedMeta = mapOf(
             "sourceQuery" to datasetConfig?.source?.query,
             "targetQuery" to datasetConfig?.target?.query,
+            "sourceUrl" to sourceR2dbcConfig.url,
+            "targetUrl" to targetR2dbcConfig.url
         )
 
         SoftAssertions.assertSoftly { softly ->

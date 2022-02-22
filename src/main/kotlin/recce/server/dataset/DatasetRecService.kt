@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import recce.server.R2dbcConfiguration
 import recce.server.RecConfiguration
 import recce.server.recrun.*
 
@@ -23,14 +24,16 @@ interface DatasetConfigProvider {
 
 @Singleton
 open class DatasetRecService(
-    @Inject private val config: RecConfiguration,
+    @Inject private val recConfig: RecConfiguration,
+    @Inject private val r2dbcConfig: R2dbcConfiguration,
     private val runService: RecRunService,
     private val recordRepository: RecRecordRepository
 ) : DatasetRecRunner, DatasetConfigProvider {
-    override val availableDataSets = config.datasets.values
+    override val availableDataSets = recConfig.datasets.values
 
     override fun runFor(datasetId: String): Mono<RecRun> {
-        val datasetConfig = config.datasets[datasetId] ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
+        val datasetConfig = recConfig.datasets[datasetId]
+            ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
 
         logger.info { "Starting reconciliation run for [$datasetId]..." }
 
@@ -53,9 +56,9 @@ open class DatasetRecService(
         def.runQuery()
             .doOnNext { logger.info { "${def.datasourceDescriptor} query completed; streaming to Recce DB" } }
             .flatMap { result -> result.map(hashingStrategy::hash) }
-            .buffer(config.defaults.batchSize)
+            .buffer(recConfig.defaults.batchSize)
             .zipWith(run.repeat())
-            .flatMap({ (rows, run) -> batchSaver(rows, run) }, config.defaults.batchConcurrency)
+            .flatMap({ (rows, run) -> batchSaver(rows, run) }, recConfig.defaults.batchConcurrency)
             .onErrorMap { DataLoadException("Failed to load data from ${def.datasourceDescriptor}: ${it.message}", it) }
             .defaultIfEmpty { DatasetMeta() }
             .last()
@@ -93,12 +96,12 @@ open class DatasetRecService(
         return updateExistingRecords.concatWith(saveNewRecords).map { rows.first().lazyMeta() }
     }
 
-    private fun generateMetadata(datasetConfig: DatasetConfiguration): Map<String, String> {
-        return mapOf(
-            "sourceQuery" to datasetConfig.source.query,
-            "targetQuery" to datasetConfig.target.query,
-        )
-    }
+    private fun generateMetadata(datasetConfig: DatasetConfiguration): Map<String, String> = mapOf(
+        "sourceQuery" to datasetConfig.source.query,
+        "targetQuery" to datasetConfig.target.query,
+        "sourceUrl" to r2dbcConfig.getUrl(datasetConfig.source.datasourceRef),
+        "targetUrl" to r2dbcConfig.getUrl(datasetConfig.target.datasourceRef)
+    )
 }
 
 class DataLoadException(message: String, cause: Throwable) : Exception(message, cause)
