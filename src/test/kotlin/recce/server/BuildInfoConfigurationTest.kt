@@ -12,6 +12,8 @@ internal class BuildInfoConfigurationTest {
 
     @Test
     fun `version property is semantic version compliant`() {
+        println("classpath ${System.getProperty("java.class.path")}")
+        println("config.version ${config.version}")
         assertThat(config.version).matches("\\d+.\\d+.\\d+(-.+)?")
     }
 }
