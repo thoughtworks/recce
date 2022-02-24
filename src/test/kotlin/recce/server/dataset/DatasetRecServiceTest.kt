@@ -48,7 +48,7 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `should throw on missing dataset`() {
-        assertThatThrownBy { DatasetRecService(mock(), mock(), mock(), mock()).runFor(testDataset) }
+        assertThatThrownBy { DatasetRecService(mock(), mock(), mock(), mock(), mock()).runFor(testDataset) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining(testDataset)
     }
@@ -57,6 +57,7 @@ internal class DatasetRecServiceTest {
     fun `mono should return failed run on failed data load`() {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            mock(),
             mock(),
             runService,
             mock()
@@ -86,6 +87,7 @@ internal class DatasetRecServiceTest {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             mock(),
+            mock(),
             runService,
             mock()
         )
@@ -105,6 +107,7 @@ internal class DatasetRecServiceTest {
     fun `mono should error on failed save of failed run`() {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            mock(),
             mock(),
             runService,
             mock()
@@ -129,6 +132,7 @@ internal class DatasetRecServiceTest {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             mock(),
+            mock(),
             runService,
             mock()
         )
@@ -147,6 +151,7 @@ internal class DatasetRecServiceTest {
     fun `should reconcile source with empty target`() {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
+            mock(),
             mock(),
             runService,
             recordRepository
@@ -172,6 +177,7 @@ internal class DatasetRecServiceTest {
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
+            mock(),
             mock(),
             runService,
             recordRepository
@@ -201,6 +207,7 @@ internal class DatasetRecServiceTest {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
             mock(),
+            mock(),
             runService,
             recordRepository
         )
@@ -228,6 +235,7 @@ internal class DatasetRecServiceTest {
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
             mock(),
+            mock(),
             runService,
             recordRepository
         )
@@ -252,7 +260,7 @@ internal class DatasetRecServiceTest {
         val first = mock<DatasetConfiguration>()
         val second = mock<DatasetConfiguration>()
         val datasetConfig = mapOf("a" to first, "b" to second)
-        assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock(), mock()).availableDataSets)
+        assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock(), mock(), mock()).availableDataSets)
             .hasSameElementsAs(listOf(first, second))
     }
 }

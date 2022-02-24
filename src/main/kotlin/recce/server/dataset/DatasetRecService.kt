@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import recce.server.BuildInfoConfiguration
 import recce.server.R2dbcConfiguration
 import recce.server.RecConfiguration
 import recce.server.recrun.*
@@ -26,6 +27,7 @@ interface DatasetConfigProvider {
 open class DatasetRecService(
     @Inject private val recConfig: RecConfiguration,
     @Inject private val r2dbcConfig: R2dbcConfiguration,
+    @Inject private val buildConfig: BuildInfoConfiguration,
     private val runService: RecRunService,
     private val recordRepository: RecRecordRepository
 ) : DatasetRecRunner, DatasetConfigProvider {
@@ -100,7 +102,8 @@ open class DatasetRecService(
         "sourceQuery" to datasetConfig.source.query,
         "targetQuery" to datasetConfig.target.query,
         "sourceUrl" to r2dbcConfig.getUrl(datasetConfig.source.datasourceRef),
-        "targetUrl" to r2dbcConfig.getUrl(datasetConfig.target.datasourceRef)
+        "targetUrl" to r2dbcConfig.getUrl(datasetConfig.target.datasourceRef),
+        "version" to buildConfig.version
     )
 }
 

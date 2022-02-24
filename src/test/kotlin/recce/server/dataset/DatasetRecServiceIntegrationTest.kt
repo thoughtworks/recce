@@ -127,7 +127,8 @@ class DatasetRecServiceIntegrationTest {
             "sourceQuery" to datasetConfig?.source?.query,
             "targetQuery" to datasetConfig?.target?.query,
             "sourceUrl" to sourceR2dbcConfig.url,
-            "targetUrl" to targetR2dbcConfig.url
+            "targetUrl" to targetR2dbcConfig.url,
+            "version" to "some-version"
         )
 
         SoftAssertions.assertSoftly { softly ->

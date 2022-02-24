@@ -1,6 +1,7 @@
 @file:Suppress("GradlePackageUpdate")
 
 import com.github.gundy.semver4j.model.Version
+import java.util.Properties
 
 plugins {
     val kotlinVersion = "1.6.10"
@@ -239,4 +240,23 @@ tasks.jibDockerBuild.configure {
             image = containerRepoName
         }
     }
+}
+
+tasks.register("generateVersionProperties") {
+    doLast {
+        file("$buildDir/resources/main/build-info.properties").writer().use {
+            Properties().apply {
+                setProperty("version", "$version")
+                store(it, null)
+            }
+        }
+    }
+}
+
+tasks.processResources.configure {
+    dependsOn("generateVersionProperties")
+}
+
+tasks.run.configure {
+    doFirst { environment("version", "$version") }
 }
