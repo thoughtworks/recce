@@ -184,6 +184,7 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 }
 
 tasks.test {
+    println("### ${project.fileTree(buildDir).files}")
     testLogging.showStandardStreams = true
     finalizedBy(tasks.jacocoTestReport)
 }
