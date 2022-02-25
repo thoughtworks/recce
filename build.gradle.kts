@@ -184,12 +184,6 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 }
 
 tasks.test {
-    doLast {
-        println("files ${project.fileTree(buildDir).files}")
-        val buildInfo = file("$buildDir/resources/main/build-info.properties").readLines()
-        println("buildInfo $buildInfo")
-    }
-    testLogging.showStandardStreams = true
     finalizedBy(tasks.jacocoTestReport)
 }
 
@@ -249,9 +243,6 @@ tasks.jibDockerBuild.configure {
 }
 
 tasks.register("generateVersionProperties") {
-    println("buildDir $buildDir")
-    println("rootDir $rootDir")
-    println("version $version")
     doLast {
         file("$buildDir/resources/main/build-info.properties").writer().use {
             Properties().apply {
