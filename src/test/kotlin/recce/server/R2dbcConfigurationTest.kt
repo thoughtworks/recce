@@ -1,7 +1,9 @@
 package recce.server
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.context.exceptions.ConfigurationException
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 internal class R2dbcConfigurationTest {
@@ -21,10 +23,13 @@ internal class R2dbcConfigurationTest {
     }
 
     @Test
-    fun `return default message for non-existent datasource when retrieving url`() {
+    fun `throw exception if datasourceRef does not exist when retrieving url`() {
+        val datasourceRef = "non-existent-datasource"
         with(ApplicationContext.run(properties)) {
             val config = getBean(R2dbcConfiguration::class.java)
-            assertThat(config.getUrl("non-existent-datasource")).isEqualTo("no url found for datasourceRef: non-existent-datasource")
+            assertThatThrownBy { config.getUrl(datasourceRef) }
+                .isExactlyInstanceOf(ConfigurationException::class.java)
+                .hasMessageContaining(datasourceRef)
         }
     }
 }

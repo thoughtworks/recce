@@ -2,6 +2,7 @@ package recce.server
 
 import io.micronaut.context.annotation.EachProperty
 import io.micronaut.context.annotation.Parameter
+import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.core.annotation.Introspected
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
@@ -15,7 +16,7 @@ class R2dbcConfiguration @Inject constructor(sources: List<R2dbcDatasource>) {
     }
 
     fun getUrl(datasourceRef: String): String =
-        datasources[datasourceRef] ?: "no url found for datasourceRef: $datasourceRef"
+        datasources[datasourceRef] ?: throw ConfigurationException("Cannot locate datasourceRef [$datasourceRef] in r2dbc configuration!")
 }
 
 @Introspected
