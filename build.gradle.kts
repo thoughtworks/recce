@@ -184,7 +184,11 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 }
 
 tasks.test {
-    println("### ${project.fileTree(buildDir).files}")
+    doLast {
+        println("files ${project.fileTree(buildDir).files}")
+        val buildInfo = file("$buildDir/resources/main/build-info.properties").readLines()
+        println("buildInfo $buildInfo")
+    }
     testLogging.showStandardStreams = true
     finalizedBy(tasks.jacocoTestReport)
 }
