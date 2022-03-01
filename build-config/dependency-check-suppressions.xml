@@ -11,10 +11,31 @@
         <cpe>cpe:/a:mysql:mysql</cpe>
     </suppress>
     <suppress>
+        <notes>Suppressing false positive - the testContainers mariadb plugin is a different thing to the actual mariadb database.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.testcontainers/mariadb@.*$</packageUrl>
+        <cpe>cpe:/a:mariadb:mariadb</cpe>
+    </suppress>
+    <suppress>
+        <notes>Suppressing false positive - the mariadb client is a different thing to the actual mariadb database.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.mariadb\.jdbc/mariadb\-java\-client@.*$</packageUrl>
+        <cpe>cpe:/a:mariadb:mariadb</cpe>
+    </suppress>
+    <suppress>
+        <notes>Suppressing false positive - the mariadb r2dbc client is a different thing to the actual mariadb database.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.mariadb/r2dbc-mariadb@.*$</packageUrl>
+        <cpe>cpe:/a:mariadb:mariadb</cpe>
+    </suppress>
+    <suppress>
+        <notes>Suppressing false positive - seems to relate to hibernate validator, not the mysql connector itself.</notes>
+        <packageUrl regex="true">^pkg:maven/mysql/mysql\-connector\-java@.*$</packageUrl>
+        <cve>CVE-2019-10219</cve>
+    </suppress>
+    <suppress>
         <notes>Recce is not subject to these H2 DB CVEs because we do not expose the H2 console or deploy H2 in the main application.</notes>
         <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
         <cve>CVE-2022-23221</cve>
         <cve>CVE-2021-23463</cve>
         <cve>CVE-2021-42392</cve>
+        <vulnerabilityName>CWE-94: Improper Control of Generation of Code ('Code Injection')</vulnerabilityName>
     </suppress>
 </suppressions>
