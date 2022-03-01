@@ -1,7 +1,7 @@
 @file:Suppress("GradlePackageUpdate")
 
 import com.github.gundy.semver4j.model.Version
-import java.util.Properties
+import java.util.*
 
 plugins {
     val kotlinVersion = "1.6.10"
@@ -34,10 +34,9 @@ val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.3.4",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
-    // Unfortunately not all Mockito/Reactor/Flyway libs are in the Micronaut BOM, this allows us to keep versions consistent.
+    // Unfortunately not all Mockito/Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
     "mockito" to "org.mockito:mockito-core:4.3.1", // Needs to be compatible with Micronaut BOM.
     "reactor" to "io.projectreactor:reactor-core:3.4.15", // Needs to be compatible with Micronaut BOM.
-    "flyway" to "org.flywaydb:flyway-core:8.5.0", // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17",
@@ -116,7 +115,6 @@ dependencies {
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
-    implementation("org.flywaydb:flyway-core:${depVersions["flyway"]}")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     runtimeOnly("org.postgresql:postgresql")
@@ -150,10 +148,10 @@ dependencies {
     testRuntimeOnly("org.postgresql:postgresql")
     testImplementation("org.testcontainers:mysql")
     testRuntimeOnly("mysql:mysql-connector-java")
-    testRuntimeOnly("org.flywaydb:flyway-mysql:${depVersions["flyway"]}")
+    testRuntimeOnly("org.flywaydb:flyway-mysql")
     testImplementation("org.testcontainers:mssqlserver")
     testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
-    testRuntimeOnly("org.flywaydb:flyway-sqlserver:${depVersions["flyway"]}")
+    testRuntimeOnly("org.flywaydb:flyway-sqlserver")
     testImplementation("org.testcontainers:mariadb")
     testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
