@@ -99,7 +99,7 @@ dependencies {
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("javax.annotation:javax.annotation-api")
-    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("com.google.guava:guava:31.1-jre")
     implementation("io.projectreactor:reactor-tools:${depVersions["reactor"]}")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.5")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
