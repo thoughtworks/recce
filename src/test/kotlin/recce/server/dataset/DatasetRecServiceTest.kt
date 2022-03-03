@@ -23,8 +23,12 @@ internal class DatasetRecServiceTest {
         on { failed(eq(recRun), any()) } doReturn Mono.just(recRun).map { recRun.asFailed(IllegalArgumentException()) }
     }
 
+    private val emptyRowResult = mock<io.r2dbc.spi.Result> {
+        on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.empty()
+    }
+
     private val emptyDataLoad = mock<DataLoadDefinition> {
-        on { runQuery() } doReturn Flux.empty()
+        on { runQuery() } doReturn Flux.just(emptyRowResult)
     }
 
     private val testMeta = listOf(FakeColumnMetadata("col1", String::class.java))
