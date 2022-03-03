@@ -267,4 +267,56 @@ internal class DatasetRecServiceTest {
         assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock(), mock(), mock()).availableDataSets)
             .hasSameElementsAs(listOf(first, second))
     }
+
+    @Test
+    fun `should throw error if there is more than one result from query`() {
+        val multipleResults = mock<DataLoadDefinition> {
+            on { runQuery() } doReturn Flux.just(singleRowResult, singleRowResult)
+        }
+
+        val service = DatasetRecService(
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(multipleResults, multipleResults))),
+            mock(),
+            mock(),
+            runService,
+            mock()
+        )
+
+        StepVerifier.create(service.runFor(testDataset))
+            .assertNext { assertThat(it.status).isEqualTo(RunStatus.Failed) }
+            .verifyComplete()
+
+        val errorCaptor = argumentCaptor<Throwable>()
+        verify(runService).failed(eq(recRun), errorCaptor.capture())
+
+        assertThat(errorCaptor.firstValue)
+            .isInstanceOf(DataLoadException::class.java)
+            .hasMessageContaining("SQL query must be a single statement")
+    }
+
+    @Test
+    fun `should throw error if there are no results from query`() {
+        val zeroResult = mock<DataLoadDefinition> {
+            on { runQuery() } doReturn Flux.empty()
+        }
+
+        val service = DatasetRecService(
+            RecConfiguration(mapOf(testDataset to DatasetConfiguration(zeroResult, zeroResult))),
+            mock(),
+            mock(),
+            runService,
+            mock()
+        )
+
+        StepVerifier.create(service.runFor(testDataset))
+            .assertNext { assertThat(it.status).isEqualTo(RunStatus.Failed) }
+            .verifyComplete()
+
+        val errorCaptor = argumentCaptor<Throwable>()
+        verify(runService).failed(eq(recRun), errorCaptor.capture())
+
+        assertThat(errorCaptor.firstValue)
+            .isInstanceOf(DataLoadException::class.java)
+            .hasMessageContaining("SQL query must be a single statement")
+    }
 }
