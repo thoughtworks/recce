@@ -35,7 +35,7 @@ val depDescriptors = mapOf(
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
     // Unfortunately not all Mockito/Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
-    "mockito" to "org.mockito:mockito-core:4.3.1", // Needs to be compatible with Micronaut BOM.
+    "mockito" to "org.mockito:mockito-core:4.4.0", // Needs to be compatible with Micronaut BOM.
     "reactor" to "io.projectreactor:reactor-core:3.4.15", // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
