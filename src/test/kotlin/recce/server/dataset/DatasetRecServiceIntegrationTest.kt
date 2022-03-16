@@ -77,9 +77,9 @@ class DatasetRecServiceIntegrationTest {
             .verifyComplete()
 
         runRepository.findAll()
-                .flatMap { run ->
-                    recordRepository.findByRecRunId(run.id!!).map { Tuples.of(run, it) }
-                }
+            .flatMap { run ->
+                recordRepository.findByRecRunId(run.id!!).map { Tuples.of(run, it) }
+            }
             .test()
             .assertNext { (run, record) ->
                 checkCompleted(run)
