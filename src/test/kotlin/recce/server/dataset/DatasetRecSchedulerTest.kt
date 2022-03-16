@@ -10,7 +10,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import recce.server.RecConfiguration
 import recce.server.api.DatasetRecRunController
 import recce.server.recrun.RecRun
@@ -76,7 +76,8 @@ internal class DatasetRecSchedulerIntegrationTest {
         runScheduler().onApplicationEvent(null)
 
         await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-            StepVerifier.create(ctx.getBean(DatasetRecRunController::class.java).retrieveRuns(DatasetRecRunController.RunQueryParams("test-dataset")).collectList())
+            ctx.getBean(DatasetRecRunController::class.java).retrieveRuns(DatasetRecRunController.RunQueryParams("test-dataset")).collectList()
+                .test()
                 .assertNext { assertThat(it).hasSizeGreaterThanOrEqualTo(1) }
                 .verifyComplete()
         }

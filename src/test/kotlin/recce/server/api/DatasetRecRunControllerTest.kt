@@ -24,7 +24,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import recce.server.dataset.DataLoadException
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.*
@@ -80,7 +80,8 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id`() {
-        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!)))
+        controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!))
+            .test()
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).isNull()
@@ -92,7 +93,8 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id with limited sample bad rows`() {
-        StepVerifier.create(controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!, sampleKeysLimit)))
+        controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!, sampleKeysLimit))
+            .test()
             .assertNext {
                 assertThatModelMatchesTestResults(it)
                 assertThat(it.summary?.source?.onlyHereSampleKeys).containsExactly("source-0")
@@ -125,7 +127,8 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get runs by dataset id`() {
-        StepVerifier.create(controller.retrieveRuns(DatasetRecRunController.RunQueryParams(testDataset)))
+        controller.retrieveRuns(DatasetRecRunController.RunQueryParams(testDataset))
+            .test()
             .assertNext(::assertThatModelMatchesTestResults)
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
@@ -133,7 +136,8 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `trigger should delegate to service`() {
-        StepVerifier.create(controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset)))
+        controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset))
+            .test()
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
     }
@@ -149,7 +153,8 @@ internal class DatasetRecRunControllerTest {
 
         whenever(service.runFor(testDataset)).doReturn(Mono.just(failedRun))
 
-        StepVerifier.create(controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset)))
+        controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset))
+            .test()
             .assertNext { apiModel ->
                 SoftAssertions.assertSoftly { softly ->
                     softly.assertThat(apiModel.id).isEqualTo(testResults.id)

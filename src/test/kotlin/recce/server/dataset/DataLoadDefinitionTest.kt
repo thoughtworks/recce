@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Answers
 import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import java.util.*
 
 internal class DataLoadDefinitionTest {
@@ -71,7 +71,8 @@ internal class DataLoadDefinitionTest {
 
         whenever(mockConnection.createStatement(eq(testQuery))).thenReturn(statement)
 
-        StepVerifier.create(definition.runQuery())
+        definition.runQuery()
+            .test()
             .expectNext(result)
             .verifyComplete()
 
@@ -88,7 +89,8 @@ internal class DataLoadDefinitionTest {
             on { connectionFactory().create() } doReturn Mono.just(mockConnection)
         }
 
-        StepVerifier.create(definition.runQuery())
+        definition.runQuery()
+            .test()
             .expectErrorSatisfies {
                 assertThat(it)
                     .isInstanceOf(NullPointerException::class.java)

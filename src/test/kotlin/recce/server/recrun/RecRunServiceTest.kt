@@ -6,7 +6,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import java.lang.IllegalArgumentException
 import java.time.Instant
 
@@ -24,7 +24,8 @@ internal class RecRunServiceTest {
 
         val eventualRun = RecRunService(runRepository, mock()).start(datasetId, emptyMap())
 
-        StepVerifier.create(eventualRun)
+        eventualRun
+            .test()
             .expectNext(startedRun)
             .verifyComplete()
     }
@@ -45,7 +46,8 @@ internal class RecRunServiceTest {
             )
         }
 
-        StepVerifier.create(RecRunService(runRepository, recordRepository).successful(startedRun))
+        RecRunService(runRepository, recordRepository).successful(startedRun)
+            .test()
             .assertNext {
                 assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
@@ -60,7 +62,8 @@ internal class RecRunServiceTest {
             on { update(any()) } doReturn Mono.just(startedRun)
         }
 
-        StepVerifier.create(RecRunService(runRepository, mock()).failed(startedRun, IllegalArgumentException("failed run!")))
+        RecRunService(runRepository, mock()).failed(startedRun, IllegalArgumentException("failed run!"))
+            .test()
             .assertNext {
                 assertThat(it.completedTime).isAfterOrEqualTo(it.createdTime)
                 assertThat(it.status).isEqualTo(RunStatus.Failed)

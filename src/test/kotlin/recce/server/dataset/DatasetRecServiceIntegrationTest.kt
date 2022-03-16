@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import reactor.util.function.Tuples
 import recce.server.R2dbcDatasource
 import recce.server.RecConfiguration
@@ -68,19 +68,19 @@ class DatasetRecServiceIntegrationTest {
 
     @Test
     fun `can run a simple reconciliation`() {
-        StepVerifier.create(service.runFor("test-dataset"))
+        service.runFor("test-dataset")
+            .test()
             .assertNext { run ->
                 checkCompleted(run)
                 checkSuccessful(run)
             }
             .verifyComplete()
 
-        StepVerifier.create(
-            runRepository.findAll()
+        runRepository.findAll()
                 .flatMap { run ->
                     recordRepository.findByRecRunId(run.id!!).map { Tuples.of(run, it) }
                 }
-        )
+            .test()
             .assertNext { (run, record) ->
                 checkCompleted(run)
                 checkSuccessful(run)
@@ -174,7 +174,8 @@ class DatasetRecServiceIntegrationTest {
         // Wipe the source DB
         flywayCleanMigrate(tempDir, "SELECT 1", sourceDataSource)
 
-        StepVerifier.create(service.runFor("test-dataset"))
+        service.runFor("test-dataset")
+            .test()
             .assertNext { run ->
                 checkCompleted(run)
                 checkFailed(run)
@@ -187,7 +188,8 @@ class DatasetRecServiceIntegrationTest {
             .verifyComplete()
 
         // Check persisted representation
-        StepVerifier.create(runRepository.findAll())
+        runRepository.findAll()
+            .test()
             .assertNext { run ->
                 checkCompleted(run)
                 checkFailed(run)
@@ -200,7 +202,8 @@ class DatasetRecServiceIntegrationTest {
         // Wipe the target DB
         flywayCleanMigrate(tempDir, "SELECT 1", targetDataSource)
 
-        StepVerifier.create(service.runFor("test-dataset"))
+        service.runFor("test-dataset")
+            .test()
             .assertNext { run ->
                 checkCompleted(run)
                 checkFailed(run)
@@ -213,7 +216,8 @@ class DatasetRecServiceIntegrationTest {
             .verifyComplete()
 
         // Check persisted representation
-        StepVerifier.create(runRepository.findAll())
+        runRepository.findAll()
+            .test()
             .assertNext { run ->
                 checkCompleted(run)
                 checkFailed(run)

@@ -8,7 +8,7 @@ import org.mockito.ArgumentMatchers.anyList
 import org.mockito.kotlin.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import recce.server.RecConfiguration
 import recce.server.recrun.*
 import java.util.function.BiFunction
@@ -70,7 +70,8 @@ internal class DatasetRecServiceTest {
         val rootCause = IllegalArgumentException("Could not connect to database")
         whenever(emptyDataLoad.runQuery()).thenReturn(Flux.error(rootCause))
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext {
                 assertThat(it.status).isEqualTo(RunStatus.Failed)
             }
@@ -98,7 +99,8 @@ internal class DatasetRecServiceTest {
 
         whenever(runService.start(any(), any())).thenReturn(Mono.error(IllegalArgumentException("failed!")))
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .expectErrorSatisfies {
                 assertThat(it)
                     .isExactlyInstanceOf(IllegalArgumentException::class.java)
@@ -123,7 +125,8 @@ internal class DatasetRecServiceTest {
         val failSaveCause = IllegalArgumentException("Could not save failure status")
         whenever(runService.failed(any(), any())).thenReturn(Mono.error(failSaveCause))
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .expectErrorSatisfies {
                 assertThat(it)
                     .isEqualTo(failSaveCause)
@@ -140,7 +143,8 @@ internal class DatasetRecServiceTest {
             runService,
             mock()
         )
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext {
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isEmpty()
@@ -161,7 +165,8 @@ internal class DatasetRecServiceTest {
             recordRepository
         )
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext {
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isNotEmpty
@@ -187,7 +192,8 @@ internal class DatasetRecServiceTest {
             recordRepository
         )
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext {
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isEmpty()
@@ -216,7 +222,8 @@ internal class DatasetRecServiceTest {
             recordRepository
         )
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext {
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isNotEmpty
@@ -244,7 +251,8 @@ internal class DatasetRecServiceTest {
             recordRepository
         )
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext {
                 assertThat(it.status).isEqualTo(RunStatus.Successful)
                 assertThat(it.sourceMeta.cols).isNotEmpty
@@ -282,7 +290,8 @@ internal class DatasetRecServiceTest {
             mock()
         )
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext { assertThat(it.status).isEqualTo(RunStatus.Failed) }
             .verifyComplete()
 
@@ -308,7 +317,8 @@ internal class DatasetRecServiceTest {
             mock()
         )
 
-        StepVerifier.create(service.runFor(testDataset))
+        service.runFor(testDataset)
+            .test()
             .assertNext { assertThat(it.status).isEqualTo(RunStatus.Failed) }
             .verifyComplete()
 

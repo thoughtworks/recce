@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.testcontainers.containers.*
 import org.testcontainers.junit.jupiter.Testcontainers
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 import recce.server.dataset.datasource.DbDescriptor
 import recce.server.dataset.datasource.flywayCleanMigrate
 import recce.server.recrun.MatchStatus
@@ -150,7 +150,8 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             runAsync { createTestData(target) }
         ).join()
 
-        StepVerifier.create(ctx.getBean(DatasetRecService::class.java).runFor("${source.db}-to-${target.db}"))
+        ctx.getBean(DatasetRecService::class.java).runFor("${source.db}-to-${target.db}")
+            .test()
             .assertNext { run ->
                 assertThat(run.summary)
                     .describedAs("Values between two DBs should match. sourceMeta=${run.sourceMeta} targetMeta=${run.targetMeta}")

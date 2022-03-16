@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import reactor.test.StepVerifier
+import reactor.kotlin.test.test
 
 @MicronautTest
 class RecRecordRepositoryTest {
@@ -27,7 +27,8 @@ class RecRecordRepositoryTest {
 
     @Test
     fun `should count matches when empty`() {
-        StepVerifier.create(recordRepository.countMatchedByKeyRecRunId(1))
+        recordRepository.countMatchedByKeyRecRunId(1)
+            .test()
             .expectNext(MatchStatus())
             .verifyComplete()
     }
@@ -42,7 +43,8 @@ class RecRecordRepositoryTest {
 
         val recRunId = captureSavedTestRun(testRecordData)
 
-        StepVerifier.create(recordRepository.countMatchedByKeyRecRunId(recRunId))
+        recordRepository.countMatchedByKeyRecRunId(recRunId)
+            .test()
             .assertNext {
                 assertThat(it).isEqualTo(MatchStatus(1, 2, 3, 4))
                 assertThat(it.sourceTotal).isEqualTo(8)
@@ -62,7 +64,8 @@ class RecRecordRepositoryTest {
 
         val recRunId = captureSavedTestRun(testRecordData)
         mutableListOf<RecRecord>().let { results ->
-            StepVerifier.create(recordRepository.findFirstByRecRunIdSplitByMatchStatus(recRunId))
+            recordRepository.findFirstByRecRunIdSplitByMatchStatus(recRunId)
+                .test()
                 .recordWith { results }
                 .expectNextCount(30)
                 .verifyComplete()
@@ -91,7 +94,8 @@ class RecRecordRepositoryTest {
 
     private fun captureSavedTestRun(testRecordData: List<Pair<String?, String?>>): Int {
         val savedRecords = mutableListOf<RecRecord>()
-        StepVerifier.create(saveTestRecords(testRecordData))
+        saveTestRecords(testRecordData)
+            .test()
             .recordWith { savedRecords }
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
@@ -119,13 +123,15 @@ class RecRecordRepositoryTest {
     fun `should bulk check for existence of records`() {
         val testRecordData = List(10) { "test" to null }
         val savedRecords = mutableListOf<RecRecord>()
-        StepVerifier.create(saveTestRecords(testRecordData))
+        saveTestRecords(testRecordData)
+            .test()
             .recordWith { savedRecords }
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
 
         val foundRecords = mutableListOf<RecRecord>()
-        StepVerifier.create(recordRepository.findByRecRunIdAndMigrationKeyIn(savedRecords.first().recRunId, savedRecords.map { it.migrationKey }))
+        recordRepository.findByRecRunIdAndMigrationKeyIn(savedRecords.first().recRunId, savedRecords.map { it.migrationKey })
+            .test()
             .recordWith { foundRecords }
             .expectNextCount(testRecordData.size.toLong())
             .verifyComplete()
