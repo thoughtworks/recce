@@ -20,9 +20,9 @@ internal class RecConfigurationPropertiesTest {
         "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
-        "reconciliation.datasets.test-dataset.source.query" to "select count(*) as sourcedatacount from testdata",
+        "reconciliation.datasets.test-dataset.source.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
         "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
-        "reconciliation.datasets.test-dataset.target.query" to "select count(*) as targetdatacount from testdata",
+        "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata",
     )
 
     @Test

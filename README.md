@@ -257,14 +257,14 @@ reconciliation:
         datasourceRef: my-source-db
         # Any SQL query to evaluate against the source DB
         query: >
-          SELECT pet.id as MigrationKey, category, name, status
+          SELECT pet.id AS MigrationKey, category, name, status
           FROM pet
       target:
         # Reference to a datasource defined in `r2dbc.datasources`  
         datasourceRef: my-target-db 
         # Any SQL query to evaluate against the source DB
         query: >
-          SELECT pet.id as MigrationKey, category.name as category, pet.name, status
+          SELECT pet.id AS MigrationKey, category.name AS category, pet.name, status
           FROM pet INNER JOIN category ON pet.category_id = category.id
       # Optional scheduling of regular or one-of reconciliations
       schedule:
@@ -284,7 +284,7 @@ Recce needs to know which column represents a unique identifier for the row that
 
 To do this, designate a column by naming it as `MigrationKey` (case insensitive)
 ```sql
-SELECT natural_id as MigrationKey, some, other, columns
+SELECT natural_id AS MigrationKey, some, other, columns
 FROM my_table
 ```
 
@@ -307,10 +307,10 @@ You should look to handle differences in types and semantics using the SQL expre
 For example, if your source database represented an enumeration using integers (`1, 2, 3` etc) whereas your target represented them using `VARCHAR`s, you would use a `CASE` statement to express this expected difference
 ```sql
 -- source
-SELECT id as MigrationKey, CASE WHEN enumerated = 1 THEN 'Completed' ELSE 'PENDING' END
+SELECT id AS MigrationKey, CASE WHEN enumerated = 1 THEN 'Completed' ELSE 'PENDING' END
 FROM my_table
 -- target
-SELECT id as MigrationKey, enumerated_text
+SELECT id AS MigrationKey, enumerated_text
 FROM my_table
 ```
 
@@ -320,7 +320,7 @@ When reconciling very large data sets, it may not be feasible to do row-by-row, 
 
 ```sql
 --- check #s of login audit records for a month of data by location and type
-SELECT user_location || user_type as MigrationKey, count(*) as Count
+SELECT user_location || user_type AS MigrationKey, count(*) AS Count
 FROM user_login_audit
 WHERE user_login_datetime >= timestamp('2021-11-01 00:00:00') AND
     user_login_datetime < timestamp('2021-12-01 00:00:00')

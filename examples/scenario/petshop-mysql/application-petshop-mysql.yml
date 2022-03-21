@@ -16,44 +16,44 @@ reconciliation:
       source:
         datasourceRef: source
         query: >
-          select pet.id as MigrationKey, category, name, status
-          from pet
+          SELECT pet.id AS MigrationKey, category, name, status
+          FROM pet
       target:
         datasourceRef: target
         query: >
-          select pet.id as MigrationKey, category.name, pet.name, status
-          from pet inner join category on pet.category_id = category.id
+          SELECT pet.id AS MigrationKey, category.name, pet.name, status
+          FROM pet INNER JOIN category ON pet.category_id = category.id
     order-status:
       source:
         datasourceRef: source
         query: >
-          select
-            order_status.id as MigrationKey,
+          SELECT
+            order_status.id AS MigrationKey,
             pet_name,
             unix_timestamp(ordered_at),
-            case
-              when status = 1 then 'placed'
-              when status = 2 then 'approved'
-              when status = 3 then 'delivered'
-            end as status_text,
+            CASE
+              WHEN status = 1 THEN 'placed'
+              WHEN status = 2 THEN 'approved'
+              WHEN status = 3 THEN 'delivered'
+            END AS status_text,
             complete
-          from order_status
+          FROM order_status
       target:
         datasourceRef: target
         query: >
-          select
-            order_status.id as MigrationKey,
+          SELECT
+            order_status.id AS MigrationKey,
             pet.name,
             unix_timestamp(ordered_at),
             order_status.status,
             complete
-          from order_status inner join pet on order_status.pet_id = pet.id
+          FROM order_status INNER JOIN pet ON order_status.pet_id = pet.id
     categories:
       source:
         datasourceRef: source
         query: >
-          select "# Categories" as MigrationKey, count(distinct category) from pet
+          SELECT "# Categories" AS MigrationKey, count(distinct category) FROM pet
       target:
         datasourceRef: target
         query: >
-          select "# Categories" as MigrationKey, count(*) from category
+          SELECT "# Categories" AS MigrationKey, count(*) FROM category

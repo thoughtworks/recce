@@ -19,7 +19,7 @@ import java.util.*
 
 internal class DataLoadDefinitionTest {
     private val testSourceName = "source1"
-    private val testQuery = "select * from somewhere"
+    private val testQuery = "SELECT * FROM somewhere"
     private lateinit var definition: DataLoadDefinition
 
     private val mockConnection: Connection = mock {

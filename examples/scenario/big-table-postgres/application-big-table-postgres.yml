@@ -16,52 +16,52 @@ reconciliation:
       source:
         datasourceRef: source
         query: >
-          select id as MigrationKey, *
-          from big_table
+          SELECT id AS MigrationKey, *
+          FROM big_table
       target:
         datasourceRef: target
         query: >
-          select id as MigrationKey, *
-          from big_table
+          SELECT id AS MigrationKey, *
+          FROM big_table
     both:
       source:
         datasourceRef: source
         query: >
-          select id as MigrationKey, *
-          from big_table where id between 50001 and 100000
+          SELECT id AS MigrationKey, *
+          FROM big_table WHERE id BETWEEN 50001 AND 100000
       target:
         datasourceRef: target
         query: >
-          select id as MigrationKey, *
-          from big_table where id between 50001 and 100000
+          SELECT id AS MigrationKey, *
+          FROM big_table WHERE id BETWEEN 50001 AND 100000
     source-only:
       source:
         datasourceRef: source
         query: >
-          select id as MigrationKey, *
-          from big_table where id between 1 and 50000
+          SELECT id AS MigrationKey, *
+          FROM big_table WHERE id BETWEEN 1 AND 50000
       target:
         datasourceRef: target
         query: >
-          select id as MigrationKey, *
-          from big_table where id between 1 and 50000
+          SELECT id AS MigrationKey, *
+          FROM big_table WHERE id BETWEEN 1 AND 50000
     target-only:
       source:
         datasourceRef: source
         query: >
-          select id as MigrationKey, *
-          from big_table where id between 100001 and 150000
+          SELECT id AS MigrationKey, *
+          FROM big_table WHERE id BETWEEN 100001 AND 150000
       target:
         datasourceRef: target
         query: >
-          select id as MigrationKey, *
-          from big_table where id between 100001 and 150000
+          SELECT id AS MigrationKey, *
+          FROM big_table WHERE id BETWEEN 100001 AND 150000
     counts:
       source:
         datasourceRef: source
         query: >
-          select 'Num rows' as MigrationKey, count(*) from big_table
+          SELECT 'Num rows' AS MigrationKey, count(*) FROM big_table
       target:
         datasourceRef: target
         query: >
-          select 'Num rows' as MigrationKey, count(*) from big_table
+          SELECT 'Num rows' AS MigrationKey, count(*) FROM big_table

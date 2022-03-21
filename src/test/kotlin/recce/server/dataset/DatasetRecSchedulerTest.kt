@@ -59,9 +59,9 @@ internal class DatasetRecSchedulerIntegrationTest {
     private val items = mutableMapOf<String, Any>(
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to everySecond,
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "default",
-        "reconciliation.datasets.test-dataset.source.query" to "select id as MigrationKey from reconciliation_run",
+        "reconciliation.datasets.test-dataset.source.query" to "SELECT id AS MigrationKey FROM reconciliation_run",
         "reconciliation.datasets.test-dataset.target.datasourceRef" to "default",
-        "reconciliation.datasets.test-dataset.target.query" to "select id as MigrationKey from reconciliation_run"
+        "reconciliation.datasets.test-dataset.target.query" to "SELECT id AS MigrationKey FROM reconciliation_run"
     )
 
     private lateinit var ctx: ApplicationContext

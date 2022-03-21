@@ -14,4 +14,4 @@ SELECT
     md5(random()::text),
     md5(random()::text),
     left(md5(random()::text), 20)
-from generate_series(50001, 150000) s(i);
+FROM generate_series(50001, 150000) s(i);
