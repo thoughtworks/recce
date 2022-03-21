@@ -221,6 +221,8 @@ jib {
         tags = setOf(tagVersion.toString(), "latest")
     }
     container {
+        user = "1000:1000"
+        ports = listOf("8080")
         creationTime = "USE_CURRENT_TIMESTAMP"
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
     }
