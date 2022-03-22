@@ -54,11 +54,11 @@ jobs:
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
-          arguments: jibDockerBuild
+          arguments: jibDockerBuild -x check
       - name: Gradle Official Docker Build & Push
         uses: gradle/gradle-build-action@v2
         if: ${{ endsWith(github.ref, '/master') }}
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
-          arguments: jib
+          arguments: jib -x check
