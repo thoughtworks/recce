@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import recce.server.dataset.DataLoadRole
 import recce.server.dataset.HashingStrategy
+import java.util.function.Consumer
 
 // Faster tests that do not load the full configuration and are quicker to iterate on when testing
 // configuration binding
@@ -53,20 +54,22 @@ internal class RecConfigurationPropertiesTest {
         val ctx = ApplicationContext.run(properties)
 
         assertThat(ctx.getBean(RecConfiguration::class.java).datasets.values)
-            .hasSize(1)
-            .first().satisfies {
-                assertThat(it.id).isEqualTo("test-dataset")
-                assertThat(it.resolvedHashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
-                assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
-                assertThat(it.source.role).isEqualTo(DataLoadRole.Source)
-                assertThat(it.source.datasourceRef).isEqualTo("source")
-                assertThat(it.source.query).contains("sourcedatacount")
-                assertThat(it.source.dbOperations).isNotNull
-                assertThat(it.target.role).isEqualTo(DataLoadRole.Target)
-                assertThat(it.target.datasourceRef).isEqualTo("target")
-                assertThat(it.target.query).contains("targetdatacount")
-                assertThat(it.target.dbOperations).isNotNull
-            }
+            .singleElement()
+            .satisfies(
+                Consumer {
+                    assertThat(it.id).isEqualTo("test-dataset")
+                    assertThat(it.resolvedHashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
+                    assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
+                    assertThat(it.source.role).isEqualTo(DataLoadRole.Source)
+                    assertThat(it.source.datasourceRef).isEqualTo("source")
+                    assertThat(it.source.query).contains("sourcedatacount")
+                    assertThat(it.source.dbOperations).isNotNull
+                    assertThat(it.target.role).isEqualTo(DataLoadRole.Target)
+                    assertThat(it.target.datasourceRef).isEqualTo("target")
+                    assertThat(it.target.query).contains("targetdatacount")
+                    assertThat(it.target.dbOperations).isNotNull
+                }
+            )
     }
 
     @Test

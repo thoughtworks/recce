@@ -32,6 +32,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.function.Consumer
 
 private const val sampleKeysLimit = 3
 private const val notFoundId = 0
@@ -64,7 +65,9 @@ private fun mockRunRepository() = mock<RecRunRepository> {
 }
 
 private fun mockRecordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
-    on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, sampleKeysLimit) } doReturn Flux.fromIterable(sampleRecords)
+    on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, sampleKeysLimit) } doReturn Flux.fromIterable(
+        sampleRecords
+    )
     on { findFirstByRecRunIdSplitByMatchStatus(notFoundId, sampleKeysLimit) } doReturn Flux.empty()
 }
 
@@ -93,7 +96,12 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id with limited sample bad rows`() {
-        controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!, sampleKeysLimit))
+        controller.retrieveIndividualRun(
+            DatasetRecRunController.IndividualRunQueryParams(
+                testResults.id!!,
+                sampleKeysLimit
+            )
+        )
             .test()
             .assertNext {
                 assertThatModelMatchesTestResults(it)
@@ -117,10 +125,12 @@ internal class DatasetRecRunControllerTest {
             softly.assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
             softly.assertThat(apiModel.summary?.source?.totalCount).isEqualTo(testResults.summary?.sourceTotal)
             softly.assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
-            softly.assertThat(apiModel.summary?.source?.meta).usingRecursiveComparison().isEqualTo(testResults.sourceMeta)
+            softly.assertThat(apiModel.summary?.source?.meta).usingRecursiveComparison()
+                .isEqualTo(testResults.sourceMeta)
             softly.assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
             softly.assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
-            softly.assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison().isEqualTo(testResults.targetMeta)
+            softly.assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison()
+                .isEqualTo(testResults.targetMeta)
             softly.assertThat(apiModel.metadata).usingRecursiveComparison().isEqualTo(testResults.metadata)
         }
     }
@@ -242,7 +252,10 @@ internal class DatasetRecRunControllerApiTest {
                 hasEntry("totalCount", 10),
                 hasEntry("bothMatchedCount", 3),
                 hasEntry("bothMismatchedCount", 4),
-                if (expectSampleKeys) hasEntry("bothMismatchedSampleKeys", listOf("both-0")) else not(hasKey("bothMismatchedSampleKeys"))
+                if (expectSampleKeys) hasEntry(
+                    "bothMismatchedSampleKeys",
+                    listOf("both-0")
+                ) else not(hasKey("bothMismatchedSampleKeys"))
             )
         )
         body(
@@ -250,7 +263,10 @@ internal class DatasetRecRunControllerApiTest {
             allOf(
                 hasEntry("totalCount", 8),
                 hasEntry("onlyHereCount", 1),
-                if (expectSampleKeys) hasEntry("onlyHereSampleKeys", listOf("source-0")) else not(hasKey("onlyHereSampleKeys"))
+                if (expectSampleKeys) hasEntry(
+                    "onlyHereSampleKeys",
+                    listOf("source-0")
+                ) else not(hasKey("onlyHereSampleKeys"))
             )
         )
         body("summary.source.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
@@ -259,7 +275,10 @@ internal class DatasetRecRunControllerApiTest {
             allOf(
                 hasEntry("totalCount", 9),
                 hasEntry("onlyHereCount", 2),
-                if (expectSampleKeys) hasEntry("onlyHereSampleKeys", listOf("target-0")) else not(hasKey("onlyHereSampleKeys"))
+                if (expectSampleKeys) hasEntry(
+                    "onlyHereSampleKeys",
+                    listOf("target-0")
+                ) else not(hasKey("onlyHereSampleKeys"))
             )
         )
         body("summary.target.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
@@ -283,11 +302,13 @@ internal class DatasetRecRunControllerApiTest {
 
         assertThat(errors)
             .singleElement()
-            .satisfies {
-                assertThat(it).hasEntrySatisfying("message") { message ->
-                    assertThat(message).contains("Missing required creator property 'datasetId'")
+            .satisfies(
+                Consumer {
+                    assertThat(it).hasEntrySatisfying("message") { message ->
+                        assertThat(message).contains("Missing required creator property 'datasetId'")
+                    }
                 }
-            }
+            )
     }
 
     @MockBean(DatasetRecRunner::class)

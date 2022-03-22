@@ -11,6 +11,7 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.kotlin.test.test
+import java.util.function.Consumer
 
 @MicronautTest
 class RecRecordRepositoryTest {
@@ -73,21 +74,27 @@ class RecRecordRepositoryTest {
             SoftAssertions.assertSoftly { softly ->
                 softly.assertThat(results).hasSize(30)
                 softly.assertThat(results.slice(0 until 10))
-                    .allSatisfy {
-                        assertThat(it.sourceData).isNotNull
-                        assertThat(it.targetData).isNull()
-                    }
+                    .allSatisfy(
+                        Consumer {
+                            assertThat(it.sourceData).isNotNull
+                            assertThat(it.targetData).isNull()
+                        }
+                    )
                 softly.assertThat(results.slice(11 until 20))
-                    .allSatisfy {
-                        assertThat(it.sourceData).isNull()
-                        assertThat(it.targetData).isNotNull
-                    }
+                    .allSatisfy(
+                        Consumer {
+                            assertThat(it.sourceData).isNull()
+                            assertThat(it.targetData).isNotNull
+                        }
+                    )
                 softly.assertThat(results.slice(21 until 30))
-                    .allSatisfy {
-                        assertThat(it.sourceData).isNotNull
-                        assertThat(it.targetData).isNotNull
-                        assertThat(it.sourceData).isNotEqualTo(it.targetData)
-                    }
+                    .allSatisfy(
+                        Consumer {
+                            assertThat(it.sourceData).isNotNull
+                            assertThat(it.targetData).isNotNull
+                            assertThat(it.sourceData).isNotEqualTo(it.targetData)
+                        }
+                    )
             }
         }
     }
