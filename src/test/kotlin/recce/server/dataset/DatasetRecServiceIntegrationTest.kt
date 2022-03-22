@@ -21,6 +21,7 @@ import recce.server.RecConfiguration
 import recce.server.dataset.datasource.flywayCleanMigrate
 import recce.server.recrun.*
 import java.nio.file.Path
+import java.util.function.Consumer
 import javax.sql.DataSource
 
 @MicronautTest(
@@ -29,14 +30,23 @@ import javax.sql.DataSource
 )
 class DatasetRecServiceIntegrationTest {
 
-    @TempDir lateinit var tempDir: Path
-    @Inject @field:Named("source-h2") lateinit var sourceDataSource: DataSource
-    @Inject @field:Named("target-h2") lateinit var targetDataSource: DataSource
+    @TempDir
+    lateinit var tempDir: Path
+    @Inject
+    @field:Named("source-h2")
+    lateinit var sourceDataSource: DataSource
+    @Inject
+    @field:Named("target-h2")
+    lateinit var targetDataSource: DataSource
 
-    @Inject lateinit var ctx: ApplicationContext
-    @Inject lateinit var service: DatasetRecService
-    @Inject lateinit var runRepository: RecRunRepository
-    @Inject lateinit var recordRepository: RecRecordRepository
+    @Inject
+    lateinit var ctx: ApplicationContext
+    @Inject
+    lateinit var service: DatasetRecService
+    @Inject
+    lateinit var runRepository: RecRunRepository
+    @Inject
+    lateinit var recordRepository: RecRecordRepository
 
     @BeforeEach
     fun setup() {
@@ -161,6 +171,7 @@ class DatasetRecServiceIntegrationTest {
         SoftAssertions.assertSoftly { softly ->
             softly.assertThat(run.status).isEqualTo(RunStatus.Failed)
             softly.assertThat(run.summary).satisfiesAnyOf(
+                Consumer
                 { st -> assertThat(st).isNull() },
                 { st -> assertThat(st).isEqualTo(MatchStatus()) }
             )
