@@ -16,6 +16,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.kotlin.test.test
 import reactor.util.function.Tuples
+import recce.server.BuildInfoConfiguration
 import recce.server.R2dbcDatasource
 import recce.server.RecConfiguration
 import recce.server.dataset.datasource.flywayCleanMigrate
@@ -130,6 +131,7 @@ class DatasetRecServiceIntegrationTest {
 
     private fun checkCompleted(run: RecRun) {
         val datasetConfig = ctx.getBean(RecConfiguration::class.java).datasets["test-dataset"]
+        val buildConfig = ctx.getBean(BuildInfoConfiguration::class.java)
         val sourceR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("source-h2"))
         val targetR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("target-h2"))
 
@@ -138,7 +140,7 @@ class DatasetRecServiceIntegrationTest {
             "targetQuery" to datasetConfig?.target?.query,
             "sourceUrl" to sourceR2dbcConfig.url,
             "targetUrl" to targetR2dbcConfig.url,
-            "version" to "some-version"
+            "version" to buildConfig.version
         )
 
         SoftAssertions.assertSoftly { softly ->

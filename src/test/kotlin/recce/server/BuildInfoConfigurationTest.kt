@@ -5,13 +5,13 @@ import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-@MicronautTest(propertySources = ["classpath:build-info.properties"])
+@MicronautTest
 internal class BuildInfoConfigurationTest {
     @Inject
     lateinit var config: BuildInfoConfiguration
 
     @Test
-    fun `version property is semantic version compliant`() {
-        assertThat(config.version).isNotBlank
+    fun `should be able to retrieve version property`() {
+        assertThat(config.version).isEqualTo("test-version")
     }
 }
