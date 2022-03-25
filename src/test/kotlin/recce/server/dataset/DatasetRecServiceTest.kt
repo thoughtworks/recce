@@ -300,7 +300,8 @@ internal class DatasetRecServiceTest {
 
         assertThat(errorCaptor.firstValue)
             .isInstanceOf(DataLoadException::class.java)
-            .hasMessageContaining("SQL query must be a single statement")
+            .hasMessageContaining("Source emitted more than one item")
+            .hasCauseExactlyInstanceOf(IndexOutOfBoundsException::class.java)
     }
 
     @Test
@@ -327,6 +328,7 @@ internal class DatasetRecServiceTest {
 
         assertThat(errorCaptor.firstValue)
             .isInstanceOf(DataLoadException::class.java)
-            .hasMessageContaining("SQL query must be a single statement")
+            .hasMessageContaining("Source was empty")
+            .hasCauseExactlyInstanceOf(NoSuchElementException::class.java)
     }
 }

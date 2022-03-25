@@ -57,11 +57,8 @@ open class DatasetRecService(
     ): Mono<DatasetMeta> =
         def.runQuery()
             .doFirst { logger.info { "${def.datasourceDescriptor} query completed; streaming to Recce DB" } }
-            .collectList()
-            .flatMapMany {
-                if (it.size != 1) throw DataLoadException("SQL query must be a single statement")
-                else it.first().map(hashingStrategy::hash)
-            }
+            .single()
+            .flatMapMany { it.map(hashingStrategy::hash) }
             .buffer(recConfig.defaults.batchSize)
             .zipWith(run.repeat())
             .flatMap({ (rows, run) -> batchSaver(rows, run) }, recConfig.defaults.batchConcurrency)
