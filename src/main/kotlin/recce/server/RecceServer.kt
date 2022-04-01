@@ -3,8 +3,12 @@ package recce.server
 import io.micronaut.runtime.Micronaut.build
 import io.swagger.v3.oas.annotations.ExternalDocumentation
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.security.SecurityScheme
+import io.swagger.v3.oas.annotations.security.SecuritySchemes
 import mu.KotlinLogging
 import reactor.tools.agent.ReactorDebugAgent
 
@@ -17,8 +21,10 @@ private val logger = KotlinLogging.logger {}
         description = "Server-based database reconciliation tool for developers",
         contact = Contact(name = "Recce Community", url = "$gitHubProject/issues")
     ),
-    externalDocs = ExternalDocumentation(description = "Server Docs", url = "$gitHubProject/README.md")
+    externalDocs = ExternalDocumentation(description = "Server Docs", url = "$gitHubProject/README.md"),
+    security = [SecurityRequirement(name = "basicAuth")]
 )
+@SecuritySchemes(SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic"))
 object RecceServer {
 
     @JvmStatic

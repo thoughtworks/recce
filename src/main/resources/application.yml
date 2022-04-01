@@ -9,6 +9,14 @@ micronaut:
       rapidoc:
         paths: classpath:META-INF/swagger/views/rapidoc
         mapping: /rapidoc/**
+  security:
+    intercept-url-map:
+      - pattern: /swagger/**
+        access:
+          - isAnonymous()
+      - pattern: /rapidoc/**
+        access:
+          - isAnonymous()
 logger:
   levels:
     io.micronaut.context.env: DEBUG # Log by default how properties are being loaded at startup
