@@ -97,6 +97,7 @@ dependencies {
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
+    implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("javax.annotation:javax.annotation-api")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("io.projectreactor:reactor-tools:${depVersions["reactor"]}")

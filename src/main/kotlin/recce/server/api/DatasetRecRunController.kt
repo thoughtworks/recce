@@ -3,6 +3,8 @@ package recce.server.api
 import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.annotation.*
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
 import io.micronaut.validation.Validated
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
@@ -27,6 +29,7 @@ private const val maximumSampleKeys = 100L
 
 @Validated
 @Controller("/runs")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 class DatasetRecRunController(
     @Inject private val runner: DatasetRecRunner,
     private val runRepository: RecRunRepository,

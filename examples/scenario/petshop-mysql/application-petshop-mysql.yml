@@ -57,3 +57,6 @@ reconciliation:
         datasourceRef: target
         query: >
           SELECT "# Categories" AS MigrationKey, count(*) FROM category
+auth:
+  username: admin
+  password: admin

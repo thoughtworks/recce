@@ -15,3 +15,6 @@ r2dbc:
       username: sa
       password: ""
 version: test-version
+auth:
+  username: admin
+  password: admin

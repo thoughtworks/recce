@@ -15,6 +15,7 @@ import org.mockito.Answers
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import recce.server.auth.AuthConfiguration
 import recce.server.dataset.DataLoadDefinition
 import recce.server.dataset.DatasetConfigProvider
 import recce.server.dataset.DatasetConfiguration
@@ -82,6 +83,9 @@ internal class DatasetControllerApiTest {
     @Inject
     lateinit var spec: RequestSpecification
 
+    @Inject
+    lateinit var authConfig: AuthConfiguration
+
     @MockBean(DatasetConfigProvider::class)
     fun mockConfigProvider(): DatasetConfigProvider {
         return configProvider
@@ -90,7 +94,7 @@ internal class DatasetControllerApiTest {
     @Test
     fun `can get datasets`() {
         Given {
-            spec(spec)
+            spec(spec).auth().preemptive().basic(authConfig.username, authConfig.password)
         } When {
             get("/datasets")
         } Then {

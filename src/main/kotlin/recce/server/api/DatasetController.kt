@@ -2,6 +2,8 @@ package recce.server.api
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
 import io.micronaut.validation.Validated
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -10,6 +12,7 @@ import recce.server.dataset.DatasetConfigProvider
 
 @Validated
 @Controller("/datasets")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 class DatasetController(
     @Inject private val configProvider: DatasetConfigProvider
 ) {

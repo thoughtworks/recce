@@ -15,6 +15,7 @@ import org.apache.http.HttpStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.hamcrest.Matchers.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -25,6 +26,7 @@ import org.mockito.kotlin.whenever
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.test.test
+import recce.server.auth.AuthConfiguration
 import recce.server.dataset.DataLoadException
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.*
@@ -188,6 +190,14 @@ internal class DatasetRecRunControllerApiTest {
 
     @Inject
     lateinit var spec: RequestSpecification
+
+    @Inject
+    lateinit var authConfig: AuthConfiguration
+
+    @BeforeEach
+    fun setup() {
+        spec.auth().preemptive().basic(authConfig.username, authConfig.password)
+    }
 
     @Test
     fun `can get run by id`() {
