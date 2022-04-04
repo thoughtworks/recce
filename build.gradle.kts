@@ -1,10 +1,9 @@
 @file:Suppress("GradlePackageUpdate")
 
 import com.github.gundy.semver4j.model.Version
-import java.util.*
 
 plugins {
-    val kotlinVersion = "1.6.10"
+    val kotlinVersion = "1.6.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.kapt") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
