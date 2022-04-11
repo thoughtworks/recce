@@ -28,6 +28,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
    * [Configuring Recce itself](README.md#configuring-recce-itself)
    * [Database configuration conveniences](README.md#database-configuration-conveniences)
    * [Adding additional configuration files](README.md#adding-additional-configuration-files)
+   * [Configuring authentication](README.md#configuring-authentication)
    * [Configuring datasources](README.md#configuring-datasources)
       * [Driver/database specific configuration](README.md#driverdatabase-specific-configuration)
       * [Customising datasource pooling](README.md#customising-datasource-pooling)
@@ -41,7 +42,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 * [FAQ](README.md#faq)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: runner, at: Thu Apr  7 09:26:39 UTC 2022 -->
+<!-- Added by: runner, at: Mon Apr 11 03:11:21 UTC 2022 -->
 
 <!--te-->
 
