@@ -76,11 +76,12 @@ These options require only JDK 11+ and Docker installed locally.
     ```
     
 2. **Explore** and trigger runs via Recce's APIs, accessible via interactive UI at http://localhost:8080/rapidoc. 
-    Some non-exhaustive examples are included below, but fuller documentation is available via the UI.  
+    Some non-exhaustive examples are included below, but fuller documentation is available via the UI. 
+    Recce uses basic authentication to protect its API endpoints. In the example scenario, both username and password are set to "admin".
  
     * **Synchronously trigger** a run, waiting for it to complete via [UI](http://localhost:8080/rapidoc#post-/runs) _or_
       ```shell
-      curl -X POST http://localhost:8080/runs -H 'Content-Type: application/json' -d '{ "datasetId": "categories" }'
+      curl -X POST http://localhost:8080/runs -H 'Content-Type: application/json' -d '{ "datasetId": "categories" }' -u "admin:admin"
       ``` 
       <details>
         <summary>Expand example results</summary>
@@ -135,11 +136,11 @@ These options require only JDK 11+ and Docker installed locally.
    
     * **Retrieve details of an individual run** by ID for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs/-runId-), _or_
       ```shell
-      curl 'http://localhost:8080/runs/35'
+      curl 'http://localhost:8080/runs/35' -u "admin:admin"
       ```
     * **Retrieve details of recent runs** for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs), _or_
       ```shell
-      curl 'http://localhost:8080/runs?datasetId=categories'
+      curl 'http://localhost:8080/runs?datasetId=categories' -u "admin:admin"
       ```
 
 # Configuration
@@ -190,6 +191,16 @@ docker run -p 8080:8080 \
   -v $(pwd)/my-dataset-configs:/config \
   -e MICRONAUT_CONFIG_FILES=/config/config1.yml,/config/config2.yml \
   ghcr.io/thoughtworks-sea/recce-server:latest
+```
+
+## Configuring authentication
+
+The credentials used in basic authentication to protect the API endpoints can be configured in the `auth` block of your config file.
+
+```yaml
+auth:
+    username: some-username
+    password: some-password
 ```
 
 ## Configuring datasources
