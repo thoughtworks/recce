@@ -171,6 +171,11 @@ application {
     mainClass.set("recce.server.RecceServer")
 }
 
+// Workaround https://github.com/ThoughtWorks-SEA/recce/issues/155
+tasks.run.configure {
+    jvmArgs("-XX:+StartAttachListener")
+}
+
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     val editorConfig = mapOf("disabled_rules" to "no-wildcard-imports")
     kotlin {
