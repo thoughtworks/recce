@@ -171,8 +171,10 @@ application {
     mainClass.set("recce.server.RecceServer")
 }
 
-// Workaround https://github.com/ThoughtWorks-SEA/recce/issues/155
 tasks.run.configure {
+    doFirst { environment("version", "$version") }
+
+    // Workaround https://github.com/ThoughtWorks-SEA/recce/issues/155
     jvmArgs("-XX:+StartAttachListener")
 }
 
@@ -246,8 +248,4 @@ tasks.jibDockerBuild.configure {
             image = containerRepoName
         }
     }
-}
-
-tasks.run.configure {
-    doFirst { environment("version", "$version") }
 }
