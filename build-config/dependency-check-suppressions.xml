@@ -16,11 +16,6 @@
         <cpe>cpe:/a:mariadb:mariadb</cpe>
     </suppress>
     <suppress>
-        <notes>Suppressing false positive - the mariadb client is a different thing to the actual mariadb database.</notes>
-        <packageUrl regex="true">^pkg:maven/org\.mariadb\.jdbc/mariadb\-java\-client@.*$</packageUrl>
-        <cpe>cpe:/a:mariadb:mariadb</cpe>
-    </suppress>
-    <suppress>
         <notes>Suppressing false positive - the mariadb r2dbc client is a different thing to the actual mariadb database.</notes>
         <packageUrl regex="true">^pkg:maven/org\.mariadb/r2dbc-mariadb@.*$</packageUrl>
         <cpe>cpe:/a:mariadb:mariadb</cpe>
