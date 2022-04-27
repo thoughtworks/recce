@@ -31,6 +31,12 @@
         <cve>CVE-2019-10219</cve>
     </suppress>
     <suppress>
+        <notes>Suppressing false positive - relate only to C++/OJDBC connectors, not java per https://www.oracle.com/security-alerts/cpujan2022.html</notes>
+        <packageUrl regex="true">^pkg:maven/mysql/mysql\-connector\-java@.*$</packageUrl>
+        <cve>CVE-2021-3711</cve>
+        <cve>CVE-2021-3712</cve>
+    </suppress>
+    <suppress>
         <notes>Recce is not subject to these H2 DB CVEs because we do not expose the H2 console or deploy H2 in the main application.</notes>
         <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
         <cve>CVE-2022-23221</cve>
