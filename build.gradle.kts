@@ -117,13 +117,11 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("com.google.cloud.sql:postgres-socket-factory:1.5.0")
     runtimeOnly("org.postgresql:postgresql")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
-    runtimeOnly("com.google.cloud.sql:cloud-sql-connector-r2dbc-mysql:1.5.0")
     runtimeOnly("io.r2dbc:r2dbc-pool")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("io.r2dbc:r2dbc-mssql")
