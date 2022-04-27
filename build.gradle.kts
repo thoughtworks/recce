@@ -102,6 +102,7 @@ dependencies {
     implementation("io.projectreactor:reactor-tools:${depVersions["reactor"]}")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.6")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("io.netty:netty-handler-proxy")
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
