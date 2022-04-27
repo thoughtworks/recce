@@ -102,7 +102,11 @@ dependencies {
     implementation("io.projectreactor:reactor-tools:${depVersions["reactor"]}")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.6")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.netty:netty-handler-proxy")
+
+    // Workaround for Gradle dependency resolution issue - may be https://github.com/gradle/gradle/issues/14220 or
+    // a related issue causing `./gradlew dependencies` and `./gradlew dependencyCheckAnalyze` to fail with weird
+    // "Problems reading data from Binary store" issues
+    runtimeOnly("io.netty:netty-handler-proxy")
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
