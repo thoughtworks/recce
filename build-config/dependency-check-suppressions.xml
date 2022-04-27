@@ -26,6 +26,11 @@
         <cpe>cpe:/a:mariadb:mariadb</cpe>
     </suppress>
     <suppress>
+        <notes>Suppressing false positives - the kotlin annotation processing lib is not the same as "Processing Foundation"</notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-annotation\-processing\-gradle@.*$</packageUrl>
+        <cpe>cpe:/a:processing:processing</cpe>
+    </suppress>
+    <suppress>
         <notes>Suppressing false positive - seems to relate to hibernate validator, not the mysql connector itself.</notes>
         <packageUrl regex="true">^pkg:maven/mysql/mysql\-connector\-java@.*$</packageUrl>
         <cve>CVE-2019-10219</cve>
