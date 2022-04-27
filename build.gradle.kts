@@ -16,7 +16,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.42.0"
     id("org.barfuin.gradle.taskinfo") version "1.4.0"
     id("org.ajoberstar.reckon") version "0.16.1"
-    id("org.owasp.dependencycheck") version "6.5.3"
+    id("org.owasp.dependencycheck") version "7.1.0.1"
 }
 
 group = "recce.server"
@@ -102,6 +102,7 @@ dependencies {
     implementation("io.projectreactor:reactor-tools:${depVersions["reactor"]}")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.6")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("io.netty:netty-handler-proxy")
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
@@ -162,8 +163,6 @@ dependencies {
 dependencyCheck {
     suppressionFile = "build-config/dependency-check-suppressions.xml"
     skipTestGroups = false
-    // The kapt configurations cause false positives for some reason. See https://github.com/dependency-check/dependency-check-gradle/issues/239
-    skipConfigurations = listOf("_classStructurekaptKotlin", "_classStructurekaptTestKotlin")
     analyzers.assemblyEnabled = false // Unneeded, and creares warning noise
 }
 
