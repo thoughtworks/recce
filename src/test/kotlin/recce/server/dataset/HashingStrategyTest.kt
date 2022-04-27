@@ -4,8 +4,6 @@ import com.google.common.hash.HashCode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Condition
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -252,45 +250,6 @@ internal class HashingStrategyTest {
                     Optional.empty<String>()
                 ),
             ).stream()
-        }
-    }
-
-    @Nested
-    class ColumnMetadataSanitization {
-
-        @Test
-        fun `should drop bad mssql metadata column`() {
-            val meta = R2dbcFakeBuilder()
-                .noMigrationKey()
-                .withCol("test", String::class.java)
-                .withCol("ROWSTAT", Integer::class.java)
-                .withRowValues("test-val", 1)
-                .buildMeta()
-
-            assertThat(meta.columnMetadatasSanitized())
-                .singleElement()
-                .isEqualTo(FakeColumnMetadata("test", String::class.java))
-        }
-
-        @Test
-        fun `should ignore non-final mssql metadata column`() {
-            val meta = R2dbcFakeBuilder()
-                .noMigrationKey()
-                .withCol("ROWSTAT", Integer::class.java)
-                .withCol("test", String::class.java)
-                .withRowValues("test-val", 1)
-                .buildMeta()
-
-            assertThat(meta.columnMetadatasSanitized()).isEqualTo(meta.columnMetadatas)
-        }
-
-        @Test
-        fun `should do nothing if no mssql metadata column`() {
-            val meta = R2dbcFakeBuilder()
-                .noMigrationKey()
-                .withCol("test", String::class.java)
-                .buildMeta()
-            assertThat(meta.columnMetadatasSanitized()).isEqualTo(meta.columnMetadatas)
         }
     }
 }
