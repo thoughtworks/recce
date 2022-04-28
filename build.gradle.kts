@@ -123,6 +123,7 @@ dependencies {
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.google.cloud.sql:postgres-socket-factory:1.5.0")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
@@ -133,6 +134,7 @@ dependencies {
     runtimeOnly("dev.miku:r2dbc-mysql")
     runtimeOnly("org.mariadb:r2dbc-mariadb")
     runtimeOnly("com.oracle.database.r2dbc:oracle-r2dbc")
+    runtimeOnly("com.google.cloud.sql:cloud-sql-connector-r2dbc-mysql:1.3.4")
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
