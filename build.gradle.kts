@@ -111,8 +111,9 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    // Version locked due to https://github.com/micronaut-projects/micronaut-openapi/issues/656, should be fixed after Micronaut OpenAPI 4.0.0
-    kapt("io.micronaut.openapi:micronaut-openapi:3.2.0!!")
+    // Version overridden due to https://github.com/micronaut-projects/micronaut-openapi/issues/656 override should be
+    // removed once Micronaut BOM uses 4.0.1+
+    kapt("io.micronaut.openapi:micronaut-openapi:4.0.1")
     implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
