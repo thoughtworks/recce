@@ -14,6 +14,7 @@ import reactor.kotlin.test.test
 import recce.server.RecConfiguration
 import recce.server.api.DatasetRecRunController
 import recce.server.recrun.RecRun
+import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 internal class DatasetRecSchedulerTest {
@@ -24,6 +25,15 @@ internal class DatasetRecSchedulerTest {
     }
 
     private val scheduler = mock<TaskScheduler>()
+
+    @Test
+    fun `fail when deleteRunsOlderThan is specified without cronExpression`() {
+        val deleteRunsOlderThanNow = Timestamp(System.currentTimeMillis())
+
+        assertThatThrownBy { Schedule(null, deleteRunsOlderThanNow) }
+            .isExactlyInstanceOf(ConfigurationException::class.java)
+            .hasMessageContaining("Older runs can only be deleted for datasets on cron schedule")
+    }
 
     @Test
     fun `does nothing when there is nothing to schedule`() {

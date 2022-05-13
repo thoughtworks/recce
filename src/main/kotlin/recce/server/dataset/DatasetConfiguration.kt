@@ -2,11 +2,13 @@ package recce.server.dataset
 
 import com.google.common.annotations.VisibleForTesting
 import io.micronaut.context.BeanLocator
+import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.bind.annotation.Bindable
 import io.micronaut.scheduling.cron.CronExpression
 import recce.server.DefaultsProvider
 import recce.server.PostConstructable
+import java.sql.Timestamp
 import java.time.ZonedDateTime
 import java.util.*
 import javax.validation.constraints.NotNull
@@ -45,7 +47,12 @@ class DatasetConfiguration(
         get() = hashingStrategy.orElseGet { defaults.hashingStrategy }
 }
 
-data class Schedule(val cronExpression: String? = null) {
+data class Schedule(val cronExpression: String? = null, val deleteRunsOlderThan: Timestamp? = null) {
+    init {
+        if (cronExpression == null && deleteRunsOlderThan != null)
+            throw ConfigurationException("Older runs can only be deleted for datasets on cron schedule")
+    }
+
     val empty: Boolean
         get() = cronExpression == null
 
@@ -53,5 +60,5 @@ data class Schedule(val cronExpression: String? = null) {
         get() = CronExpression.create(cronExpression).nextTimeAfter(ZonedDateTime.now())
 
     val summary: String
-        get() = if (empty) "" else "[$cronExpression], next run [$nextTriggerTime]"
+        get() = if (empty) "" else "[$cronExpression], next run [$nextTriggerTime], if successful, will cleanup runs older than  [$deleteRunsOlderThan]"
 }
