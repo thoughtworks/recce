@@ -30,7 +30,7 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.4.3",
+    "micronaut" to "io.micronaut:micronaut-core:3.4.4",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
     // Unfortunately not all Mockito/Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
@@ -103,17 +103,11 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.6")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Workaround for Gradle dependency resolution issue - may be https://github.com/gradle/gradle/issues/14220 or
-    // a related issue causing `./gradlew dependencies` and `./gradlew dependencyCheckAnalyze` to fail with weird
-    // "Problems reading data from Binary store" issues
-    runtimeOnly("io.netty:netty-handler-proxy")
-
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    // Version overridden due to https://github.com/micronaut-projects/micronaut-openapi/issues/656 override should be
-    // removed once Micronaut BOM uses 4.0.1+
-    kapt("io.micronaut.openapi:micronaut-openapi:4.0.1")
+    // OpenAPI specification and interactive UI generated from code
+    kapt("io.micronaut.openapi:micronaut-openapi")
     implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
