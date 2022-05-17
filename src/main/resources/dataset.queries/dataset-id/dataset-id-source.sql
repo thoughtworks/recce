@@ -1,2 +1,0 @@
--- Any SQL query to evaluate against the source DB
--- SELECT id AS MigrationKey, * FROM my-table

@@ -1,5 +1,4 @@
 reconciliation:
-  queryFileLocation: test-location
   datasets:
     test-dataset:
       source:
