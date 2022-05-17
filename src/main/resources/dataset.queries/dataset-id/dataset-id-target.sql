@@ -1,0 +1,2 @@
+-- Any SQL query to evaluate against the target DB
+-- SELECT id AS MigrationKey, * FROM my-table

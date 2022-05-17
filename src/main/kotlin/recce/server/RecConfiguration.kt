@@ -20,6 +20,7 @@ interface PostConstructable {
 @ConfigurationProperties("reconciliation")
 class RecConfiguration
 @ConfigurationInject constructor(
+    val queryFileLocation: String,
     val datasets: Map<String, DatasetConfiguration>,
     val defaults: DefaultsProvider = DefaultsProvider()
 ) : PostConstructable {

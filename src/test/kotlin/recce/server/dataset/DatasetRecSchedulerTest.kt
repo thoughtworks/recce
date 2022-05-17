@@ -17,6 +17,7 @@ import recce.server.recrun.RecRun
 import java.util.concurrent.TimeUnit
 
 internal class DatasetRecSchedulerTest {
+    private val queryFileLocation = "test-location"
     private val testDataset = "test-dataset"
 
     private val runner = mock<DatasetRecRunner> {
@@ -40,7 +41,7 @@ internal class DatasetRecSchedulerTest {
             on { schedule } doReturn Schedule(cronExpression)
         }
 
-        val config = RecConfiguration(mapOf(testDataset to datasetConfig))
+        val config = RecConfiguration(queryFileLocation, mapOf(testDataset to datasetConfig))
 
         DatasetRecScheduler(config, runner, scheduler).onApplicationEvent(null)
 

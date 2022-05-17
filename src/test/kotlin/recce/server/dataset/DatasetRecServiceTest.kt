@@ -14,6 +14,7 @@ import recce.server.recrun.*
 import java.util.function.BiFunction
 
 internal class DatasetRecServiceTest {
+    private val queryFileLocation = "test-location"
     private val testDataset = "test-dataset"
     private val recRun = RecRun(1, testDataset)
 
@@ -60,7 +61,7 @@ internal class DatasetRecServiceTest {
     @Test
     fun `mono should return failed run on failed data load`() {
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             mock(),
             mock(),
             runService,
@@ -90,7 +91,7 @@ internal class DatasetRecServiceTest {
     @Test
     fun `mono should error on failed initial save`() {
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             mock(),
             mock(),
             runService,
@@ -112,7 +113,7 @@ internal class DatasetRecServiceTest {
     @Test
     fun `mono should error on failed save of failed run`() {
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             mock(),
             mock(),
             runService,
@@ -137,7 +138,7 @@ internal class DatasetRecServiceTest {
     @Test
     fun `should reconcile empty datasets without error`() {
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
             mock(),
             mock(),
             runService,
@@ -158,7 +159,7 @@ internal class DatasetRecServiceTest {
     @Test
     fun `should reconcile source with empty target`() {
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
             mock(),
             mock(),
             runService,
@@ -185,7 +186,7 @@ internal class DatasetRecServiceTest {
             .doReturn(Flux.empty())
 
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
             mock(),
             mock(),
             runService,
@@ -215,7 +216,7 @@ internal class DatasetRecServiceTest {
             .doReturn(Flux.empty())
 
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
             mock(),
             mock(),
             runService,
@@ -244,7 +245,7 @@ internal class DatasetRecServiceTest {
             .doReturn(Flux.just(testRecord))
 
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
             mock(),
             mock(),
             runService,
@@ -272,7 +273,7 @@ internal class DatasetRecServiceTest {
         val first = mock<DatasetConfiguration>()
         val second = mock<DatasetConfiguration>()
         val datasetConfig = mapOf("a" to first, "b" to second)
-        assertThat(DatasetRecService(RecConfiguration(datasetConfig), mock(), mock(), mock(), mock()).availableDataSets)
+        assertThat(DatasetRecService(RecConfiguration(queryFileLocation, datasetConfig), mock(), mock(), mock(), mock()).availableDataSets)
             .hasSameElementsAs(listOf(first, second))
     }
 
@@ -283,7 +284,7 @@ internal class DatasetRecServiceTest {
         }
 
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(multipleResults, multipleResults))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(multipleResults, multipleResults))),
             mock(),
             mock(),
             runService,
@@ -311,7 +312,7 @@ internal class DatasetRecServiceTest {
         }
 
         val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(zeroResult, zeroResult))),
+            RecConfiguration(queryFileLocation, mapOf(testDataset to DatasetConfiguration(zeroResult, zeroResult))),
             mock(),
             mock(),
             runService,

@@ -18,6 +18,7 @@ internal class RecConfigurationPropertiesTest {
         "flyway.datasources.default.enabled" to "false",
         "r2dbc.datasources.source.url" to "r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
         "r2dbc.datasources.target.url" to "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
+        "reconciliation.queryFileLocation" to "test-location",
         "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
