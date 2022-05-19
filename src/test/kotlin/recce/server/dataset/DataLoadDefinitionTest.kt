@@ -28,11 +28,6 @@ internal class DataLoadDefinitionTest {
     private val testQueryInvalidFile = "test-invalid-query.sql"
 
     private lateinit var definitionQuery: DataLoadDefinition
-    private lateinit var definitionQueryFromFile: DataLoadDefinition
-    private lateinit var definitionQueryFromInvalidFile: DataLoadDefinition
-    private lateinit var definitionQueryAndQueryFromFile: DataLoadDefinition
-    private lateinit var definitionQueryAndQueryFromInvalidFile: DataLoadDefinition
-    private lateinit var definitionNoQueryAndNoQueryFromFile: DataLoadDefinition
 
     private val mockConnection: Connection = mock {
         on { close() } doReturn Mono.empty()
@@ -41,15 +36,12 @@ internal class DataLoadDefinitionTest {
     @BeforeEach
     fun setUp() {
         definitionQuery = DataLoadDefinition(testSourceName, testQuery).apply { role = DataLoadRole.Source }
-        definitionQueryFromFile = DataLoadDefinition(testSourceName, "", testQueryFile).apply { role = DataLoadRole.Source }
-        definitionQueryFromInvalidFile = DataLoadDefinition(testSourceName, "", testQueryInvalidFile).apply { role = DataLoadRole.Source }
-        definitionQueryAndQueryFromFile = DataLoadDefinition(testSourceName, testQuery, testQueryFile).apply { role = DataLoadRole.Source }
-        definitionQueryAndQueryFromInvalidFile = DataLoadDefinition(testSourceName, testQuery, testQueryInvalidFile).apply { role = DataLoadRole.Source }
-        definitionNoQueryAndNoQueryFromFile = DataLoadDefinition(testSourceName, "", "").apply { role = DataLoadRole.Source }
     }
 
     @Test
     fun `should load query statement from file if valid query file provided`() {
+        val definitionQueryFromFile =
+            DataLoadDefinition(testSourceName, "", testQueryFile).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -62,6 +54,8 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should fail to load query statement from file if invalid query file provided`() {
+        val definitionQueryFromInvalidFile =
+            DataLoadDefinition(testSourceName, "", testQueryInvalidFile).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -74,6 +68,8 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should load query statement from query if both query and query file provided`() {
+        val definitionQueryAndQueryFromFile =
+            DataLoadDefinition(testSourceName, testQuery, testQueryFile).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -86,6 +82,8 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should load query statement from query if both query and invalid query file provided`() {
+        val definitionQueryAndQueryFromInvalidFile =
+            DataLoadDefinition(testSourceName, testQuery, testQueryInvalidFile).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -98,6 +96,8 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should fail to load query statement from query if query not provided and query file not provided`() {
+        val definitionNoQueryAndNoQueryFromFile =
+            DataLoadDefinition(testSourceName, "", "").apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
