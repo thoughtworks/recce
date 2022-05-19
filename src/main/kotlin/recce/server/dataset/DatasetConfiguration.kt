@@ -8,7 +8,6 @@ import io.micronaut.core.bind.annotation.Bindable
 import io.micronaut.scheduling.cron.CronExpression
 import recce.server.DefaultsProvider
 import recce.server.PostConstructable
-import java.sql.Timestamp
 import java.time.ZonedDateTime
 import java.util.*
 import javax.validation.constraints.NotNull
@@ -24,7 +23,12 @@ class DatasetConfiguration(
     lateinit var defaults: DefaultsProvider
 
     @VisibleForTesting
-    constructor(source: DataLoadDefinition, target: DataLoadDefinition) : this(source, target, Schedule(), Optional.empty()) {
+    constructor(source: DataLoadDefinition, target: DataLoadDefinition) : this(
+        source,
+        target,
+        Schedule(),
+        Optional.empty()
+    ) {
         defaults = DefaultsProvider()
     }
 
@@ -47,10 +51,11 @@ class DatasetConfiguration(
         get() = hashingStrategy.orElseGet { defaults.hashingStrategy }
 }
 
-data class Schedule(val cronExpression: String? = null, val deleteRunsOlderThan: Timestamp? = null) {
+data class Schedule(val cronExpression: String? = null, val deleteRunsOlderThanISOString: String? = null) {
     init {
-        if (cronExpression == null && deleteRunsOlderThan != null)
+        if (deleteRunsOlderThanISOString != null) requireNotNull(cronExpression) {
             throw ConfigurationException("Older runs can only be deleted for datasets on cron schedule")
+        }
     }
 
     val empty: Boolean
@@ -59,6 +64,9 @@ data class Schedule(val cronExpression: String? = null, val deleteRunsOlderThan:
     val nextTriggerTime: ZonedDateTime
         get() = CronExpression.create(cronExpression).nextTimeAfter(ZonedDateTime.now())
 
+    val deleteRunsOlderThan: ZonedDateTime
+        get() = ZonedDateTime.parse(deleteRunsOlderThanISOString)
+
     val summary: String
-        get() = if (empty) "" else "[$cronExpression], next run [$nextTriggerTime], if successful, will cleanup runs older than  [$deleteRunsOlderThan]"
+        get() = if (empty) "" else "[$cronExpression], next run [$nextTriggerTime], if successful, will cleanup runs older than [$deleteRunsOlderThanISOString]"
 }

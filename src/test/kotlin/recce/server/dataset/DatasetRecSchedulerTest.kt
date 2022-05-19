@@ -14,7 +14,7 @@ import reactor.kotlin.test.test
 import recce.server.RecConfiguration
 import recce.server.api.DatasetRecRunController
 import recce.server.recrun.RecRun
-import java.sql.Timestamp
+import java.time.format.DateTimeParseException
 import java.util.concurrent.TimeUnit
 
 internal class DatasetRecSchedulerTest {
@@ -28,11 +28,20 @@ internal class DatasetRecSchedulerTest {
 
     @Test
     fun `fail when deleteRunsOlderThan is specified without cronExpression`() {
-        val deleteRunsOlderThanNow = Timestamp(System.currentTimeMillis())
+        val deleteRunsOlderThanNow = "2010-10-12T08:50:00Z"
 
         assertThatThrownBy { Schedule(null, deleteRunsOlderThanNow) }
             .isExactlyInstanceOf(ConfigurationException::class.java)
             .hasMessageContaining("Older runs can only be deleted for datasets on cron schedule")
+    }
+
+    @Test
+    fun `fail when deleteRunsOlderThan is not a string in ISO UTC format`() {
+        val invalidDeleteRunsOlderThanNow = "2010-10-12T08:50:0et0Z"
+        val cronExpression = "0 0 * * *"
+        assertThatThrownBy { Schedule(cronExpression, invalidDeleteRunsOlderThanNow).deleteRunsOlderThan }
+            .isExactlyInstanceOf(DateTimeParseException::class.java)
+            .hasMessageContaining("Text '2010-10-12T08:50:0et0Z' could not be parsed at index 16")
     }
 
     @Test
