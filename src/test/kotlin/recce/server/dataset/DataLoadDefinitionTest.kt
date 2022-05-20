@@ -35,13 +35,13 @@ internal class DataLoadDefinitionTest {
 
     @BeforeEach
     fun setUp() {
-        definitionQuery = DataLoadDefinition(testSourceName, testQuery).apply { role = DataLoadRole.Source }
+        definitionQuery = DataLoadDefinition(testSourceName, QueryConfig(testQuery)).apply { role = DataLoadRole.Source }
     }
 
     @Test
     fun `should load query statement from file if valid query file provided`() {
         val definitionQueryFromFile =
-            DataLoadDefinition(testSourceName, "", testQueryFile).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig("", testQueryFile)).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -55,7 +55,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should fail to load query statement from file if invalid query file provided`() {
         val definitionQueryFromInvalidFile =
-            DataLoadDefinition(testSourceName, "", testQueryInvalidFile).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig("", testQueryInvalidFile)).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -69,7 +69,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should load query statement from query if both query and query file provided`() {
         val definitionQueryAndQueryFromFile =
-            DataLoadDefinition(testSourceName, testQuery, testQueryFile).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig(testQuery, testQueryFile)).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -83,7 +83,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should load query statement from query if both query and invalid query file provided`() {
         val definitionQueryAndQueryFromInvalidFile =
-            DataLoadDefinition(testSourceName, testQuery, testQueryInvalidFile).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig(testQuery, testQueryInvalidFile)).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -97,7 +97,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should fail to load query statement from query if query not provided and query file not provided`() {
         val definitionNoQueryAndNoQueryFromFile =
-            DataLoadDefinition(testSourceName, "", "").apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig()).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -146,6 +146,8 @@ internal class DataLoadDefinitionTest {
             on { connectionFactory().create() } doReturn Mono.just(mockConnection)
         }
 
+        definitionQuery.queryStatement = testQuery
+
         whenever(mockConnection.createStatement(eq(testQuery))).thenReturn(statement)
 
         definitionQuery.runQuery()
@@ -165,6 +167,8 @@ internal class DataLoadDefinitionTest {
         definitionQuery.dbOperations = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
             on { connectionFactory().create() } doReturn Mono.just(mockConnection)
         }
+
+        definitionQuery.queryStatement = testQuery
 
         definitionQuery.runQuery()
             .test()

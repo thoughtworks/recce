@@ -16,10 +16,7 @@ import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import recce.server.auth.AuthConfiguration
-import recce.server.dataset.DataLoadDefinition
-import recce.server.dataset.DatasetConfigProvider
-import recce.server.dataset.DatasetConfiguration
-import recce.server.dataset.Schedule
+import recce.server.dataset.*
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -28,12 +25,12 @@ import java.time.temporal.ChronoUnit
 val configProvider = mock<DatasetConfigProvider> {
     on { availableDataSets } doReturn setOf(
         DatasetConfiguration(
-            DataLoadDefinition("source1", ""),
-            DataLoadDefinition("target1", "")
+            DataLoadDefinition("source1", QueryConfig("")),
+            DataLoadDefinition("target1", QueryConfig(""))
         ).apply { id = "two" },
         DatasetConfiguration(
-            DataLoadDefinition("source2", ""),
-            DataLoadDefinition("target2", ""),
+            DataLoadDefinition("source2", QueryConfig("")),
+            DataLoadDefinition("target2", QueryConfig("")),
             Schedule("0 0 0 ? * *")
         ).apply { id = "datasets" },
     )

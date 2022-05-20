@@ -21,9 +21,9 @@ internal class RecConfigurationPropertiesTest {
         "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
-        "reconciliation.datasets.test-dataset.source.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
+        "reconciliation.datasets.test-dataset.source.queryConfig.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
         "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
-        "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata",
+        "reconciliation.datasets.test-dataset.target.queryConfig.query" to "SELECT count(*) AS targetdatacount FROM testdata",
     )
 
     @Test
@@ -62,11 +62,11 @@ internal class RecConfigurationPropertiesTest {
                     assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
                     assertThat(it.source.role).isEqualTo(DataLoadRole.Source)
                     assertThat(it.source.datasourceRef).isEqualTo("source")
-                    assertThat(it.source.query).contains("sourcedatacount")
+                    assertThat(it.source.queryConfig.query).contains("sourcedatacount")
                     assertThat(it.source.dbOperations).isNotNull
                     assertThat(it.target.role).isEqualTo(DataLoadRole.Target)
                     assertThat(it.target.datasourceRef).isEqualTo("target")
-                    assertThat(it.target.query).contains("targetdatacount")
+                    assertThat(it.target.queryConfig.query).contains("targetdatacount")
                     assertThat(it.target.dbOperations).isNotNull
                 }
             )

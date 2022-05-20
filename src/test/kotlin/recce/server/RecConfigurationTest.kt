@@ -21,10 +21,10 @@ internal class RecConfigurationTest {
             .hasEntrySatisfying("test-dataset") {
                 assertThat(it.id).isEqualTo("test-dataset")
                 assertThat(it.source.datasourceRef).isEqualTo("source-h2")
-                assertThat(it.source.query).contains("SELECT name AS MigrationKey")
+                assertThat(it.source.queryStatement).contains("SELECT name AS MigrationKey")
                 assertThat(it.source.dbOperations).isNotNull
                 assertThat(it.target.datasourceRef).isEqualTo("target-h2")
-                assertThat(it.target.query).contains("SELECT name AS MigrationKey")
+                assertThat(it.target.queryStatement).contains("SELECT name AS MigrationKey")
                 assertThat(it.target.dbOperations).isNotNull
             }
     }
