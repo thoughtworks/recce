@@ -117,7 +117,7 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql:42.3.5")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
@@ -145,7 +145,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
-    testRuntimeOnly("org.postgresql:postgresql")
+    testRuntimeOnly("org.postgresql:postgresql:42.3.5")
     testImplementation("org.testcontainers:mysql")
     testRuntimeOnly("mysql:mysql-connector-java")
     testRuntimeOnly("org.flywaydb:flyway-mysql")
