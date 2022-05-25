@@ -33,7 +33,8 @@ val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.4.4",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
-    // Unfortunately not all Mockito/Reactor libs are in the Micronaut BOM, this allows us to keep versions consistent.
+    // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
+    // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
     "mockito" to "org.mockito:mockito-core:4.5.1", // Needs to be compatible with Micronaut BOM.
     "reactor" to "io.projectreactor:reactor-core:3.4.18", // Needs to be compatible with Micronaut BOM.
 )
@@ -117,7 +118,7 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql:42.3.5")
+    runtimeOnly("org.postgresql:postgresql:42.3.6") // Remove version number when Micronaut has updated to at least this version
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
@@ -145,13 +146,15 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
-    testRuntimeOnly("org.postgresql:postgresql:42.3.5")
+
     testImplementation("org.testcontainers:mysql")
     testRuntimeOnly("mysql:mysql-connector-java")
     testRuntimeOnly("org.flywaydb:flyway-mysql")
+
     testImplementation("org.testcontainers:mssqlserver")
     testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc")
     testRuntimeOnly("org.flywaydb:flyway-sqlserver")
+
     testImplementation("org.testcontainers:mariadb")
     testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
