@@ -117,7 +117,7 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql:42.3.5")
+    runtimeOnly("org.postgresql:postgresql:42.3.6")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
