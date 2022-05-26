@@ -264,25 +264,35 @@ Datasets are groupings of data which
 ```yaml
 reconciliation:
   datasets:
-    pets: # Name your datasets however you would like
+    my-data-set: # Name your datasets however you would like
       source:
-        # Reference to a datasource defined in `r2dbc.datasources`
+#        # Reference to a datasource defined in `r2dbc.datasources`
         datasourceRef: my-source-db
-        # Any SQL query to evaluate against the source DB
-        query: >
-          SELECT pet.id AS MigrationKey, category, name, status
-          FROM pet
+#        # Specify whether to load inline `query` or read from a `queryFile`
+#        # If both `query` and `queryFile` are provided, inline `query` takes precedence
+        queryConfig:
+#          # Any SQL query to evaluate against the source DB
+          query: >
+            SELECT id AS MigrationKey, * FROM my-table
+#          # Path to file containing query to evaluate against the source DB
+          queryFile: examples/scenario/<{example-scenario}/queries/<{example-scenario}-my-data-set-source.yml
       target:
-        # Reference to a datasource defined in `r2dbc.datasources`  
-        datasourceRef: my-target-db 
-        # Any SQL query to evaluate against the source DB
-        query: >
-          SELECT pet.id AS MigrationKey, category.name AS category, pet.name, status
-          FROM pet INNER JOIN category ON pet.category_id = category.id
-      # Optional scheduling of regular or one-of reconciliations
+#        # Reference to a datasource defined in `r2dbc.datasources`
+        datasourceRef: my-target-db
+#        # Specify whether to load inline `query` or read from a `queryFile`
+#        # If both `query` and `queryFile` are provided, inline `query` takes precedence
+        queryConfig:
+#          # Any SQL query to evaluate against the target DB
+          query: >
+            SELECT id AS MigrationKey, * FROM my-table
+#          # Path to file containing query to evaluate against the target DB
+          queryFile: examples/scenario/<{example-scenario}/queries/<{example-scenario}-my-data-set-target.yml
+#      # Optional strategy for determining equivalence of column values
+      hashingStrategy: TypeLenient
+#      # Optional scheduling of regular or one-of reconciliations
       schedule:
-        # Must adhere to format https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html
-        # or https://crontab.guru/ (without seconds)
+#        # Must adhere to format https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html
+#        # or https://crontab.guru/ (without seconds)
         cronExpression: 0 0 * * *
 ```
 Fuller example Recce-specific configuration is [available here](src/main/resources/application.yml).
