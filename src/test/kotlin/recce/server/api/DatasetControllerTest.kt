@@ -25,12 +25,12 @@ import java.time.temporal.ChronoUnit
 val configProvider = mock<DatasetConfigProvider> {
     on { availableDataSets } doReturn setOf(
         DatasetConfiguration(
-            DataLoadDefinition("source1", QueryConfig("")),
-            DataLoadDefinition("target1", QueryConfig(""))
+            DataLoadDefinition("source1", QueryConfig("SELECT name AS MigrationKey, name, value FROM testdata")),
+            DataLoadDefinition("target1", QueryConfig("SELECT name AS MigrationKey, name, value FROM testdata"))
         ).apply { id = "two" },
         DatasetConfiguration(
-            DataLoadDefinition("source2", QueryConfig("")),
-            DataLoadDefinition("target2", QueryConfig("")),
+            DataLoadDefinition("source2", QueryConfig("SELECT name AS MigrationKey, name, value FROM testdata")),
+            DataLoadDefinition("target2", QueryConfig("SELECT name AS MigrationKey, name, value FROM testdata")),
             Schedule("0 0 0 ? * *")
         ).apply { id = "datasets" },
     )

@@ -15,7 +15,6 @@ import org.mockito.Answers
 import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
 import reactor.kotlin.test.test
-import java.net.URL
 import java.nio.file.Paths
 import java.util.*
 
@@ -23,8 +22,7 @@ internal class DataLoadDefinitionTest {
     private val testSourceName = "source1"
     private val testQuery = "SELECT * FROM somewhere"
     private val testQueryStatementFromFile = "SELECT * FROM elsewhere\n"
-    private val res: URL = javaClass.classLoader.getResource("config/test-query.sql")
-    private val testQueryFile = Paths.get(res.toURI()).toFile().absolutePath
+    private val testQueryFile = Paths.get((javaClass.classLoader.getResource("config/test-query.sql")).toURI()).toFile().absolutePath
     private val testQueryInvalidFile = "test-invalid-query.sql"
 
     private lateinit var definitionQuery: DataLoadDefinition
@@ -92,20 +90,6 @@ internal class DataLoadDefinitionTest {
         definitionQueryAndQueryFromInvalidFile.populate(beanLocator)
 
         assertThat(definitionQueryAndQueryFromInvalidFile.queryStatement).isEqualTo(testQuery)
-    }
-
-    @Test
-    fun `should fail to load query statement from query if query not provided and query file not provided`() {
-        val definitionNoQueryAndNoQueryFromFile =
-            DataLoadDefinition(testSourceName, QueryConfig()).apply { role = DataLoadRole.Source }
-        val operations = mock<R2dbcOperations>()
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-        }
-
-        assertThatThrownBy { definitionNoQueryAndNoQueryFromFile.populate(beanLocator) }
-            .isExactlyInstanceOf(ConfigurationException::class.java)
-            .hasMessageContaining("Either query or queryFile must be provided!")
     }
 
     @Test
