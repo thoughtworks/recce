@@ -56,9 +56,8 @@ open class DatasetRecService(
         batchSaver: (List<HashedRow>, RecRun) -> Flux<LazyDatasetMeta>
     ): Mono<DatasetMeta> =
         def.runQuery()
-            .doFirst { logger.info { "${def.datasourceDescriptor} query completed; streaming to Recce DB" } }
-            .single()
-            .flatMapMany { it.map(hashingStrategy::hash) }
+            .doOnNext { logger.info { "${def.datasourceDescriptor} query completed; streaming to Recce DB" } }
+            .flatMap { result -> result.map(hashingStrategy::hash) }
             .buffer(recConfig.defaults.batchSize)
             .zipWith(run.repeat())
             .flatMap({ (rows, run) -> batchSaver(rows, run) }, recConfig.defaults.batchConcurrency)
@@ -108,4 +107,4 @@ open class DatasetRecService(
     )
 }
 
-class DataLoadException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class DataLoadException(message: String, cause: Throwable) : Exception(message, cause)
