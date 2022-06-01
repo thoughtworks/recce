@@ -51,7 +51,7 @@ data class QueryConfig(val query: String = "", private val queryFile: String = "
             try {
                 File(this.queryFile).readText(Charsets.UTF_8)
             } catch (e: Exception) {
-                throw ConfigurationException("Cannot load query statement from queryFile $this.queryFile: ${e.message}")
+                throw ConfigurationException("Cannot load query statement from queryFile ${this.queryFile}: ${e.message}")
             }
         }
     }
