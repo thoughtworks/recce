@@ -30,7 +30,7 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.4.4",
+    "micronaut" to "io.micronaut:micronaut-core:3.5.3",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
