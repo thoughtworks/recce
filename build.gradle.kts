@@ -124,7 +124,7 @@ dependencies {
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
     runtimeOnly("io.r2dbc:r2dbc-pool")
-    runtimeOnly("io.r2dbc:r2dbc-postgresql")
+    runtimeOnly("org.postgresql:r2dbc-postgresql")
     runtimeOnly("io.r2dbc:r2dbc-mssql")
     runtimeOnly("dev.miku:r2dbc-mysql")
     runtimeOnly("org.mariadb:r2dbc-mariadb")
@@ -161,7 +161,10 @@ dependencies {
     testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
     testRuntimeOnly("com.h2database:h2")
-    testRuntimeOnly("io.r2dbc:r2dbc-h2")
+    testRuntimeOnly("io.r2dbc:r2dbc-h2:1.0.0.RC1") {
+        // Remove version number and excludes block when Micronaut has updated to at least 1.0.0.RELEASE
+        exclude("io.projectreactor", "reactor-core")
+    }
 }
 
 dependencyCheck {

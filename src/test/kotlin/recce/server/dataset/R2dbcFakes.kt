@@ -3,20 +3,26 @@ package recce.server.dataset
 import io.r2dbc.spi.ColumnMetadata
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
+import io.r2dbc.spi.Type
 
 data class FakeColumnMetadata(private val name: String, private val javaType: Class<*>) : ColumnMetadata {
     override fun getName() = name
+    override fun getJavaType() = type.javaType
+    override fun getType() = FakeType(javaType)
+}
+
+data class FakeType(private val javaType: Class<*>) : Type {
     override fun getJavaType() = javaType
+    override fun getName(): String = javaType.name
 }
 
 class FakeRowMetadata(private val cols: List<ColumnMetadata>) : RowMetadata {
     override fun getColumnMetadata(index: Int) = cols[index]
     override fun getColumnMetadata(name: String) = cols.first { it.name == name }
     override fun getColumnMetadatas() = cols
-    override fun getColumnNames() = cols.map { it.name }
 }
 
-class FakeRow(private val values: List<Pair<String, Any?>>) : Row {
+class FakeRow(private val meta: RowMetadata, private val values: List<Pair<String, Any?>>) : Row {
     private val valuesByColName = values.toMap()
 
     @Suppress("UNCHECKED_CAST")
@@ -30,6 +36,8 @@ class FakeRow(private val values: List<Pair<String, Any?>>) : Row {
         require(type == Object::class.java) { "Only support generic Object type returns" }
         return valuesByColName[name] as T
     }
+
+    override fun getMetadata() = meta
 }
 
 class R2dbcFakeBuilder {
@@ -64,12 +72,8 @@ class R2dbcFakeBuilder {
         return this
     }
 
-    fun build(): Pair<Row, RowMetadata> {
-        return buildRow() to buildMeta()
-    }
-
-    fun buildRow(): Row {
-        return FakeRow(rowValues)
+    fun build(): Row {
+        return FakeRow(buildMeta(), rowValues)
     }
 
     fun buildMeta(): RowMetadata {
