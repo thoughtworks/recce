@@ -15,53 +15,63 @@ reconciliation:
     all:
       source:
         datasourceRef: source
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table
       target:
         datasourceRef: target
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table
     both:
       source:
         datasourceRef: source
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table WHERE id BETWEEN 50001 AND 100000
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table WHERE id BETWEEN 50001 AND 100000
       target:
         datasourceRef: target
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table WHERE id BETWEEN 50001 AND 100000
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table WHERE id BETWEEN 50001 AND 100000
     source-only:
       source:
         datasourceRef: source
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table WHERE id BETWEEN 1 AND 50000
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table WHERE id BETWEEN 1 AND 50000
       target:
         datasourceRef: target
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table WHERE id BETWEEN 1 AND 50000
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table WHERE id BETWEEN 1 AND 50000
     target-only:
       source:
         datasourceRef: source
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table WHERE id BETWEEN 100001 AND 150000
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table WHERE id BETWEEN 100001 AND 150000
       target:
         datasourceRef: target
-        query: >
-          SELECT id AS MigrationKey, *
-          FROM big_table WHERE id BETWEEN 100001 AND 150000
+        queryConfig:
+          query: >
+            SELECT id AS MigrationKey, *
+            FROM big_table WHERE id BETWEEN 100001 AND 150000
     counts:
       source:
         datasourceRef: source
-        query: >
-          SELECT 'Num rows' AS MigrationKey, count(*) FROM big_table
+        queryConfig:
+          query: >
+            SELECT 'Num rows' AS MigrationKey, count(*) FROM big_table
       target:
         datasourceRef: target
-        query: >
-          SELECT 'Num rows' AS MigrationKey, count(*) FROM big_table
+        queryConfig:
+          query: >
+            SELECT 'Num rows' AS MigrationKey, count(*) FROM big_table
