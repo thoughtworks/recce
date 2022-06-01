@@ -7,6 +7,4 @@ import javax.validation.constraints.NotBlank
 
 @Singleton
 @ConfigurationProperties("auth")
-class AuthConfiguration
-    @ConfigurationInject constructor(@NotBlank val username: String, @NotBlank val password: String) {
-}
+class AuthConfiguration @ConfigurationInject constructor(@NotBlank val username: String, @NotBlank val password: String)

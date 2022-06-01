@@ -24,11 +24,11 @@ internal class AuthConfigurationTest {
     @Test
     fun `validate at start`() {
         with(ApplicationContext.run(mutableMapOf<String, Any>("auth.username" to " "))) {
-            assertThatThrownBy {  getBean(AuthConfiguration::class.java) }.rootCause
+            assertThatThrownBy { getBean(AuthConfiguration::class.java) }.rootCause
                 .hasMessageContaining("username - must not be blank")
         }
         with(ApplicationContext.run(mutableMapOf<String, Any>("auth.password" to " "))) {
-            assertThatThrownBy {  getBean(AuthConfiguration::class.java) }.rootCause
+            assertThatThrownBy { getBean(AuthConfiguration::class.java) }.rootCause
                 .hasMessageContaining("password - must not be blank")
         }
     }
