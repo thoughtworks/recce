@@ -1,5 +1,6 @@
 package recce.server.dataset
 
+import com.google.common.io.Resources
 import io.micronaut.context.BeanLocator
 import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
@@ -15,14 +16,13 @@ import org.mockito.Answers
 import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
 import reactor.kotlin.test.test
-import java.nio.file.Paths
 import java.util.*
 
 internal class DataLoadDefinitionTest {
     private val testSourceName = "source1"
     private val testQuery = "SELECT * FROM somewhere"
     private val testQueryStatementFromFile = "SELECT * FROM elsewhere\n"
-    private val testQueryFile = Paths.get((javaClass.classLoader.getResource("config/test-query.sql")).toURI()).toFile().absolutePath
+    private val testQueryFile = Resources.getResource("config/test-query.sql").path
     private val testQueryInvalidFile = "test-invalid-query.sql"
 
     private lateinit var definitionQuery: DataLoadDefinition
