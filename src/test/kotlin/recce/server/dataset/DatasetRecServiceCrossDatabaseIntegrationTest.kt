@@ -73,7 +73,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         fun startApplication() {
             val datasources = databases.flatMap { (name, container) ->
                 listOf(
-                    "r2dbc.datasources.$name.url" to container.jdbcUrl.replace("jdbc", "r2dbc:pool"),
+                    "r2dbc.datasources.$name.url" to r2dbcUrl(container.jdbcUrl),
                     "r2dbc.datasources.$name.username" to container.username,
                     "r2dbc.datasources.$name.password" to container.password
                 )
@@ -90,6 +90,10 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
 
             ctx = ApplicationContext.run(datasources + datasets)
         }
+
+        private fun r2dbcUrl(jdbcUrl: String) =
+            jdbcUrl.replace("jdbc", "r2dbc:pool")
+                .substringBefore(';')
 
         @JvmStatic
         @AfterAll
@@ -153,6 +157,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         ctx.getBean(DatasetRecService::class.java).runFor("${source.db}-to-${target.db}")
             .test()
             .assertNext { run ->
+                assertThat(run.failureCause).isNull()
                 assertThat(run.summary)
                     .describedAs("Values between two DBs should match. sourceMeta=${run.sourceMeta} targetMeta=${run.targetMeta}")
                     .usingRecursiveComparison()
