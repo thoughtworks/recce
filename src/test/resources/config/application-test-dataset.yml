@@ -4,11 +4,11 @@ reconciliation:
       source:
         datasourceRef: source-h2
         queryConfig:
-          query: SELECT name AS MigrationKey, name, value FROM testdata
+          query: SELECT name AS MigrationKey, name, val FROM testdata
       target:
         datasourceRef: target-h2
         queryConfig:
-          query: SELECT name AS MigrationKey, name, value FROM testdata
+          query: SELECT name AS MigrationKey, name, val FROM testdata
     test-dataset-with-query-file:
       source:
         datasourceRef: source-h2
@@ -22,12 +22,12 @@ reconciliation:
       source:
         datasourceRef: source-h2
         queryConfig:
-          query: SELECT name AS MigrationKey, name, value FROM testdata
+          query: SELECT name AS MigrationKey, name, val FROM testdata
           queryFile: ./src/test/resources/config/test-query.sql
       target:
         datasourceRef: target-h2
         queryConfig:
-          query: SELECT name AS MigrationKey, name, value FROM testdata
+          query: SELECT name AS MigrationKey, name, val FROM testdata
           queryFile: ./src/test/resources/config/test-query.sql
     test-dataset-with-no-query-and-no-query-file:
       source:

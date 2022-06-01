@@ -54,13 +54,13 @@ class DatasetRecServiceIntegrationTest {
         val createTable = """
             CREATE TABLE TestData (
                 name VARCHAR(255) PRIMARY KEY NOT NULL,
-                value VARCHAR(255) NOT NULL
+                val VARCHAR(255) NOT NULL
             );
         """.trimMargin()
 
         val insertUser: (Int) -> String = { i ->
             """
-            INSERT INTO TestData (name, value) 
+            INSERT INTO TestData (name, val) 
             VALUES ('Test$i', 'User$i');
             """.trimIndent()
         }
@@ -156,12 +156,13 @@ class DatasetRecServiceIntegrationTest {
     private fun checkSuccessful(run: RecRun) {
         SoftAssertions.assertSoftly { softly ->
             softly.assertThat(run.status).isEqualTo(RunStatus.Successful)
+            softly.assertThat(run.failureCause).isNull()
             softly.assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
             val expectedMeta = DatasetMeta(
                 listOf(
                     ColMeta("MIGRATIONKEY", "String"),
                     ColMeta("NAME", "String"),
-                    ColMeta("VALUE", "String")
+                    ColMeta("VAL", "String")
                 )
             )
             softly.assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
