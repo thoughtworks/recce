@@ -99,8 +99,8 @@ open class DatasetRecService(
     }
 
     private fun generateMetadata(datasetConfig: DatasetConfiguration): Map<String, String> = mapOf(
-        "sourceQuery" to datasetConfig.source.query,
-        "targetQuery" to datasetConfig.target.query,
+        "sourceQuery" to datasetConfig.source.queryStatement,
+        "targetQuery" to datasetConfig.target.queryStatement,
         "sourceUrl" to r2dbcConfig.getUrl(datasetConfig.source.datasourceRef),
         "targetUrl" to r2dbcConfig.getUrl(datasetConfig.target.datasourceRef),
         "version" to buildConfig.version

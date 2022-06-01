@@ -3,7 +3,40 @@ reconciliation:
     test-dataset:
       source:
         datasourceRef: source-h2
-        query: SELECT name AS MigrationKey, name, value FROM testdata
+        queryConfig:
+          query: SELECT name AS MigrationKey, name, value FROM testdata
       target:
         datasourceRef: target-h2
-        query: SELECT name AS MigrationKey, name, value FROM testdata
+        queryConfig:
+          query: SELECT name AS MigrationKey, name, value FROM testdata
+    test-dataset-with-query-file:
+      source:
+        datasourceRef: source-h2
+        queryConfig:
+          queryFile: ./src/test/resources/config/test-query.sql
+      target:
+        datasourceRef: target-h2
+        queryConfig:
+          queryFile: ./src/test/resources/config/test-query.sql
+    test-dataset-with-query-and-query-file:
+      source:
+        datasourceRef: source-h2
+        queryConfig:
+          query: SELECT name AS MigrationKey, name, value FROM testdata
+          queryFile: ./src/test/resources/config/test-query.sql
+      target:
+        datasourceRef: target-h2
+        queryConfig:
+          query: SELECT name AS MigrationKey, name, value FROM testdata
+          queryFile: ./src/test/resources/config/test-query.sql
+    test-dataset-with-no-query-and-no-query-file:
+      source:
+        datasourceRef: source-h2
+        queryConfig:
+          query:
+          queryFile:
+      target:
+        datasourceRef: target-h2
+        queryConfig:
+          query:
+          queryFile:

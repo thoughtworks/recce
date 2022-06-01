@@ -136,8 +136,8 @@ class DatasetRecServiceIntegrationTest {
         val targetR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("target-h2"))
 
         val expectedMeta = mapOf(
-            "sourceQuery" to datasetConfig?.source?.query,
-            "targetQuery" to datasetConfig?.target?.query,
+            "sourceQuery" to datasetConfig?.source?.queryStatement,
+            "targetQuery" to datasetConfig?.target?.queryStatement,
             "sourceUrl" to sourceR2dbcConfig.url,
             "targetUrl" to targetR2dbcConfig.url,
             "version" to buildConfig.version
