@@ -22,7 +22,7 @@ reconciliation:
       target:
         datasourceRef: target
         queryConfig:
-          queryFile: /examples/scenario/petshop-mysql/queries/petshop-mysql-pets-target.sql
+          queryFile: examples/scenario/petshop-mysql/queries/petshop-mysql-pets-target.sql
     order-status:
       source:
         datasourceRef: source
