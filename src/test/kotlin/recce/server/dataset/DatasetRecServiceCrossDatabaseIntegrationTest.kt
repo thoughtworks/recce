@@ -33,7 +33,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         private val databases: Map<String, JdbcDatabaseContainer<Nothing>> = mapOf(
             "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense(),
             "mysql" to MySQLContainer("mysql:8"),
-            "mariadb" to MariaDBContainer("mariadb:10.5"),
+            "mariadb" to MariaDBContainer("mariadb:10"),
             "postgres" to PostgreSQLContainer("postgres:14-alpine"),
         )
 
