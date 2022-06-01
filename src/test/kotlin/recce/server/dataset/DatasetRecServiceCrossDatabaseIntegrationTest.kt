@@ -34,7 +34,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense(),
             "mysql" to MySQLContainer("mysql:8"),
             "mariadb" to MariaDBContainer("mariadb:10.5"),
-            "postgres" to PostgreSQLContainer("postgres:13-alpine"),
+            "postgres" to PostgreSQLContainer("postgres:14-alpine"),
         )
 
         /**
