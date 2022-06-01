@@ -177,6 +177,8 @@ tasks.run.configure {
 
     // Workaround https://github.com/ThoughtWorks-SEA/recce/issues/155
     jvmArgs("-XX:+StartAttachListener")
+    environment.computeIfAbsent("AUTH_USERNAME") { "admin" }
+    environment.computeIfAbsent("AUTH_PASSWORD") { "admin" }
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {

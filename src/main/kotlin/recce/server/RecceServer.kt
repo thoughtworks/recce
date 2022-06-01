@@ -35,6 +35,7 @@ object RecceServer {
             .banner(false)
             .args(*args)
             .packages("recce.server")
+            .eagerInitSingletons(true)
             .start()
     }
 }

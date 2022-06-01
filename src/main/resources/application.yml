@@ -54,6 +54,11 @@ r2dbc:
 jackson:
   serialization:
     writeDatesAsTimestamps: false
+auth:
+  # HTTP Basic auth username for access to Recce APIs
+  username: ""
+  # HTTP Basic auth password for access to Recce APIs
+  password: ""
 reconciliation:
   # Configuration that applies to all data set definitions by default. Some can be overridden dataset-by-dataset.
   defaults:

@@ -111,6 +111,8 @@ tasks:
     run:
       container: recce-docker-local
       environment:
+        AUTH_USERNAME: admin
+        AUTH_PASSWORD: admin
         DATABASE_HOST: recce-db
         DATABASE_PORT: 5432
         MICRONAUT_CONFIG_FILES: /examples/scenario/<{example-scenario}/application-<{example-scenario}.yml

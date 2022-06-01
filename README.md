@@ -69,6 +69,7 @@ These options require only JDK 11+ and Docker installed locally.
     # Run in another shell - runs Recce
     docker run -p 8080:8080 \
       -v $(pwd)/examples/scenario/petshop-mysql:/config \
+      -e AUTH_USERNAME=admin -e AUTH_PASSWORD=admin \
       -e MICRONAUT_CONFIG_FILES=/config/application-petshop-mysql.yml \
       -e DATABASE_HOST=host.docker.internal \
       -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mysql://host.docker.internal:8000/db \
