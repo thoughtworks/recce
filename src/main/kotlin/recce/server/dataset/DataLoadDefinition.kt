@@ -8,8 +8,10 @@ import io.micronaut.inject.qualifiers.Qualifiers
 import io.r2dbc.spi.Result
 import reactor.core.publisher.Flux
 import recce.server.PostConstructable
-import java.io.File
+import java.nio.file.Path
+import java.util.*
 import javax.validation.constraints.NotBlank
+import kotlin.io.path.readText
 
 class DataLoadDefinition
 @ConfigurationInject constructor(
@@ -41,18 +43,27 @@ class DataLoadDefinition
         get() = "$role(ref=$datasourceRef)"
 }
 
-data class QueryConfig(val query: String = "", private val queryFile: String = "") {
+data class QueryConfig(
+    val query: Optional<String> = Optional.empty(),
+    val queryFile: Optional<Path> = Optional.empty()
+) {
     init {
-        require(!(this.query.isEmpty() && this.queryFile.isEmpty())) { "query and queryFile cannot both be empty!" }
+        require(!(this.query.isEmpty && this.queryFile.isEmpty)) { "query and queryFile cannot both be empty!" }
     }
 
     fun resolveQueryStatement(): String {
-        return this.query.ifEmpty {
-            try {
-                File(this.queryFile).readText(Charsets.UTF_8)
-            } catch (e: Exception) {
-                throw ConfigurationException("Cannot load query statement from queryFile ${this.queryFile}: ${e.message}")
+        return if (this.query.isEmpty) {
+            if (this.queryFile.isEmpty) {
+                throw ConfigurationException("query and queryFile cannot both be empty!")
+            } else {
+                try {
+                    this.queryFile.get().readText(Charsets.UTF_8)
+                } catch (e: Exception) {
+                    throw ConfigurationException("Cannot load query statement from queryFile ${this.queryFile}: ${e.message}")
+                }
             }
+        } else {
+            this.query.get()
         }
     }
 }

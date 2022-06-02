@@ -17,6 +17,7 @@ import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
 import reactor.kotlin.test.test
 import java.util.*
+import kotlin.io.path.Path
 
 internal class DataLoadDefinitionTest {
     private val testSourceName = "source1"
@@ -33,13 +34,13 @@ internal class DataLoadDefinitionTest {
 
     @BeforeEach
     fun setUp() {
-        definitionQuery = DataLoadDefinition(testSourceName, QueryConfig(testQuery)).apply { role = DataLoadRole.Source }
+        definitionQuery = DataLoadDefinition(testSourceName, QueryConfig(Optional.of(testQuery))).apply { role = DataLoadRole.Source }
     }
 
     @Test
     fun `should load query statement from file if valid query file provided`() {
         val definitionQueryFromFile =
-            DataLoadDefinition(testSourceName, QueryConfig("", testQueryFile)).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig(Optional.empty<String>(), Optional.of(Path(testQueryFile)))).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -53,7 +54,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should fail to load query statement from file if invalid query file provided`() {
         val definitionQueryFromInvalidFile =
-            DataLoadDefinition(testSourceName, QueryConfig("", testQueryInvalidFile)).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig(Optional.empty<String>(), Optional.of(Path(testQueryInvalidFile)))).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -67,7 +68,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should load query statement from query if both query and query file provided`() {
         val definitionQueryAndQueryFromFile =
-            DataLoadDefinition(testSourceName, QueryConfig(testQuery, testQueryFile)).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig(Optional.of(testQuery), Optional.of(Path(testQueryFile)))).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
@@ -81,7 +82,7 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should load query statement from query if both query and invalid query file provided`() {
         val definitionQueryAndQueryFromInvalidFile =
-            DataLoadDefinition(testSourceName, QueryConfig(testQuery, testQueryInvalidFile)).apply { role = DataLoadRole.Source }
+            DataLoadDefinition(testSourceName, QueryConfig(Optional.of(testQuery), Optional.of(Path(testQueryInvalidFile)))).apply { role = DataLoadRole.Source }
         val operations = mock<R2dbcOperations>()
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)

@@ -62,11 +62,11 @@ internal class RecConfigurationPropertiesTest {
                     assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
                     assertThat(it.source.role).isEqualTo(DataLoadRole.Source)
                     assertThat(it.source.datasourceRef).isEqualTo("source")
-                    assertThat(it.source.queryConfig.query).contains("sourcedatacount")
+                    assertThat(it.source.queryConfig.query.get()).contains("sourcedatacount")
                     assertThat(it.source.dbOperations).isNotNull
                     assertThat(it.target.role).isEqualTo(DataLoadRole.Target)
                     assertThat(it.target.datasourceRef).isEqualTo("target")
-                    assertThat(it.target.queryConfig.query).contains("targetdatacount")
+                    assertThat(it.target.queryConfig.query.get()).contains("targetdatacount")
                     assertThat(it.target.dbOperations).isNotNull
                 }
             )

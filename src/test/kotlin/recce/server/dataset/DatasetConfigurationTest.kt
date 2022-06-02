@@ -8,8 +8,8 @@ internal class DatasetConfigurationTest {
 
     private val conf =
         DatasetConfiguration(
-            DataLoadDefinition("source", QueryConfig("blah")),
-            DataLoadDefinition("target", QueryConfig("blah"))
+            DataLoadDefinition("source", QueryConfig(Optional.of("blah"))),
+            DataLoadDefinition("target", QueryConfig(Optional.of("blah")))
         )
 
     @Test
@@ -24,8 +24,8 @@ internal class DatasetConfigurationTest {
 
         assertThat(
             DatasetConfiguration(
-                DataLoadDefinition("source", QueryConfig("blah")),
-                DataLoadDefinition("target", QueryConfig("blah")),
+                DataLoadDefinition("source", QueryConfig(Optional.of("blah"))),
+                DataLoadDefinition("target", QueryConfig(Optional.of("blah"))),
                 hashingStrategy = Optional.of(HashingStrategy.TypeStrict)
             ).resolvedHashingStrategy
         ).isEqualTo(HashingStrategy.TypeStrict)
