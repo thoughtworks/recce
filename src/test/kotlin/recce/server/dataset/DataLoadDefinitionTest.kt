@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Answers
 import org.mockito.kotlin.*
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.test.test
 import java.util.*
@@ -168,5 +169,32 @@ internal class DataLoadDefinitionTest {
             verify(mockConnection).createStatement(eq(testQuery))
             verify(mockConnection).close()
         }
+    }
+
+    @Test
+    fun `should fail on query with more than one statement`() {
+        val result = mock<Result>()
+
+        val statement: Statement = mock {
+            on { execute() } doReturn Flux.just(result, result)
+        }
+
+        definitionQuery.dbOperations = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
+            on { connectionFactory().create() } doReturn Mono.just(mockConnection)
+        }
+
+        definitionQuery.queryStatement = testQuery
+
+        whenever(mockConnection.createStatement(eq(testQuery))).thenReturn(statement)
+
+        definitionQuery.runQuery()
+            .test()
+            .expectNext(result)
+            .consumeErrorWith {
+                assertThat(it)
+                    .hasMessageContaining("More than one query found")
+                    .isExactlyInstanceOf(IllegalArgumentException::class.java)
+            }
+            .verify()
     }
 }

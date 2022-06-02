@@ -7,6 +7,8 @@ import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.inject.qualifiers.Qualifiers
 import io.r2dbc.spi.Result
 import reactor.core.publisher.Flux
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import recce.server.PostConstructable
 import java.nio.file.Path
 import java.util.*
@@ -38,6 +40,8 @@ class DataLoadDefinition
         { it.createStatement(queryStatement).execute() },
         { it.close() }
     )
+        .index()
+        .map { (i, r) -> if (i > 0) throw IllegalArgumentException("More than one query found.") else r }
 
     val datasourceDescriptor: String
         get() = "$role(ref=$datasourceRef)"

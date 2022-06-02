@@ -2,7 +2,8 @@ package recce.server.dataset
 
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.kotlin.*
