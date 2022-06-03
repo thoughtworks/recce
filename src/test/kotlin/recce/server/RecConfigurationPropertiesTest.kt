@@ -18,12 +18,13 @@ internal class RecConfigurationPropertiesTest {
         "flyway.datasources.default.enabled" to "false",
         "r2dbc.datasources.source.url" to "r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
         "r2dbc.datasources.target.url" to "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
+        "reconciliation.queryFileBaseDir" to "queries",
         "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
-        "reconciliation.datasets.test-dataset.source.queryConfig.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
+        "reconciliation.datasets.test-dataset.source.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
         "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
-        "reconciliation.datasets.test-dataset.target.queryConfig.query" to "SELECT count(*) AS targetdatacount FROM testdata",
+        "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata",
     )
 
     @Test
@@ -62,11 +63,11 @@ internal class RecConfigurationPropertiesTest {
                     assertThat(it.schedule.cronExpression).isEqualTo("0 0 0 ? * *")
                     assertThat(it.source.role).isEqualTo(DataLoadRole.Source)
                     assertThat(it.source.datasourceRef).isEqualTo("source")
-                    assertThat(it.source.queryConfig.query.get()).contains("sourcedatacount")
+                    assertThat(it.source.query.get()).contains("sourcedatacount")
                     assertThat(it.source.dbOperations).isNotNull
                     assertThat(it.target.role).isEqualTo(DataLoadRole.Target)
                     assertThat(it.target.datasourceRef).isEqualTo("target")
-                    assertThat(it.target.queryConfig.query.get()).contains("targetdatacount")
+                    assertThat(it.target.query.get()).contains("targetdatacount")
                     assertThat(it.target.dbOperations).isNotNull
                 }
             )
