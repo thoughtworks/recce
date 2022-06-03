@@ -89,6 +89,8 @@ reconciliation:
     # treat types, even ignoring the underlying differences in types specificed in tables.
     hashingStrategy: TypeLenient
 
+  query-file-base-dir: queries
+
   datasets:
 #    my-data-set: # Name your datasets however you would like
 #      source:

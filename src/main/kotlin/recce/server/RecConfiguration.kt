@@ -8,6 +8,8 @@ import io.micronaut.core.bind.annotation.Bindable
 import mu.KotlinLogging
 import recce.server.dataset.DatasetConfiguration
 import recce.server.dataset.HashingStrategy
+import java.nio.file.Path
+import java.util.*
 import javax.annotation.PostConstruct
 
 private val logger = KotlinLogging.logger {}
@@ -21,13 +23,15 @@ interface PostConstructable {
 class RecConfiguration
 @ConfigurationInject constructor(
     val datasets: Map<String, DatasetConfiguration>,
-    val defaults: DefaultsProvider = DefaultsProvider()
+    val defaults: DefaultsProvider = DefaultsProvider(),
+    val queryFileBaseDir: Optional<Path> = Optional.empty()
 ) : PostConstructable {
 
     @PostConstruct
     override fun populate(locator: BeanLocator) {
         for ((id, config) in datasets) {
             config.id = id
+            config.queryFileBaseDir = queryFileBaseDir
             config.populate(locator)
         }
         logger.info {
