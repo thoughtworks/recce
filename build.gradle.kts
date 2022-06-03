@@ -35,7 +35,7 @@ val depDescriptors = mapOf(
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
     // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
-    "mockito" to "org.mockito:mockito-core:4.6.0", // Needs to be compatible with Micronaut BOM.
+    "mockito" to "org.mockito:mockito-core:4.6.1", // Needs to be compatible with Micronaut BOM.
     "reactor" to "io.projectreactor:reactor-core:3.4.18", // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
