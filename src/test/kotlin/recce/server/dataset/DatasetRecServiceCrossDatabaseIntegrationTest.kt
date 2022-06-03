@@ -82,9 +82,9 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             val datasets = databaseCombinations.flatMap { (source, target) ->
                 listOf(
                     "reconciliation.datasets.$source-to-$target.source.datasourceRef" to source,
-                    "reconciliation.datasets.$source-to-$target.source.queryConfig.query" to "SELECT id AS MigrationKey, value FROM TestData",
+                    "reconciliation.datasets.$source-to-$target.source.query" to "SELECT id AS MigrationKey, value FROM TestData",
                     "reconciliation.datasets.$source-to-$target.target.datasourceRef" to target,
-                    "reconciliation.datasets.$source-to-$target.target.queryConfig.query" to "SELECT id AS MigrationKey, value FROM TestData",
+                    "reconciliation.datasets.$source-to-$target.target.query" to "SELECT id AS MigrationKey, value FROM TestData",
                 )
             }.toMap()
 
