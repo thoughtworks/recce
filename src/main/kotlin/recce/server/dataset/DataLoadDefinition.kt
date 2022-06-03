@@ -1,5 +1,6 @@
 package recce.server.dataset
 
+import com.google.common.annotations.VisibleForTesting
 import io.micronaut.context.BeanLocator
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.exceptions.ConfigurationException
@@ -18,17 +19,19 @@ import kotlin.io.path.readText
 class DataLoadDefinition
 @ConfigurationInject constructor(
     @NotBlank val datasourceRef: String,
-    val queryConfig: QueryConfig
+    var query: Optional<String> = Optional.empty(),
+    var queryFile: Optional<Path> = Optional.empty()
 ) : PostConstructable {
     lateinit var dbOperations: R2dbcOperations
     lateinit var role: DataLoadRole
     lateinit var queryStatement: String
+    lateinit var queryFileBaseDir: Optional<Path>
 
     override fun populate(locator: BeanLocator) {
         dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(datasourceRef))
             .orElseThrow { ConfigurationException("Cannot locate ${R2dbcOperations::class.java.simpleName} named [$datasourceRef] in configuration!") }
 
-        queryStatement = queryConfig.resolveQueryStatement()
+        queryStatement = this.resolveQueryStatement()
     }
 
     companion object {
@@ -43,18 +46,7 @@ class DataLoadDefinition
         .index()
         .map { (i, r) -> if (i > 0) throw IllegalArgumentException("More than one query found.") else r }
 
-    val datasourceDescriptor: String
-        get() = "$role(ref=$datasourceRef)"
-}
-
-data class QueryConfig(
-    val query: Optional<String> = Optional.empty(),
-    val queryFile: Optional<Path> = Optional.empty()
-) {
-    init {
-        require(!(this.query.isEmpty && this.queryFile.isEmpty)) { "query and queryFile cannot both be empty!" }
-    }
-
+    @VisibleForTesting
     fun resolveQueryStatement(): String {
         return if (this.query.isEmpty) {
             if (this.queryFile.isEmpty) {
@@ -70,6 +62,9 @@ data class QueryConfig(
             this.query.get()
         }
     }
+
+    val datasourceDescriptor: String
+        get() = "$role(ref=$datasourceRef)"
 }
 
 enum class DataLoadRole { Source, Target }
