@@ -30,9 +30,11 @@ class DatasetConfiguration(
 
     override fun populate(locator: BeanLocator) {
         defaults = locator.getBean(DefaultsProvider::class.java)
+        source.datasetId = id
         source.role = DataLoadRole.Source
         source.queryFileBaseDir = this.queryFileBaseDir
         source.populate(locator)
+        target.datasetId = id
         target.role = DataLoadRole.Target
         target.queryFileBaseDir = this.queryFileBaseDir
         target.populate(locator)

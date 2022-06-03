@@ -12,7 +12,12 @@ import recce.server.PostConstructable
 import java.nio.file.Path
 import java.util.*
 import javax.validation.constraints.NotBlank
+import kotlin.io.path.Path
 import kotlin.io.path.readText
+
+object DataLoadDefinitionConstants {
+    const val DEFAULT_QUERY_FILE_BASE_DIR = "queries"
+}
 
 class DataLoadDefinition
 @ConfigurationInject constructor(
@@ -24,6 +29,7 @@ class DataLoadDefinition
     lateinit var role: DataLoadRole
     lateinit var queryStatement: String
     lateinit var queryFileBaseDir: Optional<Path>
+    lateinit var datasetId: String
 
     override fun populate(locator: BeanLocator) {
         dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(datasourceRef))
@@ -44,19 +50,27 @@ class DataLoadDefinition
 
     @VisibleForTesting
     fun resolveQueryStatement(): String {
-        return if (this.query.isEmpty) {
-            if (this.queryFile.isEmpty) {
-                throw ConfigurationException("query and queryFile cannot both be empty!")
-            } else {
-                try {
+        try {
+            return if (this.query.isEmpty) {
+                if (this.queryFile.isEmpty) {
+                    if (this.queryFileBaseDir.isEmpty) {
+                        Path(buildQueryFilePath(Path(DataLoadDefinitionConstants.DEFAULT_QUERY_FILE_BASE_DIR))).readText(Charsets.UTF_8)
+                    } else {
+                        Path(buildQueryFilePath(this.queryFileBaseDir.get())).readText(Charsets.UTF_8)
+                    }
+                } else {
                     this.queryFile.get().readText(Charsets.UTF_8)
-                } catch (e: Exception) {
-                    throw ConfigurationException("Cannot load query statement from queryFile ${this.queryFile}: ${e.message}")
                 }
+            } else {
+                this.query.get()
             }
-        } else {
-            this.query.get()
+        } catch (e: Exception) {
+            throw ConfigurationException("Cannot load query: ${e.message}")
         }
+    }
+
+    private fun buildQueryFilePath(dir: Path): String {
+        return "$dir/${this.datasetId}-${this.role.name.lowercase()}.sql"
     }
 
     val datasourceDescriptor: String
