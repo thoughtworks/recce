@@ -70,7 +70,6 @@ internal class DataLoadDefinitionTest {
         assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
     }
 
-
     @Test
     fun `should fail to load query statement from file if file not found`() {
         definitionQuery.role = DataLoadRole.Source
