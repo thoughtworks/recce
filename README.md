@@ -269,25 +269,27 @@ reconciliation:
       source:
 #        # Reference to a datasource defined in `r2dbc.datasources`
         datasourceRef: my-source-db
-#        # Specify whether to load inline `query` or read from a `queryFile`
-#        # If both `query` and `queryFile` are provided, inline `query` takes precedence
-        queryConfig:
-#          # Any SQL query to evaluate against the source DB
-          query: >
-            SELECT id AS MigrationKey, * FROM my-table
-#          # Path to file containing query to evaluate against the source DB
-          queryFile: examples/scenario/<{example-scenario}/queries/<{example-scenario}-my-data-set-source.yml
+#        # Specify whether to load inline query or read from a query file
+#        # If both `query` and `queryFile` are provided, inline query takes precedence
+#        # If both query and queryFile are not specified,
+#        # load the query statement from ${dataset-name}-${source-or-target}.sql in `query-file-base-dir`
+#        # Optional SQL query to evaluate against the source DB
+        query: >
+          SELECT id AS MigrationKey, * FROM my-table
+#        # Optional path to file containing query to evaluate against the source DB
+        queryFile: examples/scenario/<{example-scenario}/queries/<{example-scenario}-my-data-set-source.yml
       target:
 #        # Reference to a datasource defined in `r2dbc.datasources`
         datasourceRef: my-target-db
-#        # Specify whether to load inline `query` or read from a `queryFile`
-#        # If both `query` and `queryFile` are provided, inline `query` takes precedence
-        queryConfig:
-#          # Any SQL query to evaluate against the target DB
-          query: >
-            SELECT id AS MigrationKey, * FROM my-table
-#          # Path to file containing query to evaluate against the target DB
-          queryFile: examples/scenario/<{example-scenario}/queries/<{example-scenario}-my-data-set-target.yml
+#        # Specify whether to load inline query or read from a query file
+#        # If both `query` and `queryFile` are provided, inline query takes precedence
+#        # If both query and queryFile are not specified,
+#        # load the query statement from ${dataset-name}-${source-or-target}.sql in `query-file-base-dir`
+#        # Optional SQL query to evaluate against the target DB
+        query: >
+          SELECT id AS MigrationKey, * FROM my-table
+#        # Optional path to file containing query to evaluate against the target DB
+        queryFile: examples/scenario/<{example-scenario}/queries/<{example-scenario}-my-data-set-target.yml
 #      # Optional strategy for determining equivalence of column values
       hashingStrategy: TypeLenient
 #      # Optional scheduling of regular or one-of reconciliations
