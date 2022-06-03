@@ -21,6 +21,7 @@ import java.util.*
 import kotlin.io.path.Path
 
 internal class DataLoadDefinitionTest {
+    private val testDatasetId = "test-dataset"
     private val testSourceName = "source1"
     private val testQuery = "SELECT * FROM somewhere"
     private val testQueryStatementFromFile = "SELECT * FROM elsewhere\n"
@@ -36,7 +37,8 @@ internal class DataLoadDefinitionTest {
 
     @BeforeEach
     fun setUp() {
-        definitionQuery = DataLoadDefinition(testSourceName, Optional.of(testQuery)).apply { role = DataLoadRole.Source }
+        definitionQuery =
+            DataLoadDefinition(testSourceName, Optional.of(testQuery)).apply { role = DataLoadRole.Source }
     }
 
     @Test
@@ -60,6 +62,7 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should load query statement from query file base directory if only query file base directory provided`() {
+        definitionQuery.datasetId = testDatasetId
         definitionQuery.role = DataLoadRole.Source
         definitionQuery.queryFileBaseDir = Optional.of(Path(testQueryFileBaseDir))
         definitionQuery.query = Optional.empty()
@@ -68,15 +71,6 @@ internal class DataLoadDefinitionTest {
         assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
     }
 
-    @Test
-    fun `should load query statement from default query file base directory if no query source provided`() {
-        definitionQuery.role = DataLoadRole.Source
-        definitionQuery.queryFileBaseDir = Optional.empty()
-        definitionQuery.query = Optional.empty()
-        definitionQuery.queryFile = Optional.empty()
-
-        assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
-    }
 
     @Test
     fun `should fail to load query statement from file if file not found`() {
@@ -87,8 +81,9 @@ internal class DataLoadDefinitionTest {
 
         assertThatThrownBy { definitionQuery.resolveQueryStatement() }
             .isExactlyInstanceOf(ConfigurationException::class.java)
-            .hasMessageContaining("Cannot load query statement from")
+            .hasMessageContaining("Cannot load query")
 
+        definitionQuery.datasetId = testDatasetId
         definitionQuery.role = DataLoadRole.Target
         definitionQuery.queryFileBaseDir = Optional.empty()
         definitionQuery.query = Optional.empty()
@@ -96,7 +91,7 @@ internal class DataLoadDefinitionTest {
 
         assertThatThrownBy { definitionQuery.resolveQueryStatement() }
             .isExactlyInstanceOf(ConfigurationException::class.java)
-            .hasMessageContaining("Cannot load query statement from")
+            .hasMessageContaining("Cannot load query")
     }
 
     @Test
