@@ -23,7 +23,8 @@ internal class DataLoadDefinitionTest {
     private val testSourceName = "source1"
     private val testQuery = "SELECT * FROM somewhere"
     private val testQueryStatementFromFile = "SELECT * FROM elsewhere\n"
-    private val testQueryFile = Resources.getResource("config/test-query.sql").path
+    private val testQueryFile = Resources.getResource("queries/test-dataset-source.sql").path
+    private val testQueryFileBaseDir = Resources.getResource("queries").path
     private val testQueryInvalidFile = "test-invalid-query.sql"
 
     private lateinit var definitionQuery: DataLoadDefinition
@@ -34,63 +35,67 @@ internal class DataLoadDefinitionTest {
 
     @BeforeEach
     fun setUp() {
-        definitionQuery = DataLoadDefinition(testSourceName, QueryConfig(Optional.of(testQuery))).apply { role = DataLoadRole.Source }
+        definitionQuery = DataLoadDefinition(testSourceName, Optional.of(testQuery)).apply { role = DataLoadRole.Source }
     }
 
     @Test
-    fun `should load query statement from file if valid query file provided`() {
-        val definitionQueryFromFile =
-            DataLoadDefinition(testSourceName, QueryConfig(Optional.empty<String>(), Optional.of(Path(testQueryFile)))).apply { role = DataLoadRole.Source }
-        val operations = mock<R2dbcOperations>()
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-        }
+    fun `should load query statement from query sql if query sql, query file and query file base directory provided`() {
+        definitionQuery.queryFileBaseDir = Optional.of(Path(testQueryFileBaseDir))
+        definitionQuery.query = Optional.of(testQuery)
+        definitionQuery.queryFile = Optional.of(Path(testQueryFile))
 
-        definitionQueryFromFile.populate(beanLocator)
-
-        assertThat(definitionQueryFromFile.queryStatement).isEqualTo(testQueryStatementFromFile)
+        assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQuery)
     }
 
     @Test
-    fun `should fail to load query statement from file if invalid query file provided`() {
-        val definitionQueryFromInvalidFile =
-            DataLoadDefinition(testSourceName, QueryConfig(Optional.empty<String>(), Optional.of(Path(testQueryInvalidFile)))).apply { role = DataLoadRole.Source }
-        val operations = mock<R2dbcOperations>()
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-        }
+    fun `should load query statement from query file if query file and query file base directory provided`() {
+        definitionQuery.role = DataLoadRole.Source
+        definitionQuery.queryFileBaseDir = Optional.empty()
+        definitionQuery.query = Optional.empty()
+        definitionQuery.queryFile = Optional.of(Path(testQueryFile))
 
-        assertThatThrownBy { definitionQueryFromInvalidFile.populate(beanLocator) }
+        assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
+    }
+
+    @Test
+    fun `should load query statement from query file base directory if only query file base directory provided`() {
+        definitionQuery.role = DataLoadRole.Source
+        definitionQuery.queryFileBaseDir = Optional.of(Path(testQueryFileBaseDir))
+        definitionQuery.query = Optional.empty()
+        definitionQuery.queryFile = Optional.empty()
+
+        assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
+    }
+
+    @Test
+    fun `should load query statement from default query file base directory if no query source provided`() {
+        definitionQuery.role = DataLoadRole.Source
+        definitionQuery.queryFileBaseDir = Optional.empty()
+        definitionQuery.query = Optional.empty()
+        definitionQuery.queryFile = Optional.empty()
+
+        assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
+    }
+
+    @Test
+    fun `should fail to load query statement from file if file not found`() {
+        definitionQuery.role = DataLoadRole.Source
+        definitionQuery.queryFileBaseDir = Optional.empty()
+        definitionQuery.query = Optional.empty()
+        definitionQuery.queryFile = Optional.of(Path(testQueryInvalidFile))
+
+        assertThatThrownBy { definitionQuery.resolveQueryStatement() }
             .isExactlyInstanceOf(ConfigurationException::class.java)
-            .hasMessageContaining("Cannot load query statement from queryFile")
-    }
+            .hasMessageContaining("Cannot load query statement from")
 
-    @Test
-    fun `should load query statement from query if both query and query file provided`() {
-        val definitionQueryAndQueryFromFile =
-            DataLoadDefinition(testSourceName, QueryConfig(Optional.of(testQuery), Optional.of(Path(testQueryFile)))).apply { role = DataLoadRole.Source }
-        val operations = mock<R2dbcOperations>()
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-        }
+        definitionQuery.role = DataLoadRole.Target
+        definitionQuery.queryFileBaseDir = Optional.empty()
+        definitionQuery.query = Optional.empty()
+        definitionQuery.queryFile = Optional.empty()
 
-        definitionQueryAndQueryFromFile.populate(beanLocator)
-
-        assertThat(definitionQueryAndQueryFromFile.queryStatement).isEqualTo(testQuery)
-    }
-
-    @Test
-    fun `should load query statement from query if both query and invalid query file provided`() {
-        val definitionQueryAndQueryFromInvalidFile =
-            DataLoadDefinition(testSourceName, QueryConfig(Optional.of(testQuery), Optional.of(Path(testQueryInvalidFile)))).apply { role = DataLoadRole.Source }
-        val operations = mock<R2dbcOperations>()
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-        }
-
-        definitionQueryAndQueryFromInvalidFile.populate(beanLocator)
-
-        assertThat(definitionQueryAndQueryFromInvalidFile.queryStatement).isEqualTo(testQuery)
+        assertThatThrownBy { definitionQuery.resolveQueryStatement() }
+            .isExactlyInstanceOf(ConfigurationException::class.java)
+            .hasMessageContaining("Cannot load query statement from")
     }
 
     @Test
