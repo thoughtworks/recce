@@ -1,5 +1,4 @@
 reconciliation:
-  query-file-base-dir: queries
   datasets:
     test-dataset:
       source:

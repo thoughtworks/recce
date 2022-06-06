@@ -17,6 +17,7 @@ import org.mockito.kotlin.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.test.test
+import recce.server.DefaultsProvider
 import java.util.*
 import kotlin.io.path.Path
 
@@ -43,9 +44,19 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should load query statement from query sql if query sql, query file and query file base directory provided`() {
-        definitionQuery.queryFileBaseDir = Optional.of(Path(testQueryFileBaseDir))
         definitionQuery.query = Optional.of(testQuery)
         definitionQuery.queryFile = Optional.of(Path(testQueryFile))
+
+        val operations = mock<R2dbcOperations>()
+        val defaultsProvider = mock<DefaultsProvider>()
+        whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
+
+        val beanLocator = mock<BeanLocator> {
+            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
+            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
+        }
+
+        definitionQuery.populate(beanLocator)
 
         assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQuery)
     }
@@ -53,56 +64,91 @@ internal class DataLoadDefinitionTest {
     @Test
     fun `should load query statement from query file if query file and query file base directory provided`() {
         definitionQuery.role = DataLoadRole.Source
-        definitionQuery.queryFileBaseDir = Optional.empty()
         definitionQuery.query = Optional.empty()
         definitionQuery.queryFile = Optional.of(Path(testQueryFile))
 
+        val operations = mock<R2dbcOperations>()
+        val defaultsProvider = mock<DefaultsProvider>()
+        whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
+
+        val beanLocator = mock<BeanLocator> {
+            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
+            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
+        }
+
+        definitionQuery.populate(beanLocator)
+
         assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
     }
 
     @Test
-    fun `should load query statement from query file base directory if only query file base directory provided`() {
+    fun `should load query statement from default query file base directory if no query source provided`() {
         definitionQuery.datasetId = testDatasetId
         definitionQuery.role = DataLoadRole.Source
-        definitionQuery.queryFileBaseDir = Optional.of(Path(testQueryFileBaseDir))
         definitionQuery.query = Optional.empty()
         definitionQuery.queryFile = Optional.empty()
 
+        val operations = mock<R2dbcOperations>()
+        val defaultsProvider = mock<DefaultsProvider>()
+        whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
+
+        val beanLocator = mock<BeanLocator> {
+            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
+            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
+        }
+
+        definitionQuery.populate(beanLocator)
+
         assertThat(definitionQuery.resolveQueryStatement()).isEqualTo(testQueryStatementFromFile)
     }
 
     @Test
-    fun `should fail to load query statement from file if file not found`() {
+    fun `should fail to load query statement from query file if query file not found`() {
         definitionQuery.role = DataLoadRole.Source
-        definitionQuery.queryFileBaseDir = Optional.empty()
         definitionQuery.query = Optional.empty()
         definitionQuery.queryFile = Optional.of(Path(testQueryInvalidFile))
 
         assertThatThrownBy { definitionQuery.resolveQueryStatement() }
             .isExactlyInstanceOf(ConfigurationException::class.java)
             .hasMessageContaining("Cannot load query")
+    }
 
+    @Test
+    fun `should fail to load query statement from default query file base directory if query file not found`() {
         definitionQuery.datasetId = testDatasetId
         definitionQuery.role = DataLoadRole.Target
-        definitionQuery.queryFileBaseDir = Optional.empty()
         definitionQuery.query = Optional.empty()
         definitionQuery.queryFile = Optional.empty()
 
-        assertThatThrownBy { definitionQuery.resolveQueryStatement() }
+        val operations = mock<R2dbcOperations>()
+        val defaultsProvider = mock<DefaultsProvider>()
+        whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path("blah"))
+
+        val beanLocator = mock<BeanLocator> {
+            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
+            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
+        }
+
+        assertThatThrownBy { definitionQuery.populate(beanLocator) }
             .isExactlyInstanceOf(ConfigurationException::class.java)
             .hasMessageContaining("Cannot load query")
     }
 
     @Test
-    fun `should populate db operations from context`() {
+    fun `should populate db operations and defaults provider from context`() {
         val operations = mock<R2dbcOperations>()
+        val defaultsProvider = mock<DefaultsProvider>()
+        whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
+
         val beanLocator = mock<BeanLocator> {
             on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
+            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
         }
 
         definitionQuery.populate(beanLocator)
 
         assertThat(definitionQuery.dbOperations).isEqualTo(operations)
+        assertThat(definitionQuery.queryFileBaseDir).isEqualTo(Path(testQueryFileBaseDir))
     }
 
     @Test
