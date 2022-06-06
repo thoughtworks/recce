@@ -10,16 +10,12 @@ import io.r2dbc.spi.Result
 import reactor.core.publisher.Flux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import recce.server.DefaultsProvider
 import recce.server.PostConstructable
 import java.nio.file.Path
 import java.util.*
 import javax.validation.constraints.NotBlank
-import kotlin.io.path.Path
 import kotlin.io.path.readText
-
-object DataLoadDefinitionConstants {
-    const val DEFAULT_QUERY_FILE_BASE_DIR = "queries"
-}
 
 class DataLoadDefinition
 @ConfigurationInject constructor(
@@ -30,12 +26,16 @@ class DataLoadDefinition
     lateinit var dbOperations: R2dbcOperations
     lateinit var role: DataLoadRole
     lateinit var queryStatement: String
-    lateinit var queryFileBaseDir: Optional<Path>
+    lateinit var queryFileBaseDir: Path
     lateinit var datasetId: String
 
     override fun populate(locator: BeanLocator) {
         dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(datasourceRef))
             .orElseThrow { ConfigurationException("Cannot locate ${R2dbcOperations::class.java.simpleName} named [$datasourceRef] in configuration!") }
+
+        queryFileBaseDir = locator.findBean(DefaultsProvider::class.java)
+            .orElseThrow { ConfigurationException("Cannot locate ${DefaultsProvider::class.java.simpleName} in configuration!") }
+            .queryFileBaseDir
 
         queryStatement = this.resolveQueryStatement()
     }
@@ -57,11 +57,7 @@ class DataLoadDefinition
         try {
             return if (this.query.isEmpty) {
                 if (this.queryFile.isEmpty) {
-                    if (this.queryFileBaseDir.isEmpty) {
-                        Path(buildQueryFilePath(Path(DataLoadDefinitionConstants.DEFAULT_QUERY_FILE_BASE_DIR))).readText(Charsets.UTF_8)
-                    } else {
-                        Path(buildQueryFilePath(this.queryFileBaseDir.get())).readText(Charsets.UTF_8)
-                    }
+                    this.queryFileBaseDir.resolve("${this.datasetId}-${this.role.name.lowercase()}.sql").readText(Charsets.UTF_8)
                 } else {
                     this.queryFile.get().readText(Charsets.UTF_8)
                 }
@@ -71,10 +67,6 @@ class DataLoadDefinition
         } catch (e: Exception) {
             throw ConfigurationException("Cannot load query: ${e.message}")
         }
-    }
-
-    private fun buildQueryFilePath(dir: Path): String {
-        return "$dir/${this.datasetId}-${this.role.name.lowercase()}.sql"
     }
 
     val datasourceDescriptor: String
