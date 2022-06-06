@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import recce.server.dataset.DataLoadRole
 import recce.server.dataset.HashingStrategy
 import java.util.function.Consumer
+import kotlin.io.path.Path
 
 // Faster tests that do not load the full configuration and are quicker to iterate on when testing
 // configuration binding
@@ -18,7 +19,6 @@ internal class RecConfigurationPropertiesTest {
         "flyway.datasources.default.enabled" to "false",
         "r2dbc.datasources.source.url" to "r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
         "r2dbc.datasources.target.url" to "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
-        "reconciliation.queryFileBaseDir" to "queries",
         "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
         "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
@@ -34,18 +34,23 @@ internal class RecConfigurationPropertiesTest {
             assertThat(configuration.defaults.batchSize).isEqualTo(1000)
             assertThat(configuration.defaults.batchConcurrency).isEqualTo(5)
             assertThat(configuration.defaults.hashingStrategy).isEqualTo(HashingStrategy.TypeLenient)
+            assertThat(configuration.defaults.queryFileBaseDir).isEqualTo(Path("queries"))
+
             assertThat(getBean(DefaultsProvider::class.java).hashingStrategy).isEqualTo(HashingStrategy.TypeLenient)
         }
 
         properties["reconciliation.defaults.batchSize"] = "3000"
         properties["reconciliation.defaults.batchConcurrency"] = "10"
         properties["reconciliation.defaults.hashingStrategy"] = "TypeStrict"
+        properties["reconciliation.defaults.queryFileBaseDir"] = "queries2"
 
         with(ApplicationContext.run(properties)) {
             val configuration2 = getBean(RecConfiguration::class.java)
             assertThat(configuration2.defaults.batchSize).isEqualTo(3000)
             assertThat(configuration2.defaults.batchConcurrency).isEqualTo(10)
             assertThat(configuration2.defaults.hashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
+            assertThat(configuration2.defaults.queryFileBaseDir).isEqualTo(Path("queries2"))
+
             assertThat(getBean(DefaultsProvider::class.java).hashingStrategy).isEqualTo(HashingStrategy.TypeStrict)
         }
     }
