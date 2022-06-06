@@ -11,6 +11,7 @@ import recce.server.dataset.HashingStrategy
 import java.nio.file.Path
 import java.util.*
 import javax.annotation.PostConstruct
+import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}
 
@@ -44,11 +45,13 @@ class RecConfiguration
 class DefaultsProvider @ConfigurationInject constructor(
     @Bindable(defaultValue = "1000") val batchSize: Int,
     @Bindable(defaultValue = "5") val batchConcurrency: Int,
-    @Bindable(defaultValue = "TypeLenient") val hashingStrategy: HashingStrategy
+    @Bindable(defaultValue = "TypeLenient") val hashingStrategy: HashingStrategy,
+    @Bindable(defaultValue = "queries") val queryFileBaseDir: Path,
 ) {
     constructor() : this(
         batchSize = 1000,
         batchConcurrency = 5,
-        hashingStrategy = HashingStrategy.TypeLenient
+        hashingStrategy = HashingStrategy.TypeLenient,
+        queryFileBaseDir = Path("queries")
     )
 }
