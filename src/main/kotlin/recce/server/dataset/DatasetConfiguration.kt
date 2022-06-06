@@ -7,7 +7,6 @@ import io.micronaut.core.bind.annotation.Bindable
 import io.micronaut.scheduling.cron.CronExpression
 import recce.server.DefaultsProvider
 import recce.server.PostConstructable
-import java.nio.file.Path
 import java.time.ZonedDateTime
 import java.util.*
 import javax.validation.constraints.NotNull
@@ -21,7 +20,6 @@ class DatasetConfiguration(
 
     lateinit var id: String
     lateinit var defaults: DefaultsProvider
-    lateinit var queryFileBaseDir: Optional<Path>
 
     @VisibleForTesting
     constructor(source: DataLoadDefinition, target: DataLoadDefinition) : this(source, target, Schedule(), Optional.empty()) {
@@ -32,11 +30,9 @@ class DatasetConfiguration(
         defaults = locator.getBean(DefaultsProvider::class.java)
         source.datasetId = id
         source.role = DataLoadRole.Source
-        source.queryFileBaseDir = this.queryFileBaseDir
         source.populate(locator)
         target.datasetId = id
         target.role = DataLoadRole.Target
-        target.queryFileBaseDir = this.queryFileBaseDir
         target.populate(locator)
     }
 

@@ -24,14 +24,12 @@ class RecConfiguration
 @ConfigurationInject constructor(
     val datasets: Map<String, DatasetConfiguration>,
     val defaults: DefaultsProvider = DefaultsProvider(),
-    val queryFileBaseDir: Optional<Path> = Optional.empty()
 ) : PostConstructable {
 
     @PostConstruct
     override fun populate(locator: BeanLocator) {
         for ((id, config) in datasets) {
             config.id = id
-            config.queryFileBaseDir = queryFileBaseDir
             config.populate(locator)
         }
         logger.info {
