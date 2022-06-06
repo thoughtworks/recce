@@ -53,21 +53,15 @@ class DataLoadDefinition
         .map { (i, r) -> if (i > 0) throw IllegalArgumentException("More than one query found.") else r }
 
     @VisibleForTesting
-    fun resolveQueryStatement(): String {
-        try {
-            return if (this.query.isEmpty) {
-                if (this.queryFile.isEmpty) {
-                    this.queryFileBaseDir.resolve("${this.datasetId}-${this.role.name.lowercase()}.sql").readText(Charsets.UTF_8)
-                } else {
-                    this.queryFile.get().readText(Charsets.UTF_8)
-                }
-            } else {
-                this.query.get()
-            }
-        } catch (e: Exception) {
-            throw ConfigurationException("Cannot load query: ${e.message}")
+    fun resolveQueryStatement(): String = kotlin.runCatching {
+        this.query.orElseGet {
+            this.queryFile.orElseGet {
+                this.queryFileBaseDir.resolve("${this.datasetId}-${this.role.name.lowercase()}.sql")
+            }.readText(Charsets.UTF_8)
         }
     }
+        .onFailure { e -> throw ConfigurationException("Cannot load query: ${e.message}") }
+        .getOrThrow()
 
     val datasourceDescriptor: String
         get() = "$role(ref=$datasourceRef)"
