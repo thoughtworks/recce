@@ -272,7 +272,7 @@ reconciliation:
         # Specify whether to load inline query or read from a query file
         # If both `query` and `queryFile` are provided, inline query takes precedence
         # If both query and queryFile are not specified,
-        # load the query statement from ${dataset-name}-${source-or-target}.sql in `query-file-base-dir`
+        # load the query statement from ${dataset-name}-${source-or-target}.sql in `queryFileBaseDir`
         # Optional SQL query to evaluate against the source DB
         query: >
           SELECT id AS MigrationKey, * FROM my-table
@@ -284,7 +284,7 @@ reconciliation:
         # Specify whether to load inline query or read from a query file
         # If both `query` and `queryFile` are provided, inline query takes precedence
         # If both query and queryFile are not specified,
-        # load the query statement from ${dataset-name}-${source-or-target}.sql in `query-file-base-dir`
+        # load the query statement from ${dataset-name}-${source-or-target}.sql in `queryFileBaseDir`
         # Optional SQL query to evaluate against the target DB
         query: >
           SELECT id AS MigrationKey, * FROM my-table

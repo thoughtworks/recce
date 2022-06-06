@@ -89,11 +89,11 @@ reconciliation:
     # treat types, even ignoring the underlying differences in types specified in tables.
     hashingStrategy: TypeLenient
 
-  # Optional directory where queries for datasets may be loaded
-  # For each dataset source/target, if both `query` and `queryFile` are not specified,
-  # load the query statement from ${dataset-name}-${source-or-target}.sql in this directory
-  # If this directory is not specified, default to "queries"
-  query-file-base-dir: queries
+    # Directory where queries for datasets may be loaded
+    #
+    # For each dataset source/target, if both `query` and `queryFile` are not specified,
+    # load the query statement from ${dataset-name}-${source-or-target}.sql in this directory.
+    queryFileBaseDir: queries
 
   datasets:
 #    my-data-set: # Name your datasets however you would like
