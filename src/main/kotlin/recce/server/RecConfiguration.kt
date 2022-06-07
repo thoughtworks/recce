@@ -4,7 +4,10 @@ import io.micronaut.context.BeanLocator
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.ConfigurationProperties
 import io.micronaut.context.annotation.Context
+import io.micronaut.context.event.StartupEvent
 import io.micronaut.core.bind.annotation.Bindable
+import io.micronaut.runtime.event.annotation.EventListener
+import jakarta.inject.Singleton
 import mu.KotlinLogging
 import recce.server.dataset.DatasetConfiguration
 import recce.server.dataset.HashingStrategy
@@ -54,4 +57,17 @@ class DefaultsProvider @ConfigurationInject constructor(
         hashingStrategy = HashingStrategy.TypeLenient,
         queryFileBaseDir = Path("queries")
     )
+}
+
+@Singleton
+@ConfigurationProperties("reconciliation.defaults")
+class ConfigurationLogging {
+    var batchSize: Int = -1
+    var batchConcurrency: Int = -1
+
+    @Suppress("UNUSED_PARAMETER")
+    @EventListener
+    internal fun onStartUpEvent(_event: StartupEvent) {
+        logger.info { "Reconciliation batch size is $batchSize and concurrency is $batchConcurrency" }
+    }
 }
