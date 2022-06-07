@@ -9,7 +9,6 @@ import mu.KotlinLogging
 import recce.server.dataset.DatasetConfiguration
 import recce.server.dataset.HashingStrategy
 import java.nio.file.Path
-import java.util.*
 import javax.annotation.PostConstruct
 import kotlin.io.path.Path
 
@@ -54,4 +53,11 @@ class DefaultsProvider @ConfigurationInject constructor(
         hashingStrategy = HashingStrategy.TypeLenient,
         queryFileBaseDir = Path("queries")
     )
+
+    @PostConstruct
+    fun log() {
+        logger.info {
+            "Reconciliation batch size is $batchSize and concurrency is $batchConcurrency"
+        }
+    }
 }
