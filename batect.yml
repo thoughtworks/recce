@@ -2,7 +2,7 @@ forbid_telemetry: true
 config_variables:
   example-scenario:
     description: Which example scenario to run from `ls examples/scenario`
-    default: petshop-mysql
+    default: petshop-mariadb
   db-name:
     description: Name of the DB to create for all local DBs
     default: db
@@ -14,8 +14,8 @@ config_variables:
     default: password
 include:
   # Include just one source and one target DB of each type
-  - examples/db/batect-source-mysql.yml
-  - examples/db/batect-target-mysql.yml
+  - examples/db/batect-source-mariadb.yml
+  - examples/db/batect-target-mariadb.yml
 #  - examples/db/batect-source-postgres.yml
 #  - examples/db/batect-target-postgres.yml
 containers:

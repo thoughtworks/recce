@@ -1,22 +1,22 @@
 containers:
   source-db:
-    image: mysql:8
+    image: mariadb:10
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: "true"
-      MYSQL_DATABASE: <{db-name}
-      MYSQL_USER: <{db-user}
-      MYSQL_PASSWORD: <{db-password}
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+      MARIADB_DATABASE: <{db-name}
+      MARIADB_USER: <{db-user}
+      MARIADB_PASSWORD: <{db-password}
     ports:
       - local: 8000
         container: 3306
     volumes:
       - type: cache
-        name: source-db-mysql
+        name: source-db-mariadb
         container: /var/lib/mysql
-  source-flyway-mysql:
+  source-flyway-mariadb:
     image: flyway/flyway:8-alpine
     environment:
-      FLYWAY_URL: jdbc:mysql://source-db:3306/<{db-name}?allowPublicKeyRetrieval=true
+      FLYWAY_URL: jdbc:mariadb://source-db:3306/<{db-name}
       FLYWAY_USER: <{db-user}
       FLYWAY_PASSWORD: <{db-password}
       FLYWAY_CONNECT_RETRIES: 60
@@ -29,8 +29,8 @@ containers:
         container: /flyway/sql
         options: ro
 tasks:
-  migrate-source-mysql:
-    description: Start and populate a source mysql DB from `config_variables.example-scenario`
+  migrate-source-mariadb:
+    description: Start and populate a source MariaDB from `config_variables.example-scenario`
     group: db
     run:
-      container: source-flyway-mysql
+      container: source-flyway-mariadb

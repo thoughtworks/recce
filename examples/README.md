@@ -6,11 +6,11 @@ Examples can be managed with a "convention over configuration" approach for deve
 
 ```
 ├── db                                       # Batect configuration for starting and migrating various databases
-│   ├── batect-source-mysql.yml
-│   └── batect-target-mysql.yml
+│   ├── batect-source-mariadb.yml
+│   └── batect-target-mariadb.yml
 └── scenario                                 # Scenarios go here
-    └── petshop-mysql                         # Scenario called "petshop-mysql"
-        ├── application-petshop-mysql.yml     # Micronaut configuration fragment for this scenario 
+    └── petshop-mariadb                      # Scenario called "petshop-mariadb"
+        ├── application-petshop-mariadb.yml  # Micronaut configuration fragment for this scenario 
         ├── source                           # Flyway migrations to apply to the "source" schema
         │   └── V1__CREATE.sql
         └── target                           # Flyway migrations to apply to the "target" schema

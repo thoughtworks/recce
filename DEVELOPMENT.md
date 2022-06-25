@@ -96,7 +96,7 @@ Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application 
 - DB migrations are being handled with [Flyway](https://flywaydb.org/)
 
 ## External data sources for Reconciliation
-- Recce uses raw Micronaut Data R2DBC SQL to execute configured queries ([example](examples/scenario/petshop-mysql/application-petshop-mysql.yml)) defined against external databases
+- Recce uses raw Micronaut Data R2DBC SQL to execute configured queries ([example](examples/scenario/petshop-mariadb/application-petshop-mariadb.yml)) defined against external databases
 
 ## Build
 - Gradle (Kotlin-style) is used build automation
