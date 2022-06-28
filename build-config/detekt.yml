@@ -1,0 +1,12 @@
+# https://detekt.dev/docs/introduction/configurations
+
+# Merged with default config at https://github.com/detekt/detekt/blob/main/detekt-core/src/main/resources/default-detekt-config.yml
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+
+style:
+  MaxLineLength:
+    active: false
+  WildcardImport:
+    active: false

@@ -1,7 +1,5 @@
 @file:Suppress("GradlePackageUpdate")
 
-import com.github.gundy.semver4j.model.Version
-
 plugins {
     val kotlinVersion = "1.7.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
@@ -10,6 +8,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
     id("io.micronaut.application") version "3.4.1"
     id("com.diffplug.spotless") version "6.7.2"
+    id("io.gitlab.arturbosch.detekt") version "1.21.0-RC1"
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.google.cloud.tools.jib") version "3.2.1"
@@ -193,6 +192,19 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
 }
 
+detekt {
+    config = files("build-config/detekt.yml")
+    buildUponDefaultConfig = true
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        xml.required.set(false)
+        txt.required.set(false)
+        sarif.required.set(false)
+    }
+}
+
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 }
@@ -222,8 +234,8 @@ jib {
         image = "eclipse-temurin:${depVersions["javaMajor"]}-jdk-alpine"
     }
     to {
-        val fullVersion = Version.fromString(project.version.toString())
-        val tagVersion = Version.builder()
+        val fullVersion = com.github.gundy.semver4j.model.Version.fromString(project.version.toString())
+        val tagVersion = com.github.gundy.semver4j.model.Version.builder()
             .major(fullVersion.major)
             .minor(fullVersion.minor)
             .patch(fullVersion.patch)
