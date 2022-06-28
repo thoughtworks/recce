@@ -78,6 +78,15 @@ containers:
       - local: <{batect.project_directory}/examples
         container: /examples
         options: cached
+  recce-docs:
+    image: structurizr/lite
+    ports:
+      - local: 8081
+        container: 8080
+    volumes:
+      - local: <{batect.project_directory}/docs
+        container: /usr/local/structurizr
+        options: cached
 tasks:
   clean:
     description: Cleans the Gradle build
@@ -128,3 +137,8 @@ tasks:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
       container: recce-dependencies
+  docs:
+    description: Render architecture documentation
+    group: recce
+    run:
+      container: recce-docs

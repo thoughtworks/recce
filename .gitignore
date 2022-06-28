@@ -35,3 +35,7 @@ Thumbs.db
 # Batect
 .batect/
 gh-md-toc
+
+# Structurizr
+docs/workspace.json
+docs/.structurizr
