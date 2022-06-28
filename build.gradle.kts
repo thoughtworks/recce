@@ -21,8 +21,9 @@ plugins {
 group = "recce.server"
 
 reckon {
-    scopeFromProp()
-    stageFromProp("dev", "final")
+    stages("dev", "final")
+    setScopeCalc(calcScopeFromProp())
+    setStageCalc(calcStageFromProp())
 }
 
 // Workaround to allow dependabot to update versions of libraries together, since dependabot doesn't understand
