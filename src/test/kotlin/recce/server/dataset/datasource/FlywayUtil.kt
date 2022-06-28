@@ -6,8 +6,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.sql.DataSource
 
-data class DbDescriptor(val jdbcUrl: String, val username: String, val password: String)
-
 fun flywayCleanMigrate(temporaryDir: Path, sql: String, db: DbDescriptor) =
     flywayCleanMigrate(temporaryDir, sql) { it.dataSource(db.jdbcUrl, db.username, db.password) }
 
@@ -24,3 +22,5 @@ fun flywayCleanMigrate(temporaryDir: Path, sql: String, configureHook: (FluentCo
         .load()
         .migrate()
 }
+
+data class DbDescriptor(val jdbcUrl: String, val username: String, val password: String)

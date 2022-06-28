@@ -36,16 +36,16 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
 
-private const val sampleKeysLimit = 3
-private const val notFoundId = 0
-private const val testDataset = "testDataset"
-private val testCompletedDuration = Duration.ofMinutes(3).plusNanos(234)
-private val testResults = RecRun(
+private const val SAMPLE_KEYS_LIMIT = 3
+private const val NOT_FOUND_ID = 0
+private const val TEST_DATASET_ID = "testDataset"
+private val TEST_COMPLETED_DURATION = Duration.ofMinutes(3).plusNanos(234)
+private val TEST_RESULTS = RecRun(
     id = 12,
-    datasetId = testDataset,
+    datasetId = TEST_DATASET_ID,
     createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC),
 ).apply {
-    completedTime = createdTime?.plusNanos(testCompletedDuration.toNanos())
+    completedTime = createdTime?.plusNanos(TEST_COMPLETED_DURATION.toNanos())
     status = RunStatus.Successful
     updatedTime = completedTime?.plusSeconds(10)
     sourceMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
@@ -55,29 +55,29 @@ private val testResults = RecRun(
 }
 
 private fun mockService() = mock<DatasetRecRunner> {
-    on { runFor(eq(testDataset)) } doReturn Mono.just(testResults)
+    on { runFor(eq(TEST_DATASET_ID)) } doReturn Mono.just(TEST_RESULTS)
 }
 
 private fun mockRunRepository() = mock<RecRunRepository> {
-    on { findById(testResults.id!!) } doReturn Mono.just(testResults)
-    on { existsById(testResults.id!!) } doReturn Mono.just(true)
-    on { findById(notFoundId) } doReturn Mono.empty()
-    on { existsById(notFoundId) } doReturn Mono.just(false)
-    on { findTop10ByDatasetIdOrderByCompletedTimeDesc(testDataset) } doReturn Flux.just(testResults, testResults)
+    on { findById(TEST_RESULTS.id!!) } doReturn Mono.just(TEST_RESULTS)
+    on { existsById(TEST_RESULTS.id!!) } doReturn Mono.just(true)
+    on { findById(NOT_FOUND_ID) } doReturn Mono.empty()
+    on { existsById(NOT_FOUND_ID) } doReturn Mono.just(false)
+    on { findTop10ByDatasetIdOrderByCompletedTimeDesc(TEST_DATASET_ID) } doReturn Flux.just(TEST_RESULTS, TEST_RESULTS)
 }
 
 private fun mockRecordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
-    on { findFirstByRecRunIdSplitByMatchStatus(testResults.id!!, sampleKeysLimit) } doReturn Flux.fromIterable(
+    on { findFirstByRecRunIdSplitByMatchStatus(TEST_RESULTS.id!!, SAMPLE_KEYS_LIMIT) } doReturn Flux.fromIterable(
         sampleRecords
     )
-    on { findFirstByRecRunIdSplitByMatchStatus(notFoundId, sampleKeysLimit) } doReturn Flux.empty()
+    on { findFirstByRecRunIdSplitByMatchStatus(NOT_FOUND_ID, SAMPLE_KEYS_LIMIT) } doReturn Flux.empty()
 }
 
 internal class DatasetRecRunControllerTest {
     private val sampleRows =
-        List(1) { RecRecord(RecRecordKey(testResults.id!!, "source-$it"), sourceData = "set") } +
-            List(2) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
-            List(3) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
+        List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "source-$it"), sourceData = "set") } +
+            List(2) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "target-$it"), targetData = "set") } +
+            List(3) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
 
     private val service = mockService()
     private val runRepository = mockRunRepository()
@@ -85,7 +85,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `can get run by id`() {
-        controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(testResults.id!!))
+        controller.retrieveIndividualRun(DatasetRecRunController.IndividualRunQueryParams(TEST_RESULTS.id!!))
             .test()
             .assertNext {
                 assertThatModelMatchesTestResults(it)
@@ -100,8 +100,8 @@ internal class DatasetRecRunControllerTest {
     fun `can get run by id with limited sample bad rows`() {
         controller.retrieveIndividualRun(
             DatasetRecRunController.IndividualRunQueryParams(
-                testResults.id!!,
-                sampleKeysLimit
+                TEST_RESULTS.id!!,
+                SAMPLE_KEYS_LIMIT
             )
         )
             .test()
@@ -116,30 +116,30 @@ internal class DatasetRecRunControllerTest {
 
     private fun assertThatModelMatchesTestResults(apiModel: RunApiModel) {
         SoftAssertions.assertSoftly { softly ->
-            softly.assertThat(apiModel.id).isEqualTo(testResults.id)
-            softly.assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
-            softly.assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
-            softly.assertThat(apiModel.completedTime).isEqualTo(testResults.completedTime)
-            softly.assertThat(apiModel.status).isEqualTo(testResults.status)
+            softly.assertThat(apiModel.id).isEqualTo(TEST_RESULTS.id)
+            softly.assertThat(apiModel.datasetId).isEqualTo(TEST_RESULTS.datasetId)
+            softly.assertThat(apiModel.createdTime).isEqualTo(TEST_RESULTS.createdTime)
+            softly.assertThat(apiModel.completedTime).isEqualTo(TEST_RESULTS.completedTime)
+            softly.assertThat(apiModel.status).isEqualTo(TEST_RESULTS.status)
             softly.assertThat(apiModel.failureCause).isNull()
-            softly.assertThat(apiModel.summary?.totalCount).isEqualTo(testResults.summary?.total)
-            softly.assertThat(apiModel.summary?.bothMatchedCount).isEqualTo(testResults.summary?.bothMatched)
-            softly.assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(testResults.summary?.bothMismatched)
-            softly.assertThat(apiModel.summary?.source?.totalCount).isEqualTo(testResults.summary?.sourceTotal)
-            softly.assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(testResults.summary?.sourceOnly)
+            softly.assertThat(apiModel.summary?.totalCount).isEqualTo(TEST_RESULTS.summary?.total)
+            softly.assertThat(apiModel.summary?.bothMatchedCount).isEqualTo(TEST_RESULTS.summary?.bothMatched)
+            softly.assertThat(apiModel.summary?.bothMismatchedCount).isEqualTo(TEST_RESULTS.summary?.bothMismatched)
+            softly.assertThat(apiModel.summary?.source?.totalCount).isEqualTo(TEST_RESULTS.summary?.sourceTotal)
+            softly.assertThat(apiModel.summary?.source?.onlyHereCount).isEqualTo(TEST_RESULTS.summary?.sourceOnly)
             softly.assertThat(apiModel.summary?.source?.meta).usingRecursiveComparison()
-                .isEqualTo(testResults.sourceMeta)
-            softly.assertThat(apiModel.summary?.target?.totalCount).isEqualTo(testResults.summary?.targetTotal)
-            softly.assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(testResults.summary?.targetOnly)
+                .isEqualTo(TEST_RESULTS.sourceMeta)
+            softly.assertThat(apiModel.summary?.target?.totalCount).isEqualTo(TEST_RESULTS.summary?.targetTotal)
+            softly.assertThat(apiModel.summary?.target?.onlyHereCount).isEqualTo(TEST_RESULTS.summary?.targetOnly)
             softly.assertThat(apiModel.summary?.target?.meta).usingRecursiveComparison()
-                .isEqualTo(testResults.targetMeta)
-            softly.assertThat(apiModel.metadata).usingRecursiveComparison().isEqualTo(testResults.metadata)
+                .isEqualTo(TEST_RESULTS.targetMeta)
+            softly.assertThat(apiModel.metadata).usingRecursiveComparison().isEqualTo(TEST_RESULTS.metadata)
         }
     }
 
     @Test
     fun `can get runs by dataset id`() {
-        controller.retrieveRuns(DatasetRecRunController.RunQueryParams(testDataset))
+        controller.retrieveRuns(DatasetRecRunController.RunQueryParams(TEST_DATASET_ID))
             .test()
             .assertNext(::assertThatModelMatchesTestResults)
             .assertNext(::assertThatModelMatchesTestResults)
@@ -148,7 +148,7 @@ internal class DatasetRecRunControllerTest {
 
     @Test
     fun `trigger should delegate to service`() {
-        controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset))
+        controller.triggerRun(DatasetRecRunController.RunCreationParams(TEST_DATASET_ID))
             .test()
             .assertNext(::assertThatModelMatchesTestResults)
             .verifyComplete()
@@ -158,20 +158,20 @@ internal class DatasetRecRunControllerTest {
     fun `failed run should return with cause`() {
         val failureCause = DataLoadException("Could not load data", IllegalArgumentException("Root Cause"))
         val failedRun = RecRun(
-            id = testResults.id,
-            datasetId = testDataset,
-            createdTime = testResults.createdTime,
+            id = TEST_RESULTS.id,
+            datasetId = TEST_DATASET_ID,
+            createdTime = TEST_RESULTS.createdTime,
         ).asFailed(failureCause)
 
-        whenever(service.runFor(testDataset)).doReturn(Mono.just(failedRun))
+        whenever(service.runFor(TEST_DATASET_ID)).doReturn(Mono.just(failedRun))
 
-        controller.triggerRun(DatasetRecRunController.RunCreationParams(testDataset))
+        controller.triggerRun(DatasetRecRunController.RunCreationParams(TEST_DATASET_ID))
             .test()
             .assertNext { apiModel ->
                 SoftAssertions.assertSoftly { softly ->
-                    softly.assertThat(apiModel.id).isEqualTo(testResults.id)
-                    softly.assertThat(apiModel.datasetId).isEqualTo(testResults.datasetId)
-                    softly.assertThat(apiModel.createdTime).isEqualTo(testResults.createdTime)
+                    softly.assertThat(apiModel.id).isEqualTo(TEST_RESULTS.id)
+                    softly.assertThat(apiModel.datasetId).isEqualTo(TEST_RESULTS.datasetId)
+                    softly.assertThat(apiModel.createdTime).isEqualTo(TEST_RESULTS.createdTime)
                     softly.assertThat(apiModel.completedTime).isNotNull
                     softly.assertThat(apiModel.status).isEqualTo(RunStatus.Failed)
                     softly.assertThat(apiModel.failureCause).isEqualTo("Could not load data, rootCause=[Root Cause]")
@@ -184,9 +184,9 @@ internal class DatasetRecRunControllerTest {
 internal class DatasetRecRunControllerApiTest {
 
     val sampleRows =
-        List(1) { RecRecord(RecRecordKey(testResults.id!!, "source-$it"), sourceData = "set") } +
-            List(1) { RecRecord(RecRecordKey(testResults.id!!, "target-$it"), targetData = "set") } +
-            List(1) { RecRecord(RecRecordKey(testResults.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
+        List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "source-$it"), sourceData = "set") } +
+            List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "target-$it"), targetData = "set") } +
+            List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
 
     @Inject
     lateinit var spec: RequestSpecification
@@ -204,7 +204,7 @@ internal class DatasetRecRunControllerApiTest {
         Given {
             spec(spec)
         } When {
-            get("/runs/${testResults.id!!}?includeSampleKeys=$sampleKeysLimit")
+            get("/runs/${TEST_RESULTS.id!!}?includeSampleKeys=$SAMPLE_KEYS_LIMIT")
         } Then {
             validateTestResultsAreReturned(expectSampleKeys = true)
         }
@@ -215,7 +215,7 @@ internal class DatasetRecRunControllerApiTest {
         Given {
             spec(spec)
         } When {
-            get("/runs/$notFoundId")
+            get("/runs/$NOT_FOUND_ID")
         } Then {
             statusCode(HttpStatus.SC_NOT_FOUND)
             body("message", equalTo("Not Found"))
@@ -228,7 +228,7 @@ internal class DatasetRecRunControllerApiTest {
         Given {
             spec(spec)
         } When {
-            get("/runs/${testResults.id!!}?includeSampleKeys=$count")
+            get("/runs/${TEST_RESULTS.id!!}?includeSampleKeys=$count")
         } Then {
             statusCode(HttpStatus.SC_BAD_REQUEST)
             body("message", equalTo("Bad Request"))
@@ -241,7 +241,7 @@ internal class DatasetRecRunControllerApiTest {
         Given {
             spec(spec)
         } When {
-            body(mapOf("datasetId" to testDataset))
+            body(mapOf("datasetId" to TEST_DATASET_ID))
             post("/runs")
         } Then {
             validateTestResultsAreReturned()
@@ -250,11 +250,11 @@ internal class DatasetRecRunControllerApiTest {
 
     private fun ValidatableResponse.validateTestResultsAreReturned(expectSampleKeys: Boolean = false) {
         statusCode(HttpStatus.SC_OK)
-        body("datasetId", equalTo(testDataset))
-        body("id", equalTo(testResults.id))
-        body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.createdTime)))
-        body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(testResults.completedTime)))
-        body("completedDurationSeconds", closeTo(testCompletedDuration.toSeconds().toDouble(), 0.00001))
+        body("datasetId", equalTo(TEST_DATASET_ID))
+        body("id", equalTo(TEST_RESULTS.id))
+        body("createdTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(TEST_RESULTS.createdTime)))
+        body("completedTime", equalTo(DateTimeFormatter.ISO_INSTANT.format(TEST_RESULTS.completedTime)))
+        body("completedDurationSeconds", closeTo(TEST_COMPLETED_DURATION.toSeconds().toDouble(), 0.00001))
         body("status", equalTo("Successful"))
         body(
             "summary",
