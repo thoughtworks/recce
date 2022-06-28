@@ -26,8 +26,8 @@ import java.util.function.Consumer
 import javax.sql.DataSource
 
 @MicronautTest(
-    environments = arrayOf("test-integration"),
-    propertySources = arrayOf("classpath:config/application-test-dataset.yml")
+    environments = ["test-integration"],
+    propertySources = ["classpath:config/application-test-dataset.yml"]
 )
 class DatasetRecServiceIntegrationTest {
 

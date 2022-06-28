@@ -6,8 +6,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 @MicronautTest(
-    environments = arrayOf("test-integration"),
-    propertySources = arrayOf("classpath:config/application-test-dataset.yml"),
+    environments = ["test-integration"],
+    propertySources = ["classpath:config/application-test-dataset.yml"],
 )
 internal class RecConfigurationTest {
 

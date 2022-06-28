@@ -21,13 +21,13 @@ class FakeRow(private val values: List<Pair<String, Any?>>) : Row {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> get(index: Int, type: Class<T>): T? {
-        if (type != Object::class.java) throw IllegalArgumentException("Only support generic Object type returns")
+        require(type == Object::class.java) { "Only support generic Object type returns" }
         return values[index].second as T
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> get(name: String, type: Class<T>): T? {
-        if (type != Object::class.java) throw IllegalArgumentException("Only support generic Object type returns")
+        require(type == Object::class.java) { "Only support generic Object type returns" }
         return valuesByColName[name] as T
     }
 }
@@ -56,8 +56,8 @@ class R2dbcFakeBuilder {
     }
 
     fun withRowValues(vararg values: Any?): R2dbcFakeBuilder {
-        if (hasMigrationKey && cols.size == 1 || cols.size == 0) throw IllegalArgumentException("Populate column metadata first!")
-        if (values.size != cols.size) throw IllegalArgumentException("Incorrect number of row values, expected ${cols.size}")
+        require(cols.size > if (hasMigrationKey) 1 else 0) { "Populate column metadata first!" }
+        require(cols.size == values.size) { "Incorrect number of row values, expected ${cols.size}" }
 
         rowValues = values.mapIndexed { index, value -> cols[index].name to value }
 

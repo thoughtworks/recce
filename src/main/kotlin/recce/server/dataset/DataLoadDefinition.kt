@@ -50,7 +50,7 @@ class DataLoadDefinition
         { it.close() }
     )
         .index()
-        .map { (i, r) -> if (i > 0) throw IllegalArgumentException("More than one query found.") else r }
+        .map { (i, r) -> require(i == 0L) { "More than one query found." }; r }
 
     @VisibleForTesting
     fun resolveQueryStatement(): String = kotlin.runCatching {

@@ -12,22 +12,23 @@ import io.swagger.v3.oas.annotations.security.SecuritySchemes
 import mu.KotlinLogging
 import reactor.tools.agent.ReactorDebugAgent
 
-private const val gitHubProject = "https://github.com/ThoughtWorks-SEA/recce"
+private const val GITHUB_PROJECT = "https://github.com/ThoughtWorks-SEA/recce"
 private val logger = KotlinLogging.logger {}
 
 @OpenAPIDefinition(
     info = Info(
         title = "Recce Server",
         description = "Server-based database reconciliation tool for developers",
-        contact = Contact(name = "Recce Community", url = "$gitHubProject/issues")
+        contact = Contact(name = "Recce Community", url = "$GITHUB_PROJECT/issues")
     ),
-    externalDocs = ExternalDocumentation(description = "Server Docs", url = "$gitHubProject/README.md"),
+    externalDocs = ExternalDocumentation(description = "Server Docs", url = "$GITHUB_PROJECT/README.md"),
     security = [SecurityRequirement(name = "basicAuth")]
 )
 @SecuritySchemes(SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic"))
 object RecceServer {
 
     @JvmStatic
+    @Suppress("SpreadOperator")
     fun main(args: Array<String>) {
         runCatching { ReactorDebugAgent.init() }
             .onFailure { logger.warn { "ReactorDebugAgent failed to initialise due to $it" } }
