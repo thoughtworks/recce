@@ -120,7 +120,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         try {
             flywayCleanMigrate(tempDir, sql, scenario.dbDescriptor)
         } catch (e: Exception) {
-            throw RuntimeException("Failed to create test schema on [${scenario.db}] for $scenario", e)
+            throw IllegalArgumentException("Failed to create test schema on [${scenario.db}] for $scenario", e)
         }
     }
 

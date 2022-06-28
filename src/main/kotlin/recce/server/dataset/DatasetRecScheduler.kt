@@ -25,6 +25,7 @@ class DatasetRecScheduler(
         config.datasets.values.forEach(::schedule)
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun schedule(config: DatasetConfiguration) {
         config.schedule.cronExpression?.let { expr ->
             try {

@@ -181,6 +181,7 @@ internal class HashingStrategyTest {
     }
 
     class TypeExamples : ArgumentsProvider {
+        @Suppress("LongMethod")
         override fun provideArguments(context: ExtensionContext?): Stream<out Arguments> {
             return listOf(
                 Arguments.of(

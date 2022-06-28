@@ -19,4 +19,5 @@ interface H2RecRunRepository : RecRunRepository
  */
 @Replaces(AbstractRecRecordRepository::class)
 @R2dbcRepository(dialect = Dialect.H2)
+@Suppress("UnnecessaryAbstractClass")
 internal abstract class H2RecRecordRepository(operations: R2dbcOperations) : AbstractRecRecordRepository(operations)

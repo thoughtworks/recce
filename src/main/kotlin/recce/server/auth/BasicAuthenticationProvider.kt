@@ -1,6 +1,7 @@
 package recce.server.auth
 
 import io.micronaut.http.HttpRequest
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationProvider
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
@@ -20,7 +21,7 @@ class BasicAuthenticationProvider(private val authConfiguration: AuthConfigurati
                 emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
                 emitter.complete()
             } else {
-                emitter.error(AuthenticationResponse.exception())
+                emitter.error(AuthenticationResponse.exception(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH))
             }
         }, FluxSink.OverflowStrategy.ERROR)
 }
