@@ -83,7 +83,7 @@ kapt {
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("junit:junit"))
-            .using(module("io.quarkus:quarkus-junit4-mock:2.10.0.Final"))
+            .using(module("io.quarkus:quarkus-junit4-mock:2.10.1.Final"))
             .because(
                 "We don't want JUnit 4; but is an unneeded transitive of testcontainers. " +
                     "See https://github.com/testcontainers/testcontainers-java/issues/970"
