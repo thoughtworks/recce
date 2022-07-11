@@ -106,7 +106,7 @@ data class RunSummary(
                 matchStatus!!.bothMatched,
                 matchStatus!!.bothMismatched,
                 source = IndividualDbRunSummary(IndividualDbMeta(sourceMeta), matchStatus!!.sourceTotal, matchStatus!!.sourceOnly),
-                target = IndividualDbRunSummary(IndividualDbMeta(targetMeta), matchStatus!!.targetTotal, matchStatus!!.targetOnly),
+                target = IndividualDbRunSummary(IndividualDbMeta(targetMeta), matchStatus!!.targetTotal, matchStatus!!.targetOnly)
             ).apply {
                 migrationKeySamples?.let {
                     source.onlyHereSampleKeys = migrationKeySamples!![RecordMatchStatus.SourceOnly]
@@ -133,7 +133,7 @@ data class IndividualDbRunSummary(
     val onlyHereCount: Int,
 
     @field:Schema(description = "Sample MigrationKeys for rows only found within this datasource")
-    var onlyHereSampleKeys: List<String>? = null,
+    var onlyHereSampleKeys: List<String>? = null
 )
 
 @Schema(name = "IndividualDatabaseMetadata", description = "Metadata about a single dataset when run against a given data source")

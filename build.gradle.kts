@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
     id("io.micronaut.application") version "3.4.1"
-    id("com.diffplug.spotless") version "6.7.2"
+    id("com.diffplug.spotless") version "6.8.0"
     id("io.gitlab.arturbosch.detekt") version "1.21.0-RC2"
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
@@ -36,10 +36,10 @@ val depDescriptors = mapOf(
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
     // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
     "mockito" to "org.mockito:mockito-core:4.6.1", // Needs to be compatible with Micronaut BOM.
-    "reactor" to "io.projectreactor:reactor-core:3.4.19", // Needs to be compatible with Micronaut BOM.
+    "reactor" to "io.projectreactor:reactor-core:3.4.19" // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
-    "javaMajor" to "17",
+    "javaMajor" to "17"
 )
 
 repositories {
@@ -74,7 +74,7 @@ kapt {
         val props = mapOf(
             "rapidoc.enabled" to true,
             "rapidoc.theme" to "dark",
-            "rapidoc.render-style" to "view",
+            "rapidoc.render-style" to "view"
         )
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
@@ -186,10 +186,10 @@ tasks.run.configure {
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     val editorConfig = mapOf("disabled_rules" to "no-wildcard-imports")
     kotlin {
-        ktlint().userData(editorConfig)
+        ktlint().editorConfigOverride(editorConfig)
     }
     kotlinGradle {
-        ktlint().userData(editorConfig)
+        ktlint().editorConfigOverride(editorConfig)
     }
 }
 

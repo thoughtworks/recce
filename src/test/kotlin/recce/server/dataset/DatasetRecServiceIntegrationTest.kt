@@ -31,12 +31,21 @@ import javax.sql.DataSource
 class DatasetRecServiceIntegrationTest {
 
     @TempDir lateinit var tempDir: Path
-    @Inject @field:Named("source-h2") lateinit var sourceDataSource: DataSource
-    @Inject @field:Named("target-h2") lateinit var targetDataSource: DataSource
+
+    @Inject
+    @field:Named("source-h2")
+    lateinit var sourceDataSource: DataSource
+
+    @Inject
+    @field:Named("target-h2")
+    lateinit var targetDataSource: DataSource
 
     @Inject lateinit var ctx: ApplicationContext
+
     @Inject lateinit var service: DatasetRecService
+
     @Inject lateinit var runRepository: RecRunRepository
+
     @Inject lateinit var recordRepository: RecRecordRepository
 
     @BeforeEach

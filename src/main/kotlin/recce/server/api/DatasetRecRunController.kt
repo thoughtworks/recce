@@ -38,10 +38,12 @@ class DatasetRecRunController(
     @Introspected
     data class IndividualRunQueryParams(
         @field:Schema(description = "The identifier of the reconciliation run to retrieve")
-        @field:PathVariable val runId: Int,
+        @field:PathVariable
+        val runId: Int,
 
         @field:Schema(description = "How many sample mismatched migration keys of each type (only in source, only in target, mismatched data) in the results")
-        @field:QueryValue(defaultValue = "0") @field:Nullable @field:PositiveOrZero @field:Max(MAXIMUM_SAMPLE_KEYS) val includeSampleKeys: Int = 0
+        @field:QueryValue(defaultValue = "0") @field:Nullable @field:PositiveOrZero @field:Max(MAXIMUM_SAMPLE_KEYS)
+        val includeSampleKeys: Int = 0
     )
 
     @Get(uri = "/{runId}{?includeSampleKeys}")
@@ -51,7 +53,10 @@ class DatasetRecRunController(
         tags = ["Reconciliation Runs"],
         responses = [ApiResponse(responseCode = "200", description = "Reconciliation run found")]
     )
-    fun retrieveIndividualRun(@Valid @RequestBean params: IndividualRunQueryParams): Mono<RunApiModel> {
+    fun retrieveIndividualRun(
+        @Valid @RequestBean
+        params: IndividualRunQueryParams
+    ): Mono<RunApiModel> {
         logger.info { "Finding $params" }
 
         val findSampleRows = if (params.includeSampleKeys == 0) {
@@ -81,7 +86,8 @@ class DatasetRecRunController(
     @Introspected
     data class RunQueryParams(
         @field:Schema(description = "Identifier of the dataset to search for runs for")
-        @field:NotBlank @field:QueryValue("datasetId") val datasetId: String
+        @field:NotBlank @field:QueryValue("datasetId")
+        val datasetId: String
     )
 
     @Get
@@ -91,7 +97,10 @@ class DatasetRecRunController(
         tags = ["Reconciliation Runs"],
         responses = [ApiResponse(responseCode = "200", description = "Dataset found")]
     )
-    fun retrieveRuns(@Valid @RequestBean params: RunQueryParams): Flux<RunApiModel> {
+    fun retrieveRuns(
+        @Valid @RequestBean
+        params: RunQueryParams
+    ): Flux<RunApiModel> {
         logger.info { "Finding runs for $params" }
         return runRepository.findTop10ByDatasetIdOrderByCompletedTimeDesc(params.datasetId)
             .map { RunApiModel.Builder(it).build() }
@@ -104,7 +113,10 @@ class DatasetRecRunController(
         tags = ["Reconciliation Runs"],
         responses = [ApiResponse(responseCode = "200", description = "Run triggered for dataset")]
     )
-    fun triggerRun(@Body @Valid params: RunCreationParams): Mono<RunApiModel> {
+    fun triggerRun(
+        @Body @Valid
+        params: RunCreationParams
+    ): Mono<RunApiModel> {
         logger.info { "Received request to create run for $params" }
         return runner.runFor(params.datasetId).map { RunApiModel.Builder(it).build() }
     }
@@ -113,6 +125,7 @@ class DatasetRecRunController(
     @Schema(name = "RunCreationParams", description = "Control how a new reconciliation run is created")
     data class RunCreationParams(
         @field:Schema(description = "Identifier of the dataset to create a new run for")
-        @field:NotBlank val datasetId: String
+        @field:NotBlank
+        val datasetId: String
     )
 }

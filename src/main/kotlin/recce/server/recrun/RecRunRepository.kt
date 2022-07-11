@@ -24,7 +24,8 @@ interface RecRunRepository : ReactorCrudRepository<RecRun, Int> {
 @Entity
 @Table(name = "reconciliation_run")
 data class RecRun(
-    @Id @GeneratedValue val id: Int? = null,
+    @Id @GeneratedValue
+    val id: Int? = null,
     val datasetId: String,
     @DateCreated val createdTime: Instant? = null,
     @DateUpdated var updatedTime: Instant? = null,
@@ -35,11 +36,13 @@ data class RecRun(
     constructor(datasetId: String) : this(null, datasetId)
 
     @Embedded var sourceMeta: DatasetMeta = DatasetMeta()
+
     @Embedded var targetMeta: DatasetMeta = DatasetMeta()
 
     @Transient var failureCause: Throwable? = null
 
-    @Suppress("JpaAttributeTypeInspection") // False positive
+    // False positive
+    @Suppress("JpaAttributeTypeInspection")
     @field:TypeDef(type = DataType.JSON)
     var metadata: Map<String, String> = emptyMap()
 

@@ -158,7 +158,6 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should throw on failure to find bean`() {
-
         assertThatThrownBy { definitionQuery.populate(mock()) }
             .isExactlyInstanceOf(ConfigurationException::class.java)
             .hasMessageContaining("source1")
@@ -166,7 +165,6 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should stream rows from query`() {
-
         val result = mock<Result>()
 
         val statement: Statement = mock {
