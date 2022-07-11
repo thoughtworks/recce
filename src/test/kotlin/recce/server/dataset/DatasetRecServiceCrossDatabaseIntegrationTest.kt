@@ -34,7 +34,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense(),
             "mysql" to MySQLContainer("mysql:8"),
             "mariadb" to MariaDBContainer("mariadb:10"),
-            "postgres" to PostgreSQLContainer("postgres:14-alpine"),
+            "postgres" to PostgreSQLContainer("postgres:14-alpine")
         )
 
         /**
@@ -45,7 +45,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             "INTEGER" to "1",
             "BIGINT" to "1",
             "VARCHAR(4)" to "'text'",
-            "TEXT" to "'text'",
+            "TEXT" to "'text'"
         )
 
         /**
@@ -84,7 +84,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
                     "reconciliation.datasets.$source-to-$target.source.datasourceRef" to source,
                     "reconciliation.datasets.$source-to-$target.source.query" to "SELECT id AS MigrationKey, value FROM TestData",
                     "reconciliation.datasets.$source-to-$target.target.datasourceRef" to target,
-                    "reconciliation.datasets.$source-to-$target.target.query" to "SELECT id AS MigrationKey, value FROM TestData",
+                    "reconciliation.datasets.$source-to-$target.target.query" to "SELECT id AS MigrationKey, value FROM TestData"
                 )
             }.toMap()
 
@@ -148,7 +148,6 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
     @ParameterizedTest
     @ArgumentsSource(TestScenarios::class)
     fun `rows match between source and target`(source: ScenarioConfig, target: ScenarioConfig) {
-
         allOf(
             runAsync { createTestData(source) },
             runAsync { createTestData(target) }

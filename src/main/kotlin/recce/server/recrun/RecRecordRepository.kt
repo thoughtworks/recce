@@ -75,7 +75,8 @@ internal abstract class AbstractRecRecordRepository(private val operations: R2db
 @Entity
 @Table(name = "reconciliation_record")
 data class RecRecord(
-    @Id @GeneratedValue val id: Int? = null,
+    @Id @GeneratedValue
+    val id: Int? = null,
     @Column(name = "reconciliation_run_id") val recRunId: Int,
     @Column(name = "migration_key") val migrationKey: String,
     var sourceData: String? = null,

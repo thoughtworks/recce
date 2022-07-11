@@ -43,7 +43,7 @@ private val TEST_COMPLETED_DURATION = Duration.ofMinutes(3).plusNanos(234)
 private val TEST_RESULTS = RecRun(
     id = 12,
     datasetId = TEST_DATASET_ID,
-    createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC),
+    createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC)
 ).apply {
     completedTime = createdTime?.plusNanos(TEST_COMPLETED_DURATION.toNanos())
     status = RunStatus.Successful
@@ -160,7 +160,7 @@ internal class DatasetRecRunControllerTest {
         val failedRun = RecRun(
             id = TEST_RESULTS.id,
             datasetId = TEST_DATASET_ID,
-            createdTime = TEST_RESULTS.createdTime,
+            createdTime = TEST_RESULTS.createdTime
         ).asFailed(failureCause)
 
         whenever(service.runFor(TEST_DATASET_ID)).doReturn(Mono.just(failedRun))

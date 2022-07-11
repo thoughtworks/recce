@@ -23,7 +23,7 @@ interface PostConstructable {
 class RecConfiguration
 @ConfigurationInject constructor(
     val datasets: Map<String, DatasetConfiguration>,
-    val defaults: DefaultsProvider = DefaultsProvider(),
+    val defaults: DefaultsProvider = DefaultsProvider()
 ) : PostConstructable {
 
     @PostConstruct
@@ -45,7 +45,7 @@ class DefaultsProvider @ConfigurationInject constructor(
     @Bindable(defaultValue = "1000") val batchSize: Int,
     @Bindable(defaultValue = "5") val batchConcurrency: Int,
     @Bindable(defaultValue = "TypeLenient") val hashingStrategy: HashingStrategy,
-    @Bindable(defaultValue = "queries") val queryFileBaseDir: Path,
+    @Bindable(defaultValue = "queries") val queryFileBaseDir: Path
 ) {
     constructor() : this(
         batchSize = 1000,

@@ -36,7 +36,6 @@ internal class HashingStrategyTest {
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
     fun `should throw on null migration key`(strat: HashingStrategy) {
-
         val (row, meta) = rowMetaWithTestCol
             .withRowValues(null, "test-val")
             .build()
@@ -86,7 +85,6 @@ internal class HashingStrategyTest {
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
     fun `consecutive fields should always lead to different hashes`(strat: HashingStrategy) {
-
         val (row, meta) = R2dbcFakeBuilder()
             .withCol("first", String::class.java)
             .withCol("second", String::class.java)
@@ -150,7 +148,7 @@ internal class HashingStrategyTest {
                 Arguments.of(Integer.valueOf(10), java.lang.Long.valueOf(10)),
                 Arguments.of(Integer.valueOf(10), java.lang.Short.valueOf(10)),
                 Arguments.of(Integer.valueOf(10), java.lang.Byte.valueOf(10)),
-                Arguments.of(java.lang.Float.valueOf(10.0f), java.lang.Double.valueOf(10.0)),
+                Arguments.of(java.lang.Float.valueOf(10.0f), java.lang.Double.valueOf(10.0))
             ).stream()
         }
     }
@@ -249,7 +247,7 @@ internal class HashingStrategyTest {
                     { ByteBuffer.wrap("10".toByteArray(Charsets.UTF_8)) },
                     "24b014ca353b4654ad3a68c8b7943cb4b5493cde3667b4b25821cb9701bab250",
                     Optional.empty<String>()
-                ),
+                )
             ).stream()
         }
     }

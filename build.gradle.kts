@@ -36,10 +36,10 @@ val depDescriptors = mapOf(
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
     // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
     "mockito" to "org.mockito:mockito-core:4.6.1", // Needs to be compatible with Micronaut BOM.
-    "reactor" to "io.projectreactor:reactor-core:3.4.19", // Needs to be compatible with Micronaut BOM.
+    "reactor" to "io.projectreactor:reactor-core:3.4.19" // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
-    "javaMajor" to "17",
+    "javaMajor" to "17"
 )
 
 repositories {
@@ -74,7 +74,7 @@ kapt {
         val props = mapOf(
             "rapidoc.enabled" to true,
             "rapidoc.theme" to "dark",
-            "rapidoc.render-style" to "view",
+            "rapidoc.render-style" to "view"
         )
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }

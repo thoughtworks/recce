@@ -24,7 +24,7 @@ internal class RecConfigurationPropertiesTest {
         "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
         "reconciliation.datasets.test-dataset.source.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
         "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
-        "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata",
+        "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata"
     )
 
     @Test

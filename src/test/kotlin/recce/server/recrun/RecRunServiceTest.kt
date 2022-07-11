@@ -17,7 +17,6 @@ internal class RecRunServiceTest {
 
     @Test
     fun `should return start results`() {
-
         val runRepository = mock<RecRunRepository> {
             on { save(any()) } doReturn Mono.just(startedRun)
         }

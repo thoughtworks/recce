@@ -33,7 +33,7 @@ val configProvider = mock<DatasetConfigProvider> {
             DataLoadDefinition("source2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")),
             DataLoadDefinition("target2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")),
             Schedule("0 0 0 ? * *")
-        ).apply { id = "datasets" },
+        ).apply { id = "datasets" }
     )
 }
 
@@ -68,7 +68,7 @@ internal class DatasetControllerTest {
                             "two",
                             DatasourceApiModel("source1"),
                             DatasourceApiModel("target1")
-                        ),
+                        )
                     )
                 )
         }
