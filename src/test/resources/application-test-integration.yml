@@ -1,10 +1,10 @@
 datasources:
-  source-h2:
+  source-h2-sync:
     url: jdbc:h2:mem:sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
     password: ""
-  target-h2:
+  target-h2-sync:
     url: jdbc:h2:mem:targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa

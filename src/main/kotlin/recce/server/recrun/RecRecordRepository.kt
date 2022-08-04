@@ -6,10 +6,10 @@ import io.micronaut.data.r2dbc.annotation.R2dbcRepository
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.data.repository.reactive.ReactorCrudRepository
 import io.r2dbc.spi.Row
+import jakarta.persistence.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
-import javax.persistence.*
 import kotlin.reflect.KMutableProperty1
 
 // Declared as an interface to make it possible to replace the bean with a mock in tests

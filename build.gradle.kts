@@ -30,7 +30,7 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.5.3",
+    "micronaut" to "io.micronaut:micronaut-core:3.6.0",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
@@ -112,13 +112,13 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
-    compileOnly("jakarta.persistence:jakarta.persistence-api:2.2.3")
+    compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql:42.4.1") // Remove version number when Micronaut has updated to at least 42.3.6
+    runtimeOnly("org.postgresql:postgresql")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")

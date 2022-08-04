@@ -33,11 +33,11 @@ class DatasetRecServiceIntegrationTest {
     @TempDir lateinit var tempDir: Path
 
     @Inject
-    @field:Named("source-h2")
+    @field:Named("source-h2-sync")
     lateinit var sourceDataSource: DataSource
 
     @Inject
-    @field:Named("target-h2")
+    @field:Named("target-h2-sync")
     lateinit var targetDataSource: DataSource
 
     @Inject lateinit var ctx: ApplicationContext
