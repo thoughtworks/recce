@@ -30,7 +30,7 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.4.4",
+    "micronaut" to "io.micronaut:micronaut-core:3.6.0",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
@@ -83,7 +83,7 @@ kapt {
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("junit:junit"))
-            .using(module("io.quarkus:quarkus-junit4-mock:2.11.1.Final"))
+            .using(module("io.quarkus:quarkus-junit4-mock:2.11.2.Final"))
             .because(
                 "We don't want JUnit 4; but is an unneeded transitive of testcontainers. " +
                     "See https://github.com/testcontainers/testcontainers-java/issues/970"
@@ -112,19 +112,19 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-annotations")
 
     // Core persistence support with Micronaut Data
-    compileOnly("jakarta.persistence:jakarta.persistence-api:2.2.3")
+    compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql:42.4.1") // Remove version number when Micronaut has updated to at least 42.3.6
+    runtimeOnly("org.postgresql:postgresql")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
     implementation("io.micronaut.r2dbc:micronaut-r2dbc-core")
     runtimeOnly("io.r2dbc:r2dbc-pool")
-    runtimeOnly("io.r2dbc:r2dbc-postgresql")
+    runtimeOnly("org.postgresql:r2dbc-postgresql")
     runtimeOnly("io.r2dbc:r2dbc-mssql")
     runtimeOnly("dev.miku:r2dbc-mysql")
     runtimeOnly("org.mariadb:r2dbc-mariadb")
@@ -161,7 +161,10 @@ dependencies {
     testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
     testRuntimeOnly("com.h2database:h2")
-    testRuntimeOnly("io.r2dbc:r2dbc-h2")
+    testRuntimeOnly("io.r2dbc:r2dbc-h2:1.0.0.RC1") {
+        // Remove version number and excludes block when Micronaut has updated to at least 1.0.0.RELEASE
+        exclude("io.projectreactor", "reactor-core")
+    }
 }
 
 dependencyCheck {
