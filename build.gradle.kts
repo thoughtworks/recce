@@ -9,6 +9,7 @@ plugins {
     id("io.micronaut.application") version "3.5.1"
     id("com.diffplug.spotless") version "6.9.1"
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
+    id("com.github.spotbugs") version "5.0.9"
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.google.cloud.tools.jib") version "3.2.1"
@@ -165,6 +166,9 @@ dependencies {
         // Remove version number and excludes block when Micronaut has updated to at least 1.0.0.RELEASE
         exclude("io.projectreactor", "reactor-core")
     }
+
+    spotbugs("com.github.spotbugs:spotbugs:4.7.1")
+    spotbugsPlugins("com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0")
 }
 
 dependencyCheck {
@@ -206,6 +210,18 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         xml.required.set(false)
         txt.required.set(false)
         sarif.required.set(false)
+    }
+}
+
+spotbugs {
+    excludeFilter.set(file("build-config/spotbugs-exclude.xml"))
+}
+
+tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
+    reports.create("html") {
+        required.set(true)
+        outputLocation.set(file("$buildDir/reports/${this@configureEach.name}.html"))
+        setStylesheet("fancy-hist.xsl")
     }
 }
 
