@@ -12,7 +12,7 @@ plugins {
     id("com.github.spotbugs") version "5.0.10"
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
-    id("com.google.cloud.tools.jib") version "3.2.1"
+    id("com.google.cloud.tools.jib") version "3.3.0"
     id("com.github.ben-manes.versions") version "0.42.0"
     id("org.barfuin.gradle.taskinfo") version "1.4.0"
     id("org.ajoberstar.reckon") version "0.16.1"
