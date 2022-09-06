@@ -9,7 +9,7 @@ plugins {
     id("io.micronaut.application") version "3.5.3"
     id("com.diffplug.spotless") version "6.10.0"
     id("io.gitlab.arturbosch.detekt") version "1.21.0"
-    id("com.github.spotbugs") version "5.0.11"
+    id("com.github.spotbugs") version "5.0.12"
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.google.cloud.tools.jib") version "3.3.0"
