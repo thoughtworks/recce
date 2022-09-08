@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/ThoughtWorks-SEA/recce/actions/workflows/build.yml/badge.svg)](https://github.com/ThoughtWorks-SEA/recce/actions/workflows/build.yml)
 
-Recce is a database reconciliation tool **_for developers_**.
+Recce (_rek-ee_) is a database reconciliation tool **_for developers_**.
 
 It is intended to make it easier to reconcile arbitrary datasets between **source** and **target** database schemas **on an
 ongoing basis** using configured SQL expressions without writing code.
