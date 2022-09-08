@@ -197,12 +197,19 @@ docker run -p 8080:8080 \
 
 ## Configuring authentication
 
-The credentials used in basic authentication to protect the API endpoints can be configured in the `auth` block of your config file.
+Recce supports only basic authentication for API endpoints out of the box. The credentials used in basic authentication
+to protect the API endpoints can be configured in the `auth` block of your config file.
 
 ```yaml
 auth:
     username: some-username
     password: some-password
+```
+
+or read from the environment:
+```bash
+export AUTH_USERNAME=some-username
+export AUTH_PASSWORD=some-password
 ```
 
 ## Configuring datasources
