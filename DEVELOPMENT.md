@@ -98,9 +98,10 @@ Recce is a [Micronaut](https://docs.micronaut.io/latest/guide/) JVM application 
 - Recce uses raw Micronaut Data R2DBC SQL to execute configured queries ([example](examples/scenario/petshop-mariadb/application-petshop-mariadb.yml)) defined against external databases
 
 ## Build
-- Gradle (Kotlin-style) is used build automation
+- Gradle (Kotlin-style) is used for build automation
 - Code is linted using [Spotless Gradle](https://github.com/diffplug/spotless/tree/main/plugin-gradle), with [ktlint](https://github.com/pinterest/ktlint) for Kotlin.
     - _Tip_: Spotless/ktlint can auto-fix a lot of nitpicks with `./gradlew spotlessApply`
+- [Detekt](https://detekt.dev/) & [FindSecBugs](https://find-sec-bugs.github.io/) (with [SpotBugs](https://spotbugs.github.io/)) are used for static analysis from a coding practices and security perspective.
 - [Batect](https://batect.dev/) is available to automate dev+testing tasks within containers, including running Recce locally
 - [GitHub Actions](.github/workflows) are being used to automate build+test
 
