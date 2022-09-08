@@ -8,6 +8,9 @@ on:
     branches: [master]
     paths-ignore: ["**.md"]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
