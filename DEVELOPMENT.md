@@ -56,26 +56,6 @@ If using IntelliJ IDEA, you should be able to create the project from the clone 
 * *Project Settings* > *Project* > Ensure SDK and language level is set to Java 17
 * *Gradle* > *Gradle Settings* > Set `Run Tests Using` to `IntelliJ IDEA`.
   * This will typically give you much faster feedback than waiting for the Gradle runner. Unfortunately at time of writing you cannot build using IntelliJ IDEA natively, because kapt annotation processing for Kotlin is [not supported outside of Gradle/Maven builds](https://youtrack.jetbrains.com/issue/KT-15040).
-
-# Setting up new folks for access
-
-While this remains an internal project there are some things to do
-
-## Add user to GitHub org
-* Ask a `Manager` within [the NEO team](https://neo.thoughtworks.net/teams/8FiOTVa06k/Regional_IT_-_SEA_-_China_Regional_IT) to invite the user via their Thoughtworks identity
-* New person accepts the invite and does an Okta "dance" to accept the invitation.
-* Everyone in the org has read access. If the new user is expected to commit, ask them to be added to [the GitHub (sub-)team](https://github.com/orgs/ThoughtWorks-SEA/teams/recce)
-* To clone with SSH, user will need to [authorize their SSH key for use with SSO](https://docs.github.com/en/authentication/authenticating-with-saml-single-sign-on/authorizing-an-ssh-key-for-use-with-saml-single-sign-on) for the org.
-
-## Pulling container images
-Pulling officially built Docker images locally requires some additional setup to authenticate with the GitHub Container Registry: 
-* Generate a personal access token in [your account](https://github.com/settings/tokens) with `packages:read` permission.
-* Use Configure SSO to [authorize the token for SSO access via the organisation](https://docs.github.com/en/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on)
-* Login with something like the below (see [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) for details)
-    ```shell
-   echo "ghp_REST_OF_TOKEN" | docker login https://ghcr.io -u my-github-username --password-stdin
-    ```
-* Then `docker pull ghcr.io/thoughtworks-sea/recce-server` etc should work.
  
 # Technical Overview
 
@@ -118,3 +98,17 @@ These tend to evolve over time and should be re-evaluated as needed, however
 
 ### Micronaut Tests
 Due to the config-driven nature of the tool, there are a number of tests which load Micronaut configuration via `@MicronautTest` or `ApplicationContext.run(props)`. Since certain config files are automatically loaded, to keep these as fast as possible the default configurations in [`application.yml`](./src/main/resources/application.yml) and [`application-test.yml`](https://github.com/ThoughtWorks-SEA/recce/blob/master/src/test/resources/application-test.yml) should be as light as possible and avoid doing slow things, triggering automated processes etc.
+
+# For maintainers
+
+Currently, core maintainer privileges are only available to Thoughtworkers. A setup guide is available [here (internal only)](https://docs.google.com/document/d/1r56rDyGOnRQAAMyHtUHflML1szdvQJMi8p3bzMNB_8A/edit#).
+
+## Pulling container images
+Officially built Docker images are not published publicly right now. Pulling them locally requires some additional setup to authenticate with the GitHub Container Registry:
+* Generate a personal access token in [your account](https://github.com/settings/tokens) with `packages:read` permission.
+* Use Configure SSO to [authorize the token for SSO access via the organisation](https://docs.github.com/en/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on)
+* Login with something like the below (see [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) for details)
+    ```shell
+   echo "ghp_REST_OF_TOKEN" | docker login https://ghcr.io -u my-github-username --password-stdin
+    ```
+* Then `docker pull ghcr.io/thoughtworks-sea/recce-server` etc should work.
