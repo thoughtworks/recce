@@ -3,9 +3,6 @@
 * [Pre-requisites](DEVELOPMENT.md#pre-requisites)
 * [Getting Started](DEVELOPMENT.md#getting-started)
 * [IDE Setup](DEVELOPMENT.md#ide-setup)
-* [Setting up new folks for access](DEVELOPMENT.md#setting-up-new-folks-for-access)
-   * [Add user to GitHub org](DEVELOPMENT.md#add-user-to-github-org)
-   * [Pulling container images](DEVELOPMENT.md#pulling-container-images)
 * [Technical Overview](DEVELOPMENT.md#technical-overview)
    * [Recce Database](DEVELOPMENT.md#recce-database)
    * [External data sources for Reconciliation](DEVELOPMENT.md#external-data-sources-for-reconciliation)
@@ -13,6 +10,8 @@
    * [Testing](DEVELOPMENT.md#testing)
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
+* [For maintainers](DEVELOPMENT.md#for-maintainers)
+   * [Pulling container images](DEVELOPMENT.md#pulling-container-images)
 <!--te-->
 
 # Pre-requisites
