@@ -41,8 +41,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 * [Development](README.md#development)
 * [FAQ](README.md#faq)
 
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: runner, at: Sat Jun 25 10:04:35 UTC 2022 -->
+<!-- Added by: runner, at: Thu Sep  8 10:47:38 UTC 2022 -->
 
 <!--te-->
 
