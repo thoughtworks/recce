@@ -308,7 +308,7 @@ Fuller example Recce-specific configuration is [available here](src/main/resourc
 
 ## Writing dataset queries
 
-The general philosophy of Recce is that differences between source and target are **best handled by the developer** in SQL.
+The general philosophy of Recce is that differences between source and target are **best handled by the developer** using regular SQL queries.
 
 ### The MigrationKey
 
