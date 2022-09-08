@@ -13,9 +13,6 @@
    * [Testing](DEVELOPMENT.md#testing)
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
-
-<!-- Added by: runner, at: Thu Sep  8 10:47:38 UTC 2022 -->
-
 <!--te-->
 
 # Pre-requisites

@@ -40,9 +40,6 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
       * [Huge datasets and aggregates](README.md#huge-datasets-and-aggregates)
 * [Development](README.md#development)
 * [FAQ](README.md#faq)
-
-<!-- Added by: runner, at: Thu Sep  8 10:47:38 UTC 2022 -->
-
 <!--te-->
 
 # Getting Started
