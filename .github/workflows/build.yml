@@ -51,6 +51,7 @@ jobs:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: build
+          gradle-home-cache-cleanup: true
 
       - name: Save test results artifact
         if: always()
