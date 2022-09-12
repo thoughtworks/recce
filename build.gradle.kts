@@ -185,7 +185,7 @@ application {
 tasks.run.configure {
     doFirst { environment("version", "$version") }
 
-    // Workaround https://github.com/ThoughtWorks-SEA/recce/issues/155
+    // Workaround https://github.com/thoughtworks-sea/recce/issues/155
     jvmArgs("-XX:+StartAttachListener")
     environment.computeIfAbsent("AUTH_USERNAME") { "admin" }
     environment.computeIfAbsent("AUTH_PASSWORD") { "admin" }
@@ -232,6 +232,7 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+    reports.xml.required.set(true)
 }
 
 tasks.register<Test>("slowTests") {
