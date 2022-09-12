@@ -96,7 +96,7 @@ These tend to evolve over time and should be re-evaluated as needed, however
 * Other tests are mainly pure unit tests; although might do "fast" things such as use Micronaut to load configuration
 
 ### Micronaut Tests
-Due to the config-driven nature of the tool, there are a number of tests which load Micronaut configuration via `@MicronautTest` or `ApplicationContext.run(props)`. Since certain config files are automatically loaded, to keep these as fast as possible the default configurations in [`application.yml`](./src/main/resources/application.yml) and [`application-test.yml`](https://github.com/ThoughtWorks-SEA/recce/blob/master/src/test/resources/application-test.yml) should be as light as possible and avoid doing slow things, triggering automated processes etc.
+Due to the config-driven nature of the tool, there are a number of tests which load Micronaut configuration via `@MicronautTest` or `ApplicationContext.run(props)`. Since certain config files are automatically loaded, to keep these as fast as possible the default configurations in [`application.yml`](./src/main/resources/application.yml) and [`application-test.yml`](src/test/resources/application-test.yml) should be as light as possible and avoid doing slow things, triggering automated processes etc.
 
 # For maintainers
 
