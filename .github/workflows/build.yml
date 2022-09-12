@@ -20,37 +20,48 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: ASDF setup
         uses: asdf-vm/actions/setup@v1
+
       - name: ASDF Cache
         id: asdf-cache
         uses: actions/cache@v3
         with:
           path: ${{ env.ASDF_DIR }}
           key: ${{ runner.os }}-${{ hashFiles('**/.tool-versions') }}
+
       - name: ASDF tool install
         uses: asdf-vm/actions/install@v1
         if: steps.asdf-cache.outputs.cache-hit != 'true'
+
       - name: Set JAVA_HOME from ASDF
         run: echo "JAVA_HOME=$(dirname $(dirname $(asdf which java)))" >> $GITHUB_ENV
+
       - name: Gradle Build, Lint, Test
         uses: gradle/gradle-build-action@v2
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: build
+
       - name: Save test results artifact
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-report
           path: build/reports/tests/test
+
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@v3.1.0
+
       - name: Gradle Local Docker Trial Build
         uses: gradle/gradle-build-action@v2
         if: ${{ !endsWith(github.ref, '/master') }}
@@ -58,6 +69,7 @@ jobs:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           arguments: jibDockerBuild -x check
+
       - name: Gradle Official Docker Build & Push
         uses: gradle/gradle-build-action@v2
         if: ${{ endsWith(github.ref, '/master') }}

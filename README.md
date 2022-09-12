@@ -1,6 +1,8 @@
 # Recce Server
 
 [![Build Status](https://github.com/ThoughtWorks-SEA/recce/actions/workflows/build.yml/badge.svg)](https://github.com/ThoughtWorks-SEA/recce/actions/workflows/build.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/ThoughtWorks-SEA/recce.svg)](https://codecov.io/gh/ThoughtWorks-SEA/recce)
+[![License](https://img.shields.io/github/license/ThoughtWorks-SEA/recce.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Recce (_rek-ee_) is a database reconciliation tool **_for developers_**.
 
