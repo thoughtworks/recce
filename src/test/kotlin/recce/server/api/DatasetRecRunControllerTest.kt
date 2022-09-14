@@ -262,10 +262,14 @@ internal class DatasetRecRunControllerApiTest {
                 hasEntry("totalCount", 10),
                 hasEntry("bothMatchedCount", 3),
                 hasEntry("bothMismatchedCount", 4),
-                if (expectSampleKeys) hasEntry(
-                    "bothMismatchedSampleKeys",
-                    listOf("both-0")
-                ) else not(hasKey("bothMismatchedSampleKeys"))
+                if (expectSampleKeys) {
+                    hasEntry(
+                        "bothMismatchedSampleKeys",
+                        listOf("both-0")
+                    )
+                } else {
+                    not(hasKey("bothMismatchedSampleKeys"))
+                }
             )
         )
         body(
@@ -273,10 +277,14 @@ internal class DatasetRecRunControllerApiTest {
             allOf(
                 hasEntry("totalCount", 8),
                 hasEntry("onlyHereCount", 1),
-                if (expectSampleKeys) hasEntry(
-                    "onlyHereSampleKeys",
-                    listOf("source-0")
-                ) else not(hasKey("onlyHereSampleKeys"))
+                if (expectSampleKeys) {
+                    hasEntry(
+                        "onlyHereSampleKeys",
+                        listOf("source-0")
+                    )
+                } else {
+                    not(hasKey("onlyHereSampleKeys"))
+                }
             )
         )
         body("summary.source.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
@@ -285,10 +293,14 @@ internal class DatasetRecRunControllerApiTest {
             allOf(
                 hasEntry("totalCount", 9),
                 hasEntry("onlyHereCount", 2),
-                if (expectSampleKeys) hasEntry(
-                    "onlyHereSampleKeys",
-                    listOf("target-0")
-                ) else not(hasKey("onlyHereSampleKeys"))
+                if (expectSampleKeys) {
+                    hasEntry(
+                        "onlyHereSampleKeys",
+                        listOf("target-0")
+                    )
+                } else {
+                    not(hasKey("onlyHereSampleKeys"))
+                }
             )
         )
         body("summary.target.meta.cols", equalTo(listOf(mapOf("name" to "test1", "javaType" to "String"))))
