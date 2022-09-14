@@ -42,7 +42,10 @@ class DatasetRecRunController(
         val runId: Int,
 
         @field:Schema(description = "How many sample mismatched migration keys of each type (only in source, only in target, mismatched data) in the results")
-        @field:QueryValue(defaultValue = "0") @field:Nullable @field:PositiveOrZero @field:Max(MAXIMUM_SAMPLE_KEYS)
+        @field:QueryValue(defaultValue = "0")
+        @field:Nullable
+        @field:PositiveOrZero
+        @field:Max(MAXIMUM_SAMPLE_KEYS)
         val includeSampleKeys: Int = 0
     )
 
@@ -86,7 +89,8 @@ class DatasetRecRunController(
     @Introspected
     data class RunQueryParams(
         @field:Schema(description = "Identifier of the dataset to search for runs for")
-        @field:NotBlank @field:QueryValue("datasetId")
+        @field:NotBlank
+        @field:QueryValue("datasetId")
         val datasetId: String
     )
 
