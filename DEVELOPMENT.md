@@ -101,3 +101,13 @@ Due to the config-driven nature of the tool, there are a number of tests which l
 
 Currently, core maintainer privileges are only available to Thoughtworkers. A setup guide is available [here (internal only)](https://docs.google.com/document/d/1r56rDyGOnRQAAMyHtUHflML1szdvQJMi8p3bzMNB_8A/edit#).
 
+## Releasing
+
+Needs to be more automated. Current we are experimenting with using [Reckon](https://github.com/ajoberstar/reckon) to determine versions from flags.
+
+Current release process looks like
+1. Tag locally and push
+    ```shell
+    ./gradlew -Preckon.stage=final reckonTagPush
+    ```
+2. This will trigger a build on GitHub Actions and push to GHCR. Create a new elease on Github via https://github.com/ThoughtWorks-SEA/recce/releases

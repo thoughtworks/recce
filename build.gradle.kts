@@ -288,3 +288,7 @@ tasks.jibDockerBuild.configure {
         }
     }
 }
+
+tasks.reckonTagCreate {
+    dependsOn(tasks.check)
+}
