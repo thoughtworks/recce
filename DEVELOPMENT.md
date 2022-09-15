@@ -102,12 +102,3 @@ Due to the config-driven nature of the tool, there are a number of tests which l
 
 Currently, core maintainer privileges are only available to Thoughtworkers. A setup guide is available [here (internal only)](https://docs.google.com/document/d/1r56rDyGOnRQAAMyHtUHflML1szdvQJMi8p3bzMNB_8A/edit#).
 
-## Pulling container images
-Officially built Docker images are not published publicly right now. Pulling them locally requires some additional setup to authenticate with the GitHub Container Registry:
-* Generate a personal access token in [your account](https://github.com/settings/tokens) with `packages:read` permission.
-* Use Configure SSO to [authorize the token for SSO access via the organisation](https://docs.github.com/en/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on)
-* Login with something like the below (see [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) for details)
-    ```shell
-   echo "ghp_REST_OF_TOKEN" | docker login https://ghcr.io -u my-github-username --password-stdin
-    ```
-* Then `docker pull ghcr.io/thoughtworks-sea/recce-server` etc should work.

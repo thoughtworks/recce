@@ -46,7 +46,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 
 # Getting Started
 
-Recce is currently only published as a container image to a private GHCR repo.
+Recce is currently [published and available as a container image via GHCR](https://github.com/ThoughtWorks-SEA/recce/pkgs/container/recce-server).
 
 However, it also
 * requires a Postgres database
