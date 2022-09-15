@@ -11,6 +11,7 @@
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
 * [For maintainers](DEVELOPMENT.md#for-maintainers)
+   * [Releasing](DEVELOPMENT.md#releasing)
 <!--te-->
 
 # Pre-requisites
