@@ -11,7 +11,6 @@
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
 * [For maintainers](DEVELOPMENT.md#for-maintainers)
-   * [Pulling container images](DEVELOPMENT.md#pulling-container-images)
 <!--te-->
 
 # Pre-requisites
