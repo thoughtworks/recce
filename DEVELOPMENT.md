@@ -107,8 +107,12 @@ Currently, core maintainer privileges are only available to Thoughtworkers. A se
 Needs to be more automated. Current we are experimenting with using [Reckon](https://github.com/ajoberstar/reckon) to determine versions from flags.
 
 Current release process looks like
-1. Tag locally and push
+1. Tag locally and pushersion
     ```shell
+    # Minor version (e.g 1.1 -> 1.2)
     ./gradlew -Preckon.stage=final reckonTagPush
+   
+    # Patch version (e.g 0.6.0 -> 0.6.1)   
+    ./gradlew -Preckon.stage=final -Preckon.scope=patch reckonTagPush
     ```
 2. This will trigger a build on GitHub Actions and push to GHCR. Create a new elease on Github via https://github.com/ThoughtWorks-SEA/recce/releases
