@@ -119,7 +119,7 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql:42.5.0") // Remove version number when Micronaut has updated to 42.4.1+
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
@@ -162,8 +162,8 @@ dependencies {
     testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
     testRuntimeOnly("com.h2database:h2")
+    // Remove version number and excludes block when Micronaut has updated to at least 1.0.0.RELEASE
     testRuntimeOnly("io.r2dbc:r2dbc-h2:1.0.0.RC1") {
-        // Remove version number and excludes block when Micronaut has updated to at least 1.0.0.RELEASE
         exclude("io.projectreactor", "reactor-core")
     }
 
