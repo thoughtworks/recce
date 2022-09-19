@@ -105,7 +105,7 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.7")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.0")
     runtimeOnly("ch.qos.logback:logback-classic")
 
     // OpenAPI specification and interactive UI generated from code
