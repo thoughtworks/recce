@@ -16,7 +16,10 @@ import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import recce.server.auth.AuthConfiguration
-import recce.server.dataset.*
+import recce.server.dataset.DataLoadDefinition
+import recce.server.dataset.DatasetConfigProvider
+import recce.server.dataset.DatasetConfiguration
+import recce.server.dataset.Schedule
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -75,7 +78,7 @@ internal class DatasetControllerTest {
     }
 }
 
-@MicronautTest
+@MicronautTest(transactional = false)
 internal class DatasetControllerApiTest {
 
     @Inject

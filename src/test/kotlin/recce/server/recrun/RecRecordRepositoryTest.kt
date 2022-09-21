@@ -12,7 +12,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.kotlin.test.test
 
-@MicronautTest
+@MicronautTest(transactional = false)
 class RecRecordRepositoryTest {
     @Inject
     lateinit var runRepository: RecRunRepository

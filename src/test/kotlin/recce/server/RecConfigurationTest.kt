@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 
 @MicronautTest(
     environments = ["test-integration"],
-    propertySources = ["classpath:config/application-test-dataset.yml"]
+    propertySources = ["classpath:config/application-test-dataset.yml"],
+    transactional = false
 )
 internal class RecConfigurationTest {
 
