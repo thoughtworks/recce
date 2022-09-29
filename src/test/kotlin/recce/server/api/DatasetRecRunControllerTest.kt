@@ -183,7 +183,7 @@ internal class DatasetRecRunControllerTest {
 @MicronautTest
 internal class DatasetRecRunControllerApiTest {
 
-    val sampleRows =
+    private val sampleRows =
         List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "source-$it"), sourceData = "set") } +
             List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "target-$it"), targetData = "set") } +
             List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "both-$it"), sourceData = "set", targetData = "set2") }
@@ -248,6 +248,7 @@ internal class DatasetRecRunControllerApiTest {
         }
     }
 
+    @Suppress("INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING")
     private fun ValidatableResponse.validateTestResultsAreReturned(expectSampleKeys: Boolean = false) {
         statusCode(HttpStatus.SC_OK)
         body("datasetId", equalTo(TEST_DATASET_ID))
