@@ -256,12 +256,10 @@ jib {
         image = "eclipse-temurin:${depVersions["javaMajor"]}-jdk-alpine"
     }
     to {
-        val fullVersion = com.github.gundy.semver4j.model.Version.fromString(project.version.toString())
-        val tagVersion = com.github.gundy.semver4j.model.Version.builder()
-            .major(fullVersion.major)
-            .minor(fullVersion.minor)
-            .patch(fullVersion.patch)
-            .preReleaseIdentifiers(fullVersion.preReleaseIdentifiers.filterIndexed { i, _ -> i == 0 })
+        val fullVersion = com.github.zafarkhaja.semver.Version.valueOf(project.version.toString())
+        val tagVersion = com.github.zafarkhaja.semver.Version.Builder()
+            .setNormalVersion(fullVersion.normalVersion)
+            .setPreReleaseVersion(fullVersion.preReleaseVersion.split('.')[0])
             .build()
         image = "ghcr.io/$githubRepoOwner/$containerRepoName"
         tags = setOf(tagVersion.toString(), "latest")
