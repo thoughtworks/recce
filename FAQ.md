@@ -25,7 +25,7 @@ Sure, but it might be slower than you would like. This will mostly depend on the
 
 **I don't like SQL in YAML. Is there a better way?**
 
-Neither. And probably. It might be a good idea to allow Recce to load queries from files, either explicitly or based on a convention. Ideas welcome!
+Neither. And probably. Recce can now load queries from files, either explicitly or based on a convention. Feedback on this approach is welcome!
 
 **Shouldn't this be done with data pipelines and big data technology X?**
 
