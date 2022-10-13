@@ -118,6 +118,9 @@ dependencies {
     // Core persistence support with Micronaut Data
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
+    // Temporary override of Jackson versions due to CVE-2022-42003. Remove when Micronaut has updated
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.13.4.20221012"))
+
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
