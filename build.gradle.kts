@@ -181,7 +181,7 @@ dependencyCheck {
     suppressionFile = "build-config/dependency-check-suppressions.xml"
     scanConfigurations = listOf("runtimeClasspath", "testRuntimeClasspath")
     skipTestGroups = false
-    analyzers.assemblyEnabled = false // Unneeded, and creares warning noise
+    analyzers.assemblyEnabled = false // Unneeded, and creates warning noise
 }
 
 application {
