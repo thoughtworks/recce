@@ -64,7 +64,7 @@ containers:
       - source-db # Expected to be defined by an included file
       - target-db # Expected to be defined by an included file
     enable_init_process: true
-    command: sh -c "sleep 86400"
+    command: sh -c "sleep 1d"
   recce-docker-local:
     image: recce-server
     dependencies:
