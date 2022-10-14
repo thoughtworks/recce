@@ -119,7 +119,7 @@ dependencies {
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
     // Temporary override of Jackson versions due to CVE-2022-42003. Remove when Micronaut has updated
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.13.4.20221012"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.13.4.20221013"))
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
