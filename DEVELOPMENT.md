@@ -98,6 +98,30 @@ These tend to evolve over time and should be re-evaluated as needed, however
 ### Micronaut Tests
 Due to the config-driven nature of the tool, there are a number of tests which load Micronaut configuration via `@MicronautTest` or `ApplicationContext.run(props)`. Since certain config files are automatically loaded, to keep these as fast as possible the default configurations in [`application.yml`](./src/main/resources/application.yml) and [`application-test.yml`](src/test/resources/application-test.yml) should be as light as possible and avoid doing slow things, triggering automated processes etc.
 
+# Common problems
+
+## Running tests via Colima
+
+Some tests run within containers via Testcontainers. You might have issues if you are using [Colima](https://github.com/abiosoft/colima) rather than Docker.
+
+Try setting the below per [this issue](https://github.com/testcontainers/testcontainers-java/issues/5034#issuecomment-1036433226).
+```shell
+export DOCKER_HOST="unix:///${HOME}/.colima/docker.sock"
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+```
+
+## Out of Memory errors running within containers
+
+Running `./batect` run fails and returns an error with error code `137`. The stack trace also indicates a `HeapDumpOnOutOfMemoryError`.
+
+If you're running on MacOS using Colima or Docker Desktop, the default VM created might be too small. When running the example scenarios, it starts multiple containers including the 'example' MariaDB databases. Hence, the VM needs more memory (at least 3GB) to avoid having to constrain Recce’s memory usage.
+
+* With Docker Desktop you can adjust using the GUI.
+* When using Colima, this can be done by recreating your colima VM with something like the below. 
+    ```shell
+    colima delete && colima start --cpu 6 --memory 6
+    ```
+
 # For maintainers
 
 Currently, core maintainer privileges are only available to Thoughtworkers. A setup guide is available [here (internal only)](https://docs.google.com/document/d/1r56rDyGOnRQAAMyHtUHflML1szdvQJMi8p3bzMNB_8A/edit#).
@@ -115,5 +139,5 @@ Current release process looks like
     # Patch version (e.g 0.6.0 -> 0.6.1)   
     ./gradlew -Preckon.stage=final -Preckon.scope=patch reckonTagPush
     ```
-2. The tag push will trigger a build on [GitHub Actions](https://github.com/ThoughtWorks-SEA/recce/actions) and push to GHCR. 
+2. The tag push will trigger a build on [GitHub Actions](https://github.com/ThoughtWorks-SEA/recce/actions) and push to GHCR.
 3. Create a new release on Github via https://github.com/ThoughtWorks-SEA/recce/releases
