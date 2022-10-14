@@ -47,15 +47,12 @@ repositories {
     mavenCentral()
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(depVersions["javaMajor"]!!))
-    }
+kotlin {
+    jvmToolchain(depVersions["javaMajor"]!!.toInt())
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = depVersions["javaMajor"]!!
         allWarningsAsErrors = true
     }
 }
