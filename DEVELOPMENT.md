@@ -10,6 +10,9 @@
    * [Testing](DEVELOPMENT.md#testing)
       * [Testing conventions](DEVELOPMENT.md#testing-conventions)
       * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
+* [Common problems](DEVELOPMENT.md#common-problems)
+   * [Running tests via Colima](DEVELOPMENT.md#running-tests-via-colima)
+   * [Out of Memory errors running within containers](DEVELOPMENT.md#out-of-memory-errors-running-within-containers)
 * [For maintainers](DEVELOPMENT.md#for-maintainers)
    * [Releasing](DEVELOPMENT.md#releasing)
 <!--te-->
