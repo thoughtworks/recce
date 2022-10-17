@@ -57,14 +57,6 @@ containers:
     working_directory: /code
     environment:
       GRADLE_OPTS: -Dorg.gradle.daemon=false
-  recce-dependencies:
-    image: alpine:latest
-    dependencies:
-      - recce-db
-      - source-db # Expected to be defined by an included file
-      - target-db # Expected to be defined by an included file
-    enable_init_process: true
-    command: sh -c "sleep 1d"
   recce-docker-local:
     image: recce-server
     dependencies:
@@ -135,8 +127,11 @@ tasks:
     group: recce
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
+    dependencies:
+      - source-db # Expected to be defined by an included file
+      - target-db # Expected to be defined by an included file
     run:
-      container: recce-dependencies
+      container: recce-db
   docs:
     description: Render architecture documentation
     group: recce
