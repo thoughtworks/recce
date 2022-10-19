@@ -200,8 +200,8 @@ to protect the API endpoints can be configured in the `auth` block of your confi
 
 ```yaml
 auth:
-    username: some-username
-    password: some-password
+  username: some-username
+  password: some-password
 ```
 
 or read from the environment:
