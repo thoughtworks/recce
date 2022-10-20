@@ -16,7 +16,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.43.0"
     id("org.barfuin.gradle.taskinfo") version "2.0.0"
     id("org.ajoberstar.reckon") version "0.16.1"
-    id("org.owasp.dependencycheck") version "7.2.1"
+    id("org.owasp.dependencycheck") version "7.3.0"
 }
 
 group = "recce.server"
