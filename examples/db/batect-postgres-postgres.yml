@@ -1,0 +1,5 @@
+forbid_telemetry: true
+include:
+  - ../../batect.yml
+  - batect-source-postgres.yml
+  - batect-target-postgres.yml

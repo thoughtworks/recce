@@ -1,4 +1,3 @@
-forbid_telemetry: true
 config_variables:
   example-scenario:
     description: Which example scenario to run from `ls examples/scenario`
@@ -12,12 +11,6 @@ config_variables:
   db-password:
     description: Password to use for all local DBs
     default: password
-include:
-  # Include just one source and one target DB of each type
-  - examples/db/batect-source-mariadb.yml
-  - examples/db/batect-target-mariadb.yml
-#  - examples/db/batect-source-postgres.yml
-#  - examples/db/batect-target-postgres.yml
 containers:
   recce-db:
     image: postgres:14-alpine
@@ -48,7 +41,7 @@ containers:
       - type: cache
         name: gradle-build-dir
         container: /code/build
-      - local: <{batect.project_directory}
+      - local: .
         container: /code
         options: cached
       - type: cache
@@ -67,7 +60,7 @@ containers:
       - local: 8080
         container: 8080
     volumes:
-      - local: <{batect.project_directory}/examples
+      - local: ./examples
         container: /examples
         options: cached
   recce-docs:
@@ -76,7 +69,7 @@ containers:
       - local: 8081
         container: 8080
     volumes:
-      - local: <{batect.project_directory}/docs
+      - local: ./docs
         container: /usr/local/structurizr
         options: cached
 tasks:
