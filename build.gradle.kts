@@ -12,7 +12,7 @@ plugins {
     id("com.github.spotbugs") version "5.0.13"
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
-    id("com.google.cloud.tools.jib") version "3.3.0"
+    id("com.google.cloud.tools.jib") version "3.3.1"
     id("com.github.ben-manes.versions") version "0.43.0"
     id("org.barfuin.gradle.taskinfo") version "2.0.0"
     id("org.ajoberstar.reckon") version "0.16.1"
@@ -271,7 +271,6 @@ jib {
         user = "1000:1000"
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
-        creationTime = "USE_CURRENT_TIMESTAMP"
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
     }
 }
