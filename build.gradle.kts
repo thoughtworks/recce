@@ -271,7 +271,6 @@ jib {
         user = "1000:1000"
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
-        creationTime = "USE_CURRENT_TIMESTAMP"
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
     }
 }
