@@ -1,3 +1,13 @@
+config_variables:
+  db-name:
+    description: Name of the DB to create for all local DBs
+    default: db
+  db-user:
+    description: Username to use for all local DBs
+    default: user
+  db-password:
+    description: Password to use for all local DBs
+    default: password
 containers:
   recce-gradle:
     image: eclipse-temurin:17-jdk-alpine
@@ -20,6 +30,19 @@ containers:
     working_directory: /code
     environment:
       GRADLE_OPTS: -Dorg.gradle.daemon=false
+  recce-db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: <{db-name}
+      POSTGRES_USER: <{db-user}
+      POSTGRES_PASSWORD: <{db-password}
+    ports:
+      - local: 9000
+        container: 5432
+    volumes:
+      - type: cache
+        name: recce-db-data
+        container: /var/lib/postgresql/data
   recce-docs:
     image: structurizr/lite
     ports:
@@ -42,6 +65,11 @@ tasks:
     run:
       container: recce-gradle
       command: ./gradlew build
+  run-db:
+    description: Start a standalone Postgres DB for use with Recce run locally (e.g from IDE/Gradle for debugging)
+    group: recce
+    run:
+      container: recce-db
   docs:
     description: Render architecture documentation
     group: recce

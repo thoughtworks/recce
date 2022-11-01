@@ -1,35 +1,12 @@
-config_variables:
-  db-name:
-    description: Name of the DB to create for all local DBs
-    default: db
-  db-user:
-    description: Username to use for all local DBs
-    default: user
-  db-password:
-    description: Password to use for all local DBs
-    default: password
 include:
   - batect.yml
 containers:
-  recce-db:
-    image: postgres:14-alpine
-    environment:
-      POSTGRES_DB: <{db-name}
-      POSTGRES_USER: <{db-user}
-      POSTGRES_PASSWORD: <{db-password}
-    ports:
-      - local: 9000
-        container: 5432
-    volumes:
-      - type: cache
-        name: recce-db-data
-        container: /var/lib/postgresql/data
   recce-docker-local:
     image: recce-server
     dependencies:
-      - recce-db
-      - source-db # Expected to be defined by an included file
-      - target-db # Expected to be defined by an included file
+      - recce-db # Expected to be defined by batect.yml
+      - source-db # Expected to be defined by a wraoping example scenario that includes this
+      - target-db # Expected to be defined by a wraoping example scenario that includes this
     ports:
       - local: 8080
         container: 8080
@@ -42,9 +19,9 @@ tasks:
     description: Compile and run the Recce server within Gradle with a configured `example-scenario`
     group: recce
     dependencies:
-      - recce-db
-      - source-db # Expected to be defined by an included file
-      - target-db # Expected to be defined by an included file
+      - recce-db # Expected to be defined by batect.yml
+      - source-db # Expected to be defined by a wraoping example scenario that includes this
+      - target-db # Expected to be defined by a wraoping example scenario that includes this
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
@@ -53,7 +30,7 @@ tasks:
       environment:
         DATABASE_HOST: recce-db
         DATABASE_PORT: 5432
-        MICRONAUT_CONFIG_FILES: examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
+        MICRONAUT_CONFIG_FILES: examples/<{example-scenario}/application-<{example-scenario}.yml
   run-docker-local:
     description: Run a previously built Recce server Docker image with a configured `example-scenario`
     group: recce
@@ -67,18 +44,13 @@ tasks:
         DATABASE_HOST: recce-db
         DATABASE_PORT: 5432
         MICRONAUT_CONFIG_FILES: /examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
-  run-db:
-    description: Start a standalone Postgres DB for use with Recce run locally (e.g from IDE/Gradle for debugging)
-    group: recce
-    run:
-      container: recce-db
   run-deps:
     description: Run only dependencies of Recce and a configured `example-scenario`
     group: recce
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     dependencies:
-      - source-db # Expected to be defined by an included file
-      - target-db # Expected to be defined by an included file
+      - source-db # Expected to be defined by a wraoping example scenario that includes this
+      - target-db # Expected to be defined by a wraoping example scenario that includes this
     run:
       container: recce-db
