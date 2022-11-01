@@ -1,5 +1,0 @@
-forbid_telemetry: true
-include:
-  - ../../batect.yml
-  - batect-source-mariadb.yml
-  - batect-target-mariadb.yml

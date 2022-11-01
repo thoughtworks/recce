@@ -1,0 +1,49 @@
+containers:
+  recce-gradle:
+    image: eclipse-temurin:17-jdk-alpine
+    ports:
+      - local: 8080
+        container: 8080
+    volumes:
+      - type: cache
+        name: gradle-working-dir
+        container: /code/.gradle
+      - type: cache
+        name: gradle-build-dir
+        container: /code/build
+      - local: .
+        container: /code
+        options: cached
+      - type: cache
+        name: gradle-cache
+        container: /root/.gradle
+    working_directory: /code
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
+  recce-docs:
+    image: structurizr/lite
+    ports:
+      - local: 8081
+        container: 8080
+    volumes:
+      - local: ./docs
+        container: /usr/local/structurizr
+        options: cached
+tasks:
+  clean:
+    description: Cleans the Gradle build
+    group: recce
+    run:
+      container: recce-gradle
+      command: ./gradlew clean
+  build:
+    description: Compile and test the Recce server code within Gradle (note this excludes tests that require Docker)
+    group: recce
+    run:
+      container: recce-gradle
+      command: ./gradlew build
+  docs:
+    description: Render architecture documentation
+    group: recce
+    run:
+      container: recce-docs

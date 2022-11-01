@@ -1,7 +1,4 @@
 config_variables:
-  example-scenario:
-    description: Which example scenario to run from `ls examples/scenario`
-    default: petshop-mariadb
   db-name:
     description: Name of the DB to create for all local DBs
     default: db
@@ -11,6 +8,8 @@ config_variables:
   db-password:
     description: Password to use for all local DBs
     default: password
+include:
+  - batect-core.yml
 containers:
   recce-db:
     image: postgres:14-alpine
@@ -25,31 +24,6 @@ containers:
       - type: cache
         name: recce-db-data
         container: /var/lib/postgresql/data
-  recce-gradle:
-    image: eclipse-temurin:17-jdk-alpine
-    dependencies:
-      - recce-db
-      - source-db # Expected to be defined by an included file
-      - target-db # Expected to be defined by an included file
-    ports:
-      - local: 8080
-        container: 8080
-    volumes:
-      - type: cache
-        name: gradle-working-dir
-        container: /code/.gradle
-      - type: cache
-        name: gradle-build-dir
-        container: /code/build
-      - local: .
-        container: /code
-        options: cached
-      - type: cache
-        name: gradle-cache
-        container: /root/.gradle
-    working_directory: /code
-    environment:
-      GRADLE_OPTS: -Dorg.gradle.daemon=false
   recce-docker-local:
     image: recce-server
     dependencies:
@@ -63,31 +37,14 @@ containers:
       - local: ./examples
         container: /examples
         options: cached
-  recce-docs:
-    image: structurizr/lite
-    ports:
-      - local: 8081
-        container: 8080
-    volumes:
-      - local: ./docs
-        container: /usr/local/structurizr
-        options: cached
 tasks:
-  clean:
-    description: Cleans the Gradle build
-    group: recce
-    run:
-      container: recce-gradle
-      command: ./gradlew clean
-  build:
-    description: Compile and test the Recce server code within Gradle (note this excludes tests that require Docker)
-    group: recce
-    run:
-      container: recce-gradle
-      command: ./gradlew build
   run:
     description: Compile and run the Recce server within Gradle with a configured `example-scenario`
     group: recce
+    dependencies:
+      - recce-db
+      - source-db # Expected to be defined by an included file
+      - target-db # Expected to be defined by an included file
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
@@ -125,8 +82,3 @@ tasks:
       - target-db # Expected to be defined by an included file
     run:
       container: recce-db
-  docs:
-    description: Render architecture documentation
-    group: recce
-    run:
-      container: recce-docs
