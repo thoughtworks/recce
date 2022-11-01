@@ -57,12 +57,12 @@ These options require only JDK 11+ and Docker installed locally.
 1. **Run Recce** locally
     * Either **Build** locally with an [example](./examples) source and target database (More info at [DEVELOPMENT.md](./DEVELOPMENT.md)).
     ```shell
-    ./batect run
+    ./batect -f examples/batect-petshop-mariadb.yml run
     ```
     * **Or use pre-validated Docker image** locally, using this repository only for setting up a DB for Recce, and an example scenario.
     ```shell
     # Run in one shell - starts a DB for Recce, and an example scenario
-    ./batect run-deps
+    ./batect -f examples/batect-petshop-mariadb.yml run-deps
   
     # Run in another shell - runs Recce
     docker run -p 8080:8080 \

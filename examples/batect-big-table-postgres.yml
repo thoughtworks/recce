@@ -1,0 +1,8 @@
+config_variables:
+  example-scenario:
+    description: Which example scenario to run from `ls examples/scenario`
+    default: big-table-postgres
+include:
+  - ../batect-shared.yml
+  - db/batect-source-postgres.yml
+  - db/batect-target-postgres.yml

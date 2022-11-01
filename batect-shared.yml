@@ -1,0 +1,56 @@
+include:
+  - batect.yml
+containers:
+  recce-docker-local:
+    image: recce-server
+    dependencies:
+      - recce-db # Expected to be defined by batect.yml
+      - source-db # Expected to be defined by a wraoping example scenario that includes this
+      - target-db # Expected to be defined by a wraoping example scenario that includes this
+    ports:
+      - local: 8080
+        container: 8080
+    volumes:
+      - local: ./examples
+        container: /examples
+        options: cached
+tasks:
+  run:
+    description: Compile and run the Recce server within Gradle with a configured `example-scenario`
+    group: recce
+    dependencies:
+      - recce-db # Expected to be defined by batect.yml
+      - source-db # Expected to be defined by a wraoping example scenario that includes this
+      - target-db # Expected to be defined by a wraoping example scenario that includes this
+    prerequisites:
+      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
+    run:
+      container: recce-gradle
+      command: ./gradlew run
+      environment:
+        DATABASE_HOST: recce-db
+        DATABASE_PORT: 5432
+        MICRONAUT_CONFIG_FILES: examples/<{example-scenario}/application-<{example-scenario}.yml
+  run-docker-local:
+    description: Run a previously built Recce server Docker image with a configured `example-scenario`
+    group: recce
+    prerequisites:
+      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
+    run:
+      container: recce-docker-local
+      environment:
+        AUTH_USERNAME: admin
+        AUTH_PASSWORD: admin
+        DATABASE_HOST: recce-db
+        DATABASE_PORT: 5432
+        MICRONAUT_CONFIG_FILES: /examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
+  run-deps:
+    description: Run only dependencies of Recce and a configured `example-scenario`
+    group: recce
+    prerequisites:
+      - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
+    dependencies:
+      - source-db # Expected to be defined by a wraoping example scenario that includes this
+      - target-db # Expected to be defined by a wraoping example scenario that includes this
+    run:
+      container: recce-db
