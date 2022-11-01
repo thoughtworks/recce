@@ -35,7 +35,7 @@ tasks:
     group: recce
     run:
       container: recce-gradle
-      command: ./gradlew clean
+      command: ./gradlew cleanLeaveBuildDir
   build:
     description: Compile and test the Recce server code within Gradle (note this excludes tests that require Docker)
     group: recce

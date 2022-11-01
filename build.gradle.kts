@@ -238,6 +238,12 @@ tasks.jacocoTestReport {
     reports.xml.required.set(true)
 }
 
+tasks.register("cleanLeaveBuildDir") {
+    doLast {
+        project.delete(files("$buildDir/*"))
+    }
+}
+
 tasks.register<Test>("slowTests") {
     group = "verification"
     useJUnitPlatform {
