@@ -33,12 +33,12 @@ To get started working on Recce:
     ```
 * **Run** Recce within a container with an [example scenario](examples/README.md) against a source/target DB
     ```shell
-    ./batect --config-file examples/batect-petshop-mariadb.yml run
+    ./batect -f examples/batect-petshop-mariadb.yml run
     ```
 * **Explore** Recce's API (after running it) via http://localhost:8080/rapidoc
 * **Build a Docker image** locally and run it with an [example scenario](examples/README.md) a
     ```shell
-    ./gradlew jibDockerBuild && ./batect --config-file examples/batect-petshop-mariadb.yml run-docker-local
+    ./gradlew jibDockerBuild && ./batect -f examples/batect-petshop-mariadb.yml run-docker-local
     ```
 * **Run** A PostgreSQL DB on its own to use with Recce locally
     ```shell
@@ -47,7 +47,7 @@ To get started working on Recce:
     ```
 * **Run** Only Recce's dependencies with an [example scenario](examples/README.md), so you can run/debug/profile Recce itself outside Docker
     ```shell
-    ./batect --config-file examples/batect-petshop-mariadb.yml run-deps
+    ./batect -f examples/batect-petshop-mariadb.yml run-deps
     ./gradlew run # or run/debug `RecceServer.kt` from your IDE
     ```
 

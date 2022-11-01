@@ -31,5 +31,5 @@ Imagine we are creating a scenario called `example-scenario`:
    types
 5. Create fragment of *Micronaut configuration* for your datasources and reconciliation datasets
    in `scenario/${name}/application-${name}.yml`
-6. Run your scenario's databases alongside Recce with `./batect --config-file examples/batect-<{example-scenario}.yml run`
+6. Run your scenario's databases alongside Recce with `./batect -f examples/batect-<{example-scenario}.yml run`
 7. Assuming everything starts up, invoke a reconciliation for one of your scenarios datasets via the Recce API.
