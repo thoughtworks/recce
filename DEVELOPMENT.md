@@ -35,7 +35,7 @@ To get started working on Recce:
     ```shell
     ./batect -f examples/batect-petshop-mariadb.yml run
     ```
-* **Explore** Recce's API (after running it) via http://localhost:8080/rapidoc
+* **Explore** Recce's API (after running it) via http://localhost:8080/rapidoc/
 * **Build a Docker image** locally and run it with an [example scenario](examples/README.md) a
     ```shell
     ./gradlew jibDockerBuild && ./batect -f examples/batect-petshop-mariadb.yml run-docker-local

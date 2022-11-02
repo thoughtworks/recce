@@ -75,11 +75,11 @@ These options require only JDK 11+ and Docker installed locally.
       ghcr.io/thoughtworks-sea/recce-server:latest
     ```
     
-2. **Explore** and trigger runs via Recce's APIs, accessible via interactive UI at http://localhost:8080/rapidoc. 
+2. **Explore** and trigger runs via Recce's APIs, accessible via interactive UI at http://localhost:8080/rapidoc/. 
     Some non-exhaustive examples are included below, but fuller documentation is available via the UI. 
     Recce uses basic authentication to protect its API endpoints. In the example scenario, both username and password are set to "admin".
  
-    * **Synchronously trigger** a run, waiting for it to complete via [UI](http://localhost:8080/rapidoc#post-/runs) _or_
+    * **Synchronously trigger** a run, waiting for it to complete via [UI](http://localhost:8080/rapidoc/#post-/runs) _or_
       ```shell
       curl -X POST http://localhost:8080/runs -H 'Content-Type: application/json' -d '{ "datasetId": "categories" }' -u "admin:admin"
       ``` 
@@ -134,11 +134,11 @@ These options require only JDK 11+ and Docker installed locally.
         ```
      </details>
    
-    * **Retrieve details of an individual run** by ID for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs/-runId-), _or_
+    * **Retrieve details of an individual run** by ID for a dataset via [UI](http://localhost:8080/rapidoc/#get-/runs/-runId-), _or_
       ```shell
       curl 'http://localhost:8080/runs/35' -u "admin:admin"
       ```
-    * **Retrieve details of recent runs** for a dataset via [UI](http://localhost:8080/rapidoc#get-/runs), _or_
+    * **Retrieve details of recent runs** for a dataset via [UI](http://localhost:8080/rapidoc/#get-/runs), _or_
       ```shell
       curl 'http://localhost:8080/runs?datasetId=categories' -u "admin:admin"
       ```
