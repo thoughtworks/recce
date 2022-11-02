@@ -19,7 +19,8 @@
 
 # Pre-requisites
 
-* Docker
+* Docker CLI
+* Docker Desktop, [Colima](https://github.com/abiosoft/colima) or some mechanism to run containers on your host
 * JDK 17 (if you use [ASDF](https://asdf-vm.com/) you can `asdf install` to install one using the [.tool-versions](./.tool-versions))
 
 # Getting Started
@@ -134,7 +135,7 @@ Currently, core maintainer privileges are only available to Thoughtworkers. A se
 Needs to be more automated. Current we are experimenting with using [Reckon](https://github.com/ajoberstar/reckon) to determine versions from flags.
 
 Current release process looks like
-1. Tag locally and push. This will run a localy build; if successful tag the revision and push the tag.
+1. Tag locally and push. This will run a local build; if successful tag the revision and push the tag.
     ```shell
     # Minor version (e.g 1.1 -> 1.2)
     ./gradlew -Preckon.stage=final reckonTagPush
@@ -143,4 +144,4 @@ Current release process looks like
     ./gradlew -Preckon.stage=final -Preckon.scope=patch reckonTagPush
     ```
 2. The tag push will trigger a build on [GitHub Actions](https://github.com/ThoughtWorks-SEA/recce/actions) and push to GHCR.
-3. Create a new release on Github via https://github.com/ThoughtWorks-SEA/recce/releases
+3. Create a new release on Github via https://github.com/ThoughtWorks-SEA/recce/releases linked to the tag
