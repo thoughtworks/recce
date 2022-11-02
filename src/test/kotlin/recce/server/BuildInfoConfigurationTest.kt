@@ -5,7 +5,7 @@ import jakarta.inject.Inject
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-@MicronautTest
+@MicronautTest(transactional = false)
 internal class BuildInfoConfigurationTest {
     @Inject
     lateinit var config: BuildInfoConfiguration

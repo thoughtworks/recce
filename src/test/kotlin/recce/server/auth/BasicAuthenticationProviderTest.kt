@@ -1,8 +1,6 @@
 package recce.server.auth
 
-import io.micronaut.http.HttpStatus.FORBIDDEN
-import io.micronaut.http.HttpStatus.OK
-import io.micronaut.http.HttpStatus.UNAUTHORIZED
+import io.micronaut.http.HttpStatus.*
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.restassured.module.kotlin.extensions.Given
 import io.restassured.module.kotlin.extensions.Then
@@ -11,7 +9,7 @@ import io.restassured.specification.RequestSpecification
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Test
 
-@MicronautTest
+@MicronautTest(transactional = false)
 class BasicAuthenticationProviderTest {
 
     @Inject

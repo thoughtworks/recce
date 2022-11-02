@@ -5,7 +5,6 @@ import io.micronaut.inject.qualifiers.Qualifiers
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.r2dbc.spi.R2dbcBadGrammarException
 import jakarta.inject.Inject
-import jakarta.inject.Named
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.AfterEach
@@ -19,26 +18,20 @@ import reactor.util.function.Tuples
 import recce.server.BuildInfoConfiguration
 import recce.server.R2dbcDatasource
 import recce.server.RecConfiguration
-import recce.server.dataset.datasource.flywayCleanMigrate
+import recce.server.dataset.datasource.FlywayMigrator
 import recce.server.recrun.*
 import java.nio.file.Path
-import javax.sql.DataSource
 
 @MicronautTest(
     environments = ["test-integration"],
-    propertySources = ["classpath:config/application-test-dataset.yml"]
+    propertySources = ["classpath:config/application-test-dataset.yml"],
+    transactional = false
 )
-class DatasetRecServiceIntegrationTest {
+open class DatasetRecServiceIntegrationTest {
 
     @TempDir lateinit var tempDir: Path
 
-    @Inject
-    @field:Named("source-h2-sync")
-    lateinit var sourceDataSource: DataSource
-
-    @Inject
-    @field:Named("target-h2-sync")
-    lateinit var targetDataSource: DataSource
+    @Inject lateinit var migrator: FlywayMigrator
 
     @Inject lateinit var ctx: ApplicationContext
 
@@ -50,24 +43,8 @@ class DatasetRecServiceIntegrationTest {
 
     @BeforeEach
     fun setup() {
-        val createTable = """
-            CREATE TABLE TestData (
-                name VARCHAR(255) PRIMARY KEY NOT NULL,
-                val VARCHAR(255) NOT NULL
-            );
-        """.trimMargin()
-
-        val insertUser: (Int) -> String = { i ->
-            """
-            INSERT INTO TestData (name, val) 
-            VALUES ('Test$i', 'User$i');
-            """.trimIndent()
-        }
-
-        val sourceSql = createTable + (0..2).joinToString("\n", transform = insertUser)
-        val targetSql = createTable + ((0..1) + (3..4)).joinToString("\n", transform = insertUser)
-        flywayCleanMigrate(tempDir, sourceSql, sourceDataSource)
-        flywayCleanMigrate(tempDir, targetSql, targetDataSource)
+        migrator.cleanMigrateSource(tempDir)
+        migrator.cleanMigrateTarget(tempDir)
     }
 
     @BeforeEach
@@ -184,7 +161,7 @@ class DatasetRecServiceIntegrationTest {
     @Test
     fun `should fail run on bad source query`() {
         // Wipe the source DB
-        flywayCleanMigrate(tempDir, "SELECT 1", sourceDataSource)
+        migrator.cleanMigrateSource(tempDir, "SELECT 1")
 
         service.runFor("test-dataset")
             .test()
@@ -212,7 +189,7 @@ class DatasetRecServiceIntegrationTest {
     @Test
     fun `should fail run on bad target query`() {
         // Wipe the target DB
-        flywayCleanMigrate(tempDir, "SELECT 1", targetDataSource)
+        migrator.cleanMigrateTarget(tempDir, "SELECT 1")
 
         service.runFor("test-dataset")
             .test()

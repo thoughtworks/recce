@@ -31,7 +31,7 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.6.3",
+    "micronaut" to "io.micronaut:micronaut-core:3.7.3",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
@@ -102,9 +102,6 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.7")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Remove this entirely when Micronaut has updated to SnakeYAML 1.32+
-    implementation("org.yaml:snakeyaml:1.33")
-
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
     runtimeOnly("ch.qos.logback:logback-classic")
 
@@ -115,14 +112,11 @@ dependencies {
     // Core persistence support with Micronaut Data
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
-    // Temporary override of Jackson versions due to CVE-2022-42003. Remove when Micronaut has updated
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.13.4.20221013"))
-
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql:42.5.0") // Remove version number when Micronaut has updated to 42.4.1+
+    runtimeOnly("org.postgresql:postgresql")
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")

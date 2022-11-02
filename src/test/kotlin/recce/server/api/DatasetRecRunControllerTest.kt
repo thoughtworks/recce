@@ -180,7 +180,7 @@ internal class DatasetRecRunControllerTest {
     }
 }
 
-@MicronautTest
+@MicronautTest(transactional = false)
 internal class DatasetRecRunControllerApiTest {
 
     private val sampleRows =
