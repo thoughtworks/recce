@@ -102,9 +102,6 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.7")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Remove this entirely when Micronaut has updated to SnakeYAML 1.32+
-    implementation("org.yaml:snakeyaml:1.33")
-
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
     runtimeOnly("ch.qos.logback:logback-classic")
 
@@ -114,9 +111,6 @@ dependencies {
 
     // Core persistence support with Micronaut Data
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
-
-    // Temporary override of Jackson versions due to CVE-2022-42003. Remove when Micronaut has updated
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.13.4.20221013"))
 
     // Traditional JDBC data access (for rec DB)
     implementation("io.micronaut.flyway:micronaut-flyway")
