@@ -30,7 +30,7 @@ tasks:
       environment:
         DATABASE_HOST: recce-db
         DATABASE_PORT: 5432
-        MICRONAUT_CONFIG_FILES: examples/<{example-scenario}/application-<{example-scenario}.yml
+        MICRONAUT_CONFIG_FILES: examples/scenario/<{example-scenario}/application-<{example-scenario}.yml
   run-docker-local:
     description: Run a previously built Recce server Docker image with a configured `example-scenario`
     group: recce
