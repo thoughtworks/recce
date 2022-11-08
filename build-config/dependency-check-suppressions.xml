@@ -25,9 +25,4 @@
     <packageUrl regex="true">^pkg:maven/org\.postgresql/r2dbc\-postgresql@.*$</packageUrl>
     <cpe>cpe:/a:postgresql:postgresql</cpe>
   </suppress>
-  <suppress>
-    <notes>Suppressing false positive - this is fixed in 1.32 and is an issue with OSSIndex data. https://github.com/OSSIndex/vulns/issues/328</notes>
-    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-    <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
-  </suppress>
 </suppressions>
