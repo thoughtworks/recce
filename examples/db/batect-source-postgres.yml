@@ -13,14 +13,14 @@ containers:
         name: source-db-postgres
         container: /var/lib/postgresql/data
   source-flyway-postgres:
-    image: flyway/flyway:8-alpine
+    image: flyway/flyway:9-alpine
     environment:
       FLYWAY_URL: jdbc:postgresql://source-db:5432/<{db-name}
       FLYWAY_USER: <{db-user}
       FLYWAY_PASSWORD: <{db-password}
       FLYWAY_CONNECT_RETRIES: 60
       FLYWAY_EDITION: community
-    command: clean migrate -skipCheckForUpdate
+    command: clean migrate -cleanDisabled=false -skipCheckForUpdate
     dependencies:
       - source-db
     volumes:

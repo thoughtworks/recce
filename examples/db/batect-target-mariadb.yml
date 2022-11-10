@@ -14,14 +14,14 @@ containers:
         name: target-db-mariadb
         container: /var/lib/mysql
   target-flyway-mariadb:
-    image: flyway/flyway:8-alpine
+    image: flyway/flyway:9-alpine
     environment:
       FLYWAY_URL: jdbc:mariadb://target-db:3306/<{db-name}
       FLYWAY_USER: <{db-user}
       FLYWAY_PASSWORD: <{db-password}
       FLYWAY_CONNECT_RETRIES: 60
       FLYWAY_EDITION: community
-    command: clean migrate -skipCheckForUpdate
+    command: clean migrate -cleanDisabled=false -skipCheckForUpdate
     dependencies:
       - target-db
     volumes:
