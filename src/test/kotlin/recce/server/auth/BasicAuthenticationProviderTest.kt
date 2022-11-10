@@ -30,6 +30,17 @@ class BasicAuthenticationProviderTest {
     }
 
     @Test
+    fun `returns 401 UNAUTHORIZED when accessing a secured URL with invalid credentials`() {
+        Given {
+            spec(spec).auth().preemptive().basic("unknown", authConfig.password)
+        } When {
+            get("/datasets")
+        } Then {
+            statusCode(UNAUTHORIZED.code)
+        }
+    }
+
+    @Test
     fun `returns 401 UNAUTHORIZED when accessing a secured URL without authenticating`() {
         Given {
             spec(spec)

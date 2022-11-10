@@ -24,7 +24,7 @@ private val logger = KotlinLogging.logger {}
     externalDocs = ExternalDocumentation(description = "Server Docs", url = "$GITHUB_PROJECT/README.md"),
     security = [SecurityRequirement(name = "basicAuth")]
 )
-@SecuritySchemes(SecurityScheme(name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic"))
+@SecuritySchemes(SecurityScheme(paramName = "Authorization", name = "basicAuth", type = SecuritySchemeType.HTTP, scheme = "basic"))
 object RecceServer {
 
     @JvmStatic
