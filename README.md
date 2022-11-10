@@ -70,8 +70,8 @@ These options require only JDK 11+ and Docker installed locally.
       -e AUTH_USERNAME=admin -e AUTH_PASSWORD=admin \
       -e MICRONAUT_CONFIG_FILES=/examples/scenario/petshop-mariadb/application-petshop-mariadb.yml \
       -e DATABASE_HOST=host.docker.internal \
-      -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mysql://host.docker.internal:8000/db \
-      -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mysql://host.docker.internal:8001/db \
+      -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mariadb://host.docker.internal:8000/db \
+      -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mariadb://host.docker.internal:8001/db \
       ghcr.io/thoughtworks-sea/recce-server:latest
     ```
     
