@@ -160,7 +160,7 @@ dependencies {
 
     testRuntimeOnly("com.h2database:h2")
     // Remove version number and excludes block when Micronaut has updated to at least 1.0.0.RELEASE
-    testRuntimeOnly("io.r2dbc:r2dbc-h2:1.0.0.RC1") {
+    testRuntimeOnly("io.r2dbc:r2dbc-h2:1.0.0.RELEASE") {
         exclude("io.projectreactor", "reactor-core")
     }
 
