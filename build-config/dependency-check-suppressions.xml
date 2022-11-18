@@ -1,28 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress>
-    <notes>Suppressing false positive - the testContainers mysql plugin is a different thing to the actual mysql database. https://github.com/jeremylong/DependencyCheck/issues/4900</notes>
-    <packageUrl regex="true">^pkg:maven/org\.testcontainers/mysql@.*$</packageUrl>
-    <cpe>cpe:/a:mysql:mysql</cpe>
-  </suppress>
-  <suppress>
-    <notes>Suppressing false positive - the testContainers mariadb plugin is a different thing to the actual mariadb database. https://github.com/jeremylong/DependencyCheck/issues/4898</notes>
-    <packageUrl regex="true">^pkg:maven/org\.testcontainers/mariadb@.*$</packageUrl>
-    <cpe>cpe:/a:mariadb:mariadb</cpe>
-  </suppress>
-  <suppress>
-    <notes>Suppressing false positive - the mariadb r2dbc client is a different thing to the actual mariadb database. https://github.com/jeremylong/DependencyCheck/issues/4899</notes>
-    <packageUrl regex="true">^pkg:maven/org\.mariadb/r2dbc-mariadb@.*$</packageUrl>
-    <cpe>cpe:/a:mariadb:mariadb</cpe>
-  </suppress>
-  <suppress>
-    <notes>Suppressing false positive - mockito-junit-jupiter is a different thing to JUnit itself. https://github.com/jeremylong/DependencyCheck/issues/4754</notes>
-    <packageUrl regex="true">^pkg:maven/org\.mockito/mockito\-junit\-jupiter@.*$</packageUrl>
-    <cpe>cpe:/a:junit:junit4</cpe>
-  </suppress>
-  <suppress>
-    <notes>Suppressing false positive - r2dbc-postgresql is versioned separately from postgresql itself. https://github.com/jeremylong/DependencyCheck/issues/4616</notes>
-    <packageUrl regex="true">^pkg:maven/org\.postgresql/r2dbc\-postgresql@.*$</packageUrl>
-    <cpe>cpe:/a:postgresql:postgresql</cpe>
-  </suppress>
+
 </suppressions>
