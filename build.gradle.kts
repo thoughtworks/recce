@@ -256,7 +256,7 @@ val githubRepoOwner = "thoughtworks-sea"
 val containerRepoName = "recce-server"
 jib {
     from {
-        image = "eclipse-temurin:${depVersions["javaMajor"]}-jdk-alpine"
+        image = "eclipse-temurin:${depVersions["javaMajor"]}-jre-alpine"
     }
     to {
         val fullVersion = com.github.zafarkhaja.semver.Version.valueOf(project.version.toString())
@@ -272,6 +272,7 @@ jib {
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
+        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-${depVersions["reactor"]!!}.jar")
     }
 }
 
