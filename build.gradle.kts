@@ -131,7 +131,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:${depVersions["mockito"]}")
     testImplementation("org.mockito:mockito-inline:${depVersions["mockito"]}")
     testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
     testImplementation("io.projectreactor:reactor-test:${depVersions["reactor"]}")
 
     testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
