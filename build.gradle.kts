@@ -34,8 +34,7 @@ val depDescriptors = mapOf(
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
     // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
-    "mockito" to "org.mockito:mockito-core:4.9.0", // Needs to be compatible with Micronaut BOM.
-    "reactor" to "io.projectreactor:reactor-core:3.5.0" // Needs to be compatible with Micronaut BOM.
+    "mockito" to "org.mockito:mockito-core:4.9.0" // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17"
@@ -79,7 +78,7 @@ kapt {
 configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("junit:junit"))
-            .using(module("io.quarkus:quarkus-junit4-mock:2.14.0.Final"))
+            .using(module("io.quarkus:quarkus-junit4-mock:2.14.2.Final"))
             .because(
                 "We don't want JUnit 4; but is an unneeded transitive of testcontainers. " +
                     "See https://github.com/testcontainers/testcontainers-java/issues/970"
@@ -102,6 +101,9 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
     runtimeOnly("ch.qos.logback:logback-classic")
+
+    // Needs to be compatible with Micronaut's reactor-based BOM.
+    implementation(platform("io.projectreactor:reactor-bom:2022.0.0"))
 
     // OpenAPI specification and interactive UI generated from code
     kapt("io.micronaut.openapi:micronaut-openapi")
@@ -132,7 +134,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:${depVersions["mockito"]}")
     testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
-    testImplementation("io.projectreactor:reactor-test:${depVersions["reactor"]}")
+    testImplementation("io.projectreactor:reactor-test")
 
     testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
     testImplementation("io.rest-assured:kotlin-extensions:${depVersions["restAssured"]}")
@@ -270,7 +272,7 @@ jib {
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
-        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-${depVersions["reactor"]!!}.jar")
+        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-3.5.0!!}.jar")
     }
 }
 
