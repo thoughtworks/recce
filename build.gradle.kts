@@ -34,7 +34,7 @@ val depDescriptors = mapOf(
 
     // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
     // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
-    "mockito" to "org.mockito:mockito-core:4.9.0" // Needs to be compatible with Micronaut BOM.
+    "mockito" to "org.mockito:mockito-core:4.10.0" // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17"
