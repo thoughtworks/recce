@@ -272,7 +272,7 @@ jib {
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
-        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-3.5.0!!}.jar")
+        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-3.5.0.jar")
     }
 }
 
