@@ -31,10 +31,6 @@ reckon {
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.7.5",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1",
-
-    // Unfortunately not all Mockito/Reactor artifacts have dependencies defined in the Micronaut BOM
-    // Overriding the versions ourselves allows us to keep versions consistent across artifacts.
-    "mockito" to "org.mockito:mockito-core:4.10.0" // Needs to be compatible with Micronaut BOM.
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17"
@@ -130,11 +126,13 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.mockito:mockito-core:${depVersions["mockito"]}")
-    testImplementation("org.mockito:mockito-inline:${depVersions["mockito"]}")
-    testImplementation("org.mockito:mockito-junit-jupiter:${depVersions["mockito"]}")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
     testImplementation("io.projectreactor:reactor-test")
+
+    testImplementation(platform("org.mockito:mockito-bom:4.10.0")) // Needs to be compatible with Micronaut BOM
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-inline")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
 
     testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
     testImplementation("io.rest-assured:kotlin-extensions:${depVersions["restAssured"]}")
