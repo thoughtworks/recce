@@ -30,7 +30,7 @@ reckon {
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
     "micronaut" to "io.micronaut:micronaut-core:3.7.5",
-    "restAssured" to "io.rest-assured:rest-assured:4.5.1",
+    "restAssured" to "io.rest-assured:rest-assured:4.5.1"
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17"
