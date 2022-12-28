@@ -254,7 +254,13 @@ val githubRepoOwner = "thoughtworks-sea"
 val containerRepoName = "recce-server"
 jib {
     from {
-        image = "eclipse-temurin:${depVersions["javaMajor"]}-jre-alpine"
+        image = "eclipse-temurin:${depVersions["javaMajor"]}-jre"
+        platforms {
+            platform {
+                architecture = if (System.getProperty("os.arch").equals("aarch64")) "arm64" else "amd64"
+                os = "linux"
+            }
+        }
     }
     to {
         val fullVersion = com.github.zafarkhaja.semver.Version.valueOf(project.version.toString())

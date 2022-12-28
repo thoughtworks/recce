@@ -10,7 +10,7 @@ config_variables:
     default: password
 containers:
   recce-gradle:
-    image: eclipse-temurin:17-jdk-alpine
+    image: eclipse-temurin:17-jdk
     ports:
       - local: 8080
         container: 8080
