@@ -13,7 +13,7 @@ containers:
         name: target-db-postgres
         container: /var/lib/postgresql/data
   target-flyway-postgres:
-    image: flyway/flyway:9-alpine
+    image: flyway/flyway:9
     environment:
       FLYWAY_URL: jdbc:postgresql://target-db:5432/<{db-name}
       FLYWAY_USER: <{db-user}

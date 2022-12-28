@@ -14,7 +14,7 @@ containers:
         name: source-db-mariadb
         container: /var/lib/mysql
   source-flyway-mariadb:
-    image: flyway/flyway:9-alpine
+    image: flyway/flyway:9
     environment:
       FLYWAY_URL: jdbc:mariadb://source-db:3306/<{db-name}
       FLYWAY_USER: <{db-user}
