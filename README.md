@@ -168,9 +168,9 @@ including connection pooling.
 | DATABASE_USERNAME | `user`      | Username to connect with                         |
 | DATABASE_PASSWORD | `password`  | Password to connect with                         |
 
-In the normal Micronaut way, additional configuring can be configured using
+In the conventional Micronaut way, additional settings can be configured using
 * `R2DBC_DATASOURCES_DEFAULT_*` environment variables, _or_
-* `r2dbc.datasource.default.*` system properties _or_
+* `r2dbc.datasources.default.*` Java system properties _or_
 * Merging in an additional YAML configuration file (see below)
 
 ## Adding additional configuration files
