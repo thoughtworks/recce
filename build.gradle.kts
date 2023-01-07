@@ -257,7 +257,11 @@ jib {
         image = "eclipse-temurin:${depVersions["javaMajor"]}-jre"
         platforms {
             platform {
-                architecture = if (System.getProperty("os.arch").equals("aarch64")) "arm64" else "amd64"
+                architecture = "amd64"
+                os = "linux"
+            }
+            platform {
+                architecture = "arm64"
                 os = "linux"
             }
         }
@@ -288,6 +292,14 @@ tasks.jib.configure {
 // use different naming when building locally, to avoid confusion
 tasks.jibDockerBuild.configure {
     jib {
+        from {
+            platforms {
+                platform {
+                    architecture = if (System.getProperty("os.arch").equals("aarch64")) "arm64" else "amd64"
+                    os = "linux"
+                }
+            }
+        }
         to {
             image = containerRepoName
         }
