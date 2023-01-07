@@ -3,10 +3,10 @@
 
   <suppress>
     <notes><![CDATA[
-   https://nvd.nist.gov/vuln/detail/CVE-2022-1471 appears to be a dubious vulnerability and seemingly cannot be mitigated.
-   To our knowledge Recce and its dependencies does not use SnakeYaml in a vulnerable way here, so suppressing this as a
-   false positive.
-   ]]></notes>
+    https://nvd.nist.gov/vuln/detail/CVE-2022-1471 appears to be a dubious vulnerability and seemingly cannot be mitigated.
+    To our knowledge Recce and its dependencies does not use SnakeYaml in a vulnerable way here, so suppressing this as a
+    false positive.
+    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
     <cve>CVE-2022-1471</cve>
@@ -14,8 +14,16 @@
 
   <suppress>
     <notes><![CDATA[
-   Recce doesn't use the H2 console so not affected by this apparent vulnerability.
-   ]]></notes>
+    False Positive per https://github.com/jeremylong/DependencyCheck/issues/5233
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+    <cpe>cpe:/a:yaml_project:yaml</cpe>
+  </suppress>
+
+  <suppress>
+    <notes><![CDATA[
+    Recce doesn't use the H2 console so not affected by this apparent vulnerability.
+    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
     <cve>CVE-2022-45868</cve>
   </suppress>
