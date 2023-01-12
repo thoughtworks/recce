@@ -105,6 +105,9 @@ dependencies {
     kapt("io.micronaut.openapi:micronaut-openapi")
     implementation("io.swagger.core.v3:swagger-annotations")
 
+    // Remove this line when micronaut-bom uses version with https://github.com/micronaut-projects/micronaut-openapi/issues/902 fixed
+    kapt(enforcedPlatform("io.micronaut.openapi:micronaut-openapi-bom:4.5.2"))
+
     // Core persistence support with Micronaut Data
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
 
