@@ -5,8 +5,8 @@ containers:
     image: recce-server
     dependencies:
       - recce-db # Expected to be defined by batect.yml
-      - source-db # Expected to be defined by a wraoping example scenario that includes this
-      - target-db # Expected to be defined by a wraoping example scenario that includes this
+      - source-db # Expected to be defined by a wrapping example scenario that includes this
+      - target-db # Expected to be defined by a wrapping example scenario that includes this
     ports:
       - local: 8080
         container: 8080
@@ -20,8 +20,8 @@ tasks:
     group: recce
     dependencies:
       - recce-db # Expected to be defined by batect.yml
-      - source-db # Expected to be defined by a wraoping example scenario that includes this
-      - target-db # Expected to be defined by a wraoping example scenario that includes this
+      - source-db # Expected to be defined by a wrapping example scenario that includes this
+      - target-db # Expected to be defined by a wrapping example scenario that includes this
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     run:
@@ -50,7 +50,7 @@ tasks:
     prerequisites:
       - migrate-* # Run any migrate tasks included for the configured scenario against any included source/target DBs
     dependencies:
-      - source-db # Expected to be defined by a wraoping example scenario that includes this
-      - target-db # Expected to be defined by a wraoping example scenario that includes this
+      - source-db # Expected to be defined by a wrapping example scenario that includes this
+      - target-db # Expected to be defined by a wrapping example scenario that includes this
     run:
       container: recce-db
