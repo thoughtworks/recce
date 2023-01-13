@@ -65,7 +65,9 @@ kapt {
         val props = mapOf(
             "rapidoc.enabled" to true,
             "rapidoc.theme" to "dark",
-            "rapidoc.render-style" to "view"
+            "rapidoc.render-style" to "view",
+            "rapidoc.copy-resources" to false, // Remove this line and the next when micronaut-bom uses version with https://github.com/micronaut-projects/micronaut-openapi/issues/902 fixed
+            "rapidoc.js.url" to "https://unpkg.com/rapidoc@9.3.3/dist/"
         )
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
@@ -104,9 +106,6 @@ dependencies {
     // OpenAPI specification and interactive UI generated from code
     kapt("io.micronaut.openapi:micronaut-openapi")
     implementation("io.swagger.core.v3:swagger-annotations")
-
-    // Remove this line when micronaut-bom uses version with https://github.com/micronaut-projects/micronaut-openapi/issues/902 fixed
-    kapt(enforcedPlatform("io.micronaut.openapi:micronaut-openapi-bom:4.5.2"))
 
     // Core persistence support with Micronaut Data
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
