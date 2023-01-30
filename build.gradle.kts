@@ -65,7 +65,7 @@ kapt {
         val props = mapOf(
             "rapidoc.enabled" to true,
             "rapidoc.theme" to "dark",
-            "rapidoc.render-style" to "view",
+            "rapidoc.render-style" to "view"
         )
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
