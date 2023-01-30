@@ -29,7 +29,7 @@ reckon {
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.8.2",
+    "micronaut" to "io.micronaut:micronaut-core:3.8.3",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1"
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
@@ -66,8 +66,6 @@ kapt {
             "rapidoc.enabled" to true,
             "rapidoc.theme" to "dark",
             "rapidoc.render-style" to "view",
-            "rapidoc.copy-resources" to false, // Remove this line and the next when micronaut-bom uses version with https://github.com/micronaut-projects/micronaut-openapi/issues/902 fixed
-            "rapidoc.js.url" to "https://unpkg.com/rapidoc@9.3.3/dist/"
         )
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
