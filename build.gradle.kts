@@ -66,8 +66,6 @@ kapt {
             "rapidoc.enabled" to true,
             "rapidoc.theme" to "dark",
             "rapidoc.render-style" to "view",
-            "rapidoc.copy-resources" to false, // Remove this line and the next when micronaut-bom uses version with https://github.com/micronaut-projects/micronaut-openapi/issues/902 fixed
-            "rapidoc.js.url" to "https://unpkg.com/rapidoc@9.3.3/dist/"
         )
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
