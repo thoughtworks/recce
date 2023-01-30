@@ -33,7 +33,8 @@ val depDescriptors = mapOf(
     "restAssured" to "io.rest-assured:rest-assured:4.5.1"
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
-    "javaMajor" to "17"
+    "javaMajor" to "17",
+    "reactorToolsVersionExpected" to "3.5.2"
 )
 
 repositories {
@@ -280,12 +281,23 @@ jib {
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
-        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-3.5.2.jar")
+        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-${depVersions["reactorToolsVersionExpected"]}.jar")
+    }
+}
+
+val checkJibDependencies = tasks.register("checkJibDependencies") {
+    doFirst {
+        val resolvedReactorToolsVersion =
+            project.configurations.runtimeClasspath.get().resolvedConfiguration.resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
+        if (depVersions["reactorToolsVersionExpected"] != resolvedReactorToolsVersion) {
+            throw GradleException("Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found [$resolvedReactorToolsVersion] in dependencies. Update expectedReactorToolsVersion!")
+        }
     }
 }
 
 // Jib task pushes an image. Only do so after running all checks
 tasks.jib.configure {
+    dependsOn(checkJibDependencies)
     dependsOn(tasks.check)
 }
 
