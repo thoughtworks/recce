@@ -290,7 +290,7 @@ val checkJibDependencies = tasks.register("checkJibDependencies") {
         val resolvedReactorToolsVersion =
             project.configurations.runtimeClasspath.get().resolvedConfiguration.resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
         if (depVersions["reactorToolsVersionExpected"] != resolvedReactorToolsVersion) {
-            throw GradleException("Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found [$resolvedReactorToolsVersion] in dependencies. Update expectedReactorToolsVersion!")
+            throw GradleException("Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found [$resolvedReactorToolsVersion] in dependencies. Update reactorToolsVersionExpected!")
         }
     }
 }
