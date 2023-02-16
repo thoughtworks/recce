@@ -14,14 +14,6 @@
 
   <suppress>
     <notes><![CDATA[
-    False Positive per https://github.com/jeremylong/DependencyCheck/issues/5233
-    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-    <cpe>cpe:/a:yaml_project:yaml</cpe>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[
     Recce doesn't use the H2 console so not affected by this apparent vulnerability.
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
