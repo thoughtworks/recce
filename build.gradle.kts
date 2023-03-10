@@ -168,6 +168,7 @@ dependencies {
 }
 
 dependencyCheck {
+    failBuildOnCVSS = 1f
     suppressionFile = "build-config/dependency-check-suppressions.xml"
     scanConfigurations = listOf("runtimeClasspath", "testRuntimeClasspath")
     skipTestGroups = false
