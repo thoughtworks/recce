@@ -130,7 +130,10 @@ class RecRecordRepositoryTest {
             .verifyComplete()
 
         val foundRecords = mutableListOf<RecRecord>()
-        recordRepository.findByRecRunIdAndMigrationKeyIn(savedRecords.first().recRunId, savedRecords.map { it.migrationKey })
+        recordRepository.findByRecRunIdAndMigrationKeyIn(
+            savedRecords.first().recRunId,
+            savedRecords.map { it.migrationKey }
+        )
             .test()
             .recordWith { foundRecords }
             .expectNextCount(testRecordData.size.toLong())

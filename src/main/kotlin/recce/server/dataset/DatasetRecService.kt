@@ -43,7 +43,9 @@ open class DatasetRecService(
         val recRun = runService.start(datasetId, metadata)
 
         return loadFrom(datasetConfig.source, datasetConfig.resolvedHashingStrategy, recRun, this::saveSourceBatch)
-            .zipWhen { loadFrom(datasetConfig.target, datasetConfig.resolvedHashingStrategy, recRun, this::saveTargetBatch) }
+            .zipWhen {
+                loadFrom(datasetConfig.target, datasetConfig.resolvedHashingStrategy, recRun, this::saveTargetBatch)
+            }
             .flatMap { (source, target) -> recRun.map { it.withMetaData(source, target) } }
             .flatMap { run -> runService.successful(run) }
             .onErrorResume { error -> recRun.flatMap { run -> runService.failed(run, error) } }

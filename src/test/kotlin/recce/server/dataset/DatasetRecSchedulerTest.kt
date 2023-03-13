@@ -76,7 +76,9 @@ internal class DatasetRecSchedulerIntegrationTest {
         runScheduler().onApplicationEvent(null)
 
         await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-            ctx.getBean(DatasetRecRunController::class.java).retrieveRuns(DatasetRecRunController.RunQueryParams("test-dataset")).collectList()
+            ctx.getBean(DatasetRecRunController::class.java)
+                .retrieveRuns(DatasetRecRunController.RunQueryParams("test-dataset"))
+                .collectList()
                 .test()
                 .assertNext { assertThat(it).hasSizeGreaterThanOrEqualTo(1) }
                 .verifyComplete()

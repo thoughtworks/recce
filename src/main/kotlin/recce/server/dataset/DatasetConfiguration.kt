@@ -22,7 +22,12 @@ class DatasetConfiguration(
     lateinit var defaults: DefaultsProvider
 
     @VisibleForTesting
-    constructor(source: DataLoadDefinition, target: DataLoadDefinition) : this(source, target, Schedule(), Optional.empty()) {
+    constructor(source: DataLoadDefinition, target: DataLoadDefinition) : this(
+        source,
+        target,
+        Schedule(),
+        Optional.empty()
+    ) {
         defaults = DefaultsProvider()
     }
 

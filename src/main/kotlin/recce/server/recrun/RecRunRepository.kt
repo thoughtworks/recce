@@ -95,7 +95,9 @@ data class MatchStatus(
 
 @Embeddable
 @Suppress("JpaAttributeTypeInspection") // False positive
-data class DatasetMeta(@field:TypeDef(type = DataType.STRING, converter = ColsConverter::class) var cols: List<ColMeta> = emptyList())
+data class DatasetMeta(
+    @field:TypeDef(type = DataType.STRING, converter = ColsConverter::class) var cols: List<ColMeta> = emptyList()
+)
 
 data class ColMeta(val name: String, val javaType: String)
 

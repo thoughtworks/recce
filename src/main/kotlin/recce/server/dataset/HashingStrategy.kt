@@ -28,7 +28,10 @@ enum class HashingStrategy {
                 }
                 is String -> hasher.putString(col, Charsets.UTF_8)
                 is ByteBuffer -> hasher.putBytes(col)
-                else -> throw IllegalArgumentException("$this hasher does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$index]")
+                else -> throw IllegalArgumentException(
+                    "$this hasher does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] " +
+                        "at index [$index]"
+                )
             }
         }
     },
@@ -49,7 +52,10 @@ enum class HashingStrategy {
                 }
                 is String -> hasher.putString(col, Charsets.UTF_8)
                 is ByteBuffer -> hasher.putBytes(col)
-                else -> throw IllegalArgumentException("$this hasher does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] at index [$index]")
+                else -> throw IllegalArgumentException(
+                    "$this hasher does not understand how to hash ${col.javaClass.name} for column [${colMeta.name}] " +
+                        "at index [$index]"
+                )
             }
         }
     };
@@ -62,8 +68,12 @@ enum class HashingStrategy {
 
         fun trySetMigrationKey(col: Any?) {
             when {
-                col == null -> throw IllegalArgumentException("$migrationKeyColumnName has null value somewhere in dataset")
-                migrationKey != null -> throw IllegalArgumentException("More than one column named $migrationKeyColumnName found in dataset")
+                col == null -> throw IllegalArgumentException(
+                    "$migrationKeyColumnName has null value somewhere in dataset"
+                )
+                migrationKey != null -> throw IllegalArgumentException(
+                    "More than one column named $migrationKeyColumnName found in dataset"
+                )
                 else -> migrationKey = col.toString()
             }
         }
@@ -80,7 +90,9 @@ enum class HashingStrategy {
             }
 
         return HashedRow(
-            migrationKey ?: throw IllegalArgumentException("No column named $migrationKeyColumnName found in dataset"),
+            migrationKey ?: throw IllegalArgumentException(
+                "No column named $migrationKeyColumnName found in dataset"
+            ),
             hasher.hash().toString(),
             meta.columnMetadatas
         )

@@ -47,7 +47,8 @@ data class RunApiModel(
         private val run: RecRun,
         private val summaryBuilder: RunSummary.Builder = RunSummary.Builder().matchStatus(run.summary)
     ) {
-        fun migrationKeySamples(migrationKeySamples: Map<RecordMatchStatus, List<String>>) = apply { summaryBuilder.migrationKeySamples(migrationKeySamples) }
+        fun migrationKeySamples(migrationKeySamples: Map<RecordMatchStatus, List<String>>) =
+            apply { summaryBuilder.migrationKeySamples(migrationKeySamples) }
 
         fun build() = RunApiModel(
             id = run.id!!,
@@ -70,16 +71,24 @@ data class RunApiModel(
     description = "Summarised matching results and metadata for a completed reconciliation run"
 )
 data class RunSummary(
-    @field:Schema(description = "Total number of rows in the dataset across both datasources, determined by distinct MigrationKey values")
+    @field:Schema(
+        description = "Total number of rows in the dataset across both datasources, determined by distinct " +
+            "MigrationKey values"
+    )
     val totalCount: Int,
 
     @field:Schema(description = "Number of rows considered matched (identical values) across both source and target")
     val bothMatchedCount: Int,
 
-    @field:Schema(description = "Number of rows considered mis-matched (one or more column value differed) across both source and target")
+    @field:Schema(
+        description = "Number of rows considered mis-matched (one or more column value differed) across both source " +
+            "and target"
+    )
     val bothMismatchedCount: Int,
 
-    @field:Schema(description = "Sample MigrationKeys for rows considered mis-matched that may need deeper investigation")
+    @field:Schema(
+        description = "Sample MigrationKeys for rows considered mis-matched that may need deeper investigation"
+    )
     var bothMismatchedSampleKeys: List<String>? = null,
 
     @field:Schema(description = "Summary results relating only to the dataset from the source datasource")
@@ -98,15 +107,24 @@ data class RunSummary(
         fun matchStatus(matchStatus: MatchStatus?) = apply { this.matchStatus = matchStatus }
         fun sourceMeta(sourceMeta: DatasetMeta) = apply { this.sourceMeta = sourceMeta }
         fun targetMeta(targetMeta: DatasetMeta) = apply { this.targetMeta = targetMeta }
-        fun migrationKeySamples(migrationKeySamples: Map<RecordMatchStatus, List<String>>) = apply { this.migrationKeySamples = migrationKeySamples }
+        fun migrationKeySamples(migrationKeySamples: Map<RecordMatchStatus, List<String>>) =
+            apply { this.migrationKeySamples = migrationKeySamples }
 
         fun build() = matchStatus?.let {
             RunSummary(
                 matchStatus!!.total,
                 matchStatus!!.bothMatched,
                 matchStatus!!.bothMismatched,
-                source = IndividualDbRunSummary(IndividualDbMeta(sourceMeta), matchStatus!!.sourceTotal, matchStatus!!.sourceOnly),
-                target = IndividualDbRunSummary(IndividualDbMeta(targetMeta), matchStatus!!.targetTotal, matchStatus!!.targetOnly)
+                source = IndividualDbRunSummary(
+                    IndividualDbMeta(sourceMeta),
+                    matchStatus!!.sourceTotal,
+                    matchStatus!!.sourceOnly
+                ),
+                target = IndividualDbRunSummary(
+                    IndividualDbMeta(targetMeta),
+                    matchStatus!!.targetTotal,
+                    matchStatus!!.targetOnly
+                )
             ).apply {
                 migrationKeySamples?.let {
                     source.onlyHereSampleKeys = migrationKeySamples!![RecordMatchStatus.SourceOnly]
@@ -136,9 +154,15 @@ data class IndividualDbRunSummary(
     var onlyHereSampleKeys: List<String>? = null
 )
 
-@Schema(name = "IndividualDatabaseMetadata", description = "Metadata about a single dataset when run against a given data source")
+@Schema(
+    name = "IndividualDatabaseMetadata",
+    description = "Metadata about a single dataset when run against a given data source"
+)
 data class IndividualDbMeta(
-    @field:Schema(description = "Metadata describing the individual columns within the dataset query, ordered as in the query expression")
+    @field:Schema(
+        description = "Metadata describing the individual columns within the dataset query, ordered as in " +
+            "the query expression"
+    )
     var cols: List<ColMeta> = emptyList()
 ) {
     internal constructor(meta: DatasetMeta?) : this(meta?.cols?.map { ColMeta(it) } ?: emptyList())
@@ -149,10 +173,18 @@ data class IndividualDbMeta(
     description = "Metadata about a single column as retrieved from a dataset query"
 )
 data class ColMeta(
-    @field:Schema(description = "Name of the column as retrieved by the dataset query. Name columns in your dataset SQL expressions to alter these.")
+    @field:Schema(
+        description = "Name of the column as retrieved by the dataset query. Name columns in your dataset " +
+            "SQL expressions to alter these."
+    )
     val name: String,
 
-    @field:Schema(description = "The deserialized Java type representing the column after retrieval from the data DataLoadRole.source. This can help you understand why two rows may not have a matching hash. If the columns have incompatible types which will not be hashed consistently, you may need to coerce the types in your dataset query. ")
+    @field:Schema(
+        description = "The deserialized Java type representing the column after retrieval from the data " +
+            "DataLoadRole.source. This can help you understand why two rows may not have a matching hash. If the " +
+            "columns have incompatible types which will not be hashed consistently, you may need to coerce the " +
+            "types in your dataset query. "
+    )
     val javaType: String
 ) {
     internal constructor(meta: recce.server.recrun.ColMeta) : this(meta.name, meta.javaType)

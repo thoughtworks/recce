@@ -103,7 +103,9 @@ internal class HashingStrategyTest {
 
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
-    fun `strategy should dictate whether nulls of different defined column java types should be considered unequal `(strat: HashingStrategy) {
+    fun `strategy should dictate whether nulls of different defined column java types should be considered unequal `(
+        strat: HashingStrategy
+    ) {
         val stringRow = R2dbcFakeBuilder()
             .withCol("test", String::class.java)
             .withRowValues("key", null)
@@ -137,7 +139,9 @@ internal class HashingStrategyTest {
             .build()
 
         assertThat(HashingStrategy.TypeLenient.hash(row, row.metadata).hashedValue)
-            .describedAs("lenient hash should be equal between ${first.javaClass}($first) and ${second.javaClass}($second)")
+            .describedAs(
+                "lenient hash should be equal between ${first.javaClass}($first) and ${second.javaClass}($second)"
+            )
             .isEqualTo(HashingStrategy.TypeLenient.hash(row2, row2.metadata).hashedValue)
     }
 

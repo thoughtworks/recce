@@ -16,7 +16,8 @@ class R2dbcConfiguration @Inject constructor(sources: List<R2dbcDatasource>) {
     }
 
     fun getUrl(datasourceRef: String): String =
-        datasources[datasourceRef] ?: throw ConfigurationException("Cannot locate datasourceRef [$datasourceRef] in r2dbc configuration!")
+        datasources[datasourceRef]
+            ?: throw ConfigurationException("Cannot locate datasourceRef [$datasourceRef] in r2dbc configuration!")
 }
 
 @Introspected

@@ -17,8 +17,10 @@ internal class R2dbcConfigurationTest {
     fun `retrieve url for valid data sources`() {
         with(ApplicationContext.run(properties)) {
             val config = getBean(R2dbcConfiguration::class.java)
-            assertThat(config.getUrl("source")).isEqualTo("r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE")
-            assertThat(config.getUrl("target")).isEqualTo("r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE")
+            assertThat(config.getUrl("source"))
+                .isEqualTo("r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE")
+            assertThat(config.getUrl("target"))
+                .isEqualTo("r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE")
         }
     }
 

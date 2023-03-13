@@ -41,7 +41,10 @@ class DatasetRecRunController(
         @field:PathVariable
         val runId: Int,
 
-        @field:Schema(description = "How many sample mismatched migration keys of each type (only in source, only in target, mismatched data) in the results")
+        @field:Schema(
+            description = "How many sample mismatched migration keys of each type (only in source, only in " +
+                "target, mismatched data) in the results"
+        )
         @field:QueryValue(defaultValue = "0")
         @field:Nullable
         @field:PositiveOrZero

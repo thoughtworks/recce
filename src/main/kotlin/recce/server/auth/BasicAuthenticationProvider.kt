@@ -17,7 +17,10 @@ class BasicAuthenticationProvider(private val authConfiguration: AuthConfigurati
         authenticationRequest: AuthenticationRequest<*, *>
     ): Publisher<AuthenticationResponse> =
         Flux.create({ emitter: FluxSink<AuthenticationResponse> ->
-            if (authenticationRequest.identity == authConfiguration.username && authenticationRequest.secret == authConfiguration.password) {
+            if (
+                authenticationRequest.identity == authConfiguration.username &&
+                authenticationRequest.secret == authConfiguration.password
+            ) {
                 emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
                 emitter.complete()
             } else {

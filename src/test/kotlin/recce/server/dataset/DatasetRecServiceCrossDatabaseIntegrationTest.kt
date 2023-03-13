@@ -81,10 +81,14 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
 
             val datasets = databaseCombinations.flatMap { (source, target) ->
                 listOf(
-                    "reconciliation.datasets.$source-to-$target.source.datasourceRef" to source,
-                    "reconciliation.datasets.$source-to-$target.source.query" to "SELECT id AS MigrationKey, value FROM TestData",
-                    "reconciliation.datasets.$source-to-$target.target.datasourceRef" to target,
-                    "reconciliation.datasets.$source-to-$target.target.query" to "SELECT id AS MigrationKey, value FROM TestData"
+                    "reconciliation.datasets.$source-to-$target.source.datasourceRef"
+                        to source,
+                    "reconciliation.datasets.$source-to-$target.source.query"
+                        to "SELECT id AS MigrationKey, value FROM TestData",
+                    "reconciliation.datasets.$source-to-$target.target.datasourceRef"
+                        to target,
+                    "reconciliation.datasets.$source-to-$target.target.query"
+                        to "SELECT id AS MigrationKey, value FROM TestData"
                 )
             }.toMap()
 
@@ -158,7 +162,11 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
             .assertNext { run ->
                 assertThat(run.failureCause).isNull()
                 assertThat(run.summary)
-                    .describedAs("Values between two DBs should match. sourceMeta=${run.sourceMeta} targetMeta=${run.targetMeta}")
+                    .describedAs(
+                        "Values between two DBs should match. " +
+                            "sourceMeta=${run.sourceMeta} " +
+                            "targetMeta=${run.targetMeta}"
+                    )
                     .usingRecursiveComparison()
                     .isEqualTo(
                         MatchStatus(bothMatched = 1)

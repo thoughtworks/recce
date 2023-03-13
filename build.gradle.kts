@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
     id("io.micronaut.application") version "3.7.5"
-    id("com.diffplug.spotless") version "6.12.0"
+    id("com.diffplug.spotless") version "6.16.0"
     id("io.gitlab.arturbosch.detekt") version "1.22.0"
     id("com.github.spotbugs") version "5.0.13"
     jacoco
@@ -189,12 +189,11 @@ tasks.run.configure {
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-    val editorConfig = mapOf("ktlint_disabled_rules" to "no-wildcard-imports")
     kotlin {
-        ktlint().editorConfigOverride(editorConfig)
+        ktlint()
     }
     kotlinGradle {
-        ktlint().editorConfigOverride(editorConfig)
+        ktlint()
     }
 }
 
@@ -289,9 +288,13 @@ jib {
 val checkJibDependencies = tasks.register("checkJibDependencies") {
     doFirst {
         val resolvedReactorToolsVersion =
-            project.configurations.runtimeClasspath.get().resolvedConfiguration.resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
+            project.configurations.runtimeClasspath.get()
+                .resolvedConfiguration.resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
         if (depVersions["reactorToolsVersionExpected"] != resolvedReactorToolsVersion) {
-            throw GradleException("Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found [$resolvedReactorToolsVersion] in dependencies. Update reactorToolsVersionExpected!")
+            throw GradleException(
+                "Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found " +
+                    "[$resolvedReactorToolsVersion] in dependencies. Update reactorToolsVersionExpected!"
+            )
         }
     }
 }

@@ -105,7 +105,10 @@ internal class DatasetControllerApiTest {
             body("[0].source.ref", equalTo("source2"))
             body("[0].target.ref", equalTo("target2"))
             body("[0].schedule.cronExpression", equalTo("0 0 0 ? * *"))
-            body("[0].schedule.nextTriggerTime", equalTo(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(expectedTriggerTime)))
+            body(
+                "[0].schedule.nextTriggerTime",
+                equalTo(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(expectedTriggerTime))
+            )
             body("[1].id", equalTo("two"))
             body("[1].source.ref", equalTo("source1"))
             body("[1].target.ref", equalTo("target1"))

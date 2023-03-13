@@ -36,7 +36,10 @@ data class DatasourceApiModel(
 
 @Schema(name = "Schedule", description = "Scheduling information")
 data class ScheduleApiModel(
-    @field:Schema(description = "Cron Expression valid per https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html")
+    @field:Schema(
+        description = "Cron Expression valid per " +
+            "https://docs.micronaut.io/latest/api/io/micronaut/scheduling/cron/CronExpression.html"
+    )
     val cronExpression: String,
 
     @field:Schema(description = "Time this dataset is scheduled to next be triggered")

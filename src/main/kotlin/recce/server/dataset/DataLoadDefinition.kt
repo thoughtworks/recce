@@ -31,10 +31,16 @@ class DataLoadDefinition
 
     override fun populate(locator: BeanLocator) {
         dbOperations = locator.findBean(R2dbcOperations::class.java, Qualifiers.byName(datasourceRef))
-            .orElseThrow { ConfigurationException("Cannot locate ${R2dbcOperations::class.java.simpleName} named [$datasourceRef] in configuration!") }
+            .orElseThrow {
+                ConfigurationException(
+                    "Cannot locate ${R2dbcOperations::class.java.simpleName} named [$datasourceRef] in configuration!"
+                )
+            }
 
         queryFileBaseDir = locator.findBean(DefaultsProvider::class.java)
-            .orElseThrow { ConfigurationException("Cannot locate ${DefaultsProvider::class.java.simpleName} in configuration!") }
+            .orElseThrow {
+                ConfigurationException("Cannot locate ${DefaultsProvider::class.java.simpleName} in configuration!")
+            }
             .queryFileBaseDir
 
         queryStatement = this.resolveQueryStatement()

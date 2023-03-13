@@ -35,7 +35,9 @@ interface RecRecordRepository : ReactorCrudRepository<RecRecord, Int> {
 internal abstract class AbstractRecRecordRepository(private val operations: R2dbcOperations) : RecRecordRepository {
 
     override fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus> {
-        return operations.withConnection { it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute() }
+        return operations.withConnection {
+            it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute()
+        }
             .toFlux()
             .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
             .reduce(MatchStatus()) { status, propSet -> propSet(status); status }
@@ -45,8 +47,13 @@ internal abstract class AbstractRecRecordRepository(private val operations: R2db
         val count = row.get(countColumnName, Number::class.java)?.toInt()
             ?: throw IllegalArgumentException("Missing [$countColumnName] column!")
 
-        val recordMatchStatus = RecordMatchStatus.valueOf(row.get(statusColumnName, String::class.java) ?: throw IllegalArgumentException("Missing [$statusColumnName] column!"))
-        return { st -> recordMatchStatus.setter(st, count) }
+        val recordMatchStatus = RecordMatchStatus.valueOf(
+            row.get(statusColumnName, String::class.java)
+                ?: throw IllegalArgumentException("Missing [$statusColumnName] column!")
+        )
+        return { st ->
+            recordMatchStatus.setter(st, count)
+        }
     }
 
     companion object {

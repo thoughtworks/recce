@@ -38,13 +38,19 @@ open class FlywayMigrator {
 
     @Transactional
     @TransactionalAdvice(transactionManager = "source-h2-sync")
-    open fun cleanMigrateSource(tempDir: Path, sql: String = createTable + (0..2).joinToString("\n", transform = insertUser)) {
+    open fun cleanMigrateSource(
+        tempDir: Path,
+        sql: String = createTable + (0..2).joinToString("\n", transform = insertUser)
+    ) {
         flywayCleanMigrate(tempDir, sql) { it.dataSource(sourceDataSource) }
     }
 
     @Transactional
     @TransactionalAdvice(transactionManager = "target-h2-sync")
-    open fun cleanMigrateTarget(tempDir: Path, sql: String = createTable + ((0..1) + (3..4)).joinToString("\n", transform = insertUser)) {
+    open fun cleanMigrateTarget(
+        tempDir: Path,
+        sql: String = createTable + ((0..1) + (3..4)).joinToString("\n", transform = insertUser)
+    ) {
         flywayCleanMigrate(tempDir, sql) { it.dataSource(targetDataSource) }
     }
 }

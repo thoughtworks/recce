@@ -182,8 +182,12 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `should reconcile empty source with target`() {
-        whenever(recordRepository.findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey)))
-            .doReturn(Flux.empty())
+        whenever(
+            recordRepository.findByRecRunIdAndMigrationKeyIn(
+                testRecordKey.recRunId,
+                listOf(testRecordKey.migrationKey)
+            )
+        ).doReturn(Flux.empty())
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
@@ -202,7 +206,10 @@ internal class DatasetRecServiceTest {
             }
             .verifyComplete()
 
-        verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
+        verify(recordRepository).findByRecRunIdAndMigrationKeyIn(
+            testRecordKey.recRunId,
+            listOf(testRecordKey.migrationKey)
+        )
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, targetData = "def")))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).successful(recRun)
@@ -212,8 +219,12 @@ internal class DatasetRecServiceTest {
     fun `should reconcile source with target with different rows`() {
         // yes, we are re-using the same key, but let's pretend they are different by telling
         // the code that the row doesn't exist
-        whenever(recordRepository.findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey)))
-            .doReturn(Flux.empty())
+        whenever(
+            recordRepository.findByRecRunIdAndMigrationKeyIn(
+                testRecordKey.recRunId,
+                listOf(testRecordKey.migrationKey)
+            )
+        ).doReturn(Flux.empty())
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
@@ -233,7 +244,10 @@ internal class DatasetRecServiceTest {
             .verifyComplete()
 
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
-        verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
+        verify(recordRepository).findByRecRunIdAndMigrationKeyIn(
+            testRecordKey.recRunId,
+            listOf(testRecordKey.migrationKey)
+        )
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, targetData = "def")))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).successful(recRun)
@@ -241,8 +255,12 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `should reconcile source with target when rows have matching key`() {
-        whenever(recordRepository.findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey)))
-            .doReturn(Flux.just(testRecord))
+        whenever(
+            recordRepository.findByRecRunIdAndMigrationKeyIn(
+                testRecordKey.recRunId,
+                listOf(testRecordKey.migrationKey)
+            )
+        ).doReturn(Flux.just(testRecord))
 
         val service = DatasetRecService(
             RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
@@ -262,7 +280,10 @@ internal class DatasetRecServiceTest {
             .verifyComplete()
 
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
-        verify(recordRepository).findByRecRunIdAndMigrationKeyIn(testRecordKey.recRunId, listOf(testRecordKey.migrationKey))
+        verify(recordRepository).findByRecRunIdAndMigrationKeyIn(
+            testRecordKey.recRunId,
+            listOf(testRecordKey.migrationKey)
+        )
         verify(recordRepository).updateAll(listOf(testRecord))
         verifyNoMoreInteractions(recordRepository)
         verify(runService).successful(recRun)

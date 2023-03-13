@@ -11,3 +11,8 @@ tab_width = 4
 
 [*.{xml,yml,yaml}]
 indent_size = 2
+
+[*.{kt,kts}]
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
