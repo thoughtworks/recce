@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: ASDF setup
-        uses: asdf-vm/actions/setup@v1
+        uses: asdf-vm/actions/setup@v2
 
       - name: ASDF Cache
         id: asdf-cache
@@ -44,7 +44,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/.tool-versions') }}
 
       - name: ASDF tool install
-        uses: asdf-vm/actions/install@v1
+        uses: asdf-vm/actions/install@v2
         if: steps.asdf-cache.outputs.cache-hit != 'true'
 
       - name: Set JAVA_HOME from ASDF
