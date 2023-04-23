@@ -145,7 +145,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
 
     testImplementation("org.testcontainers:mysql")
-    testRuntimeOnly("mysql:mysql-connector-java") {
+    testRuntimeOnly("mysql:mysql-connector-java:8.0.33") { // Remove fixed version when micronaut has updated to 8.0.33+
         exclude("com.google.protobuf", "protobuf-java") // Unnecessary, we don't use this part of the driver
     }
     testRuntimeOnly("org.flywaydb:flyway-mysql")
