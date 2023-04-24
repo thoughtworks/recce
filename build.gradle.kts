@@ -13,17 +13,10 @@ plugins {
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.google.cloud.tools.jib") version "3.3.1"
-    id("org.ajoberstar.reckon") version "0.16.1"
     id("org.owasp.dependencycheck") version "8.2.1"
 }
 
 group = "recce.server"
-
-reckon {
-    stages("dev", "final")
-    setScopeCalc(calcScopeFromProp())
-    setStageCalc(calcStageFromProp())
-}
 
 // Workaround to allow dependabot to update versions of libraries together, since dependabot doesn't understand
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
