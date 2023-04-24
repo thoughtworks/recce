@@ -13,7 +13,7 @@ plugins {
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.google.cloud.tools.jib") version "3.3.1"
-    id("org.ajoberstar.reckon") version "0.16.1"
+    id("org.ajoberstar.reckon") version "0.18.0"
     id("org.owasp.dependencycheck") version "8.2.1"
 }
 
