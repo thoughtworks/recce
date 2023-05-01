@@ -22,7 +22,7 @@ group = "recce.server"
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.9.0",
+    "micronaut" to "io.micronaut:micronaut-core:3.9.1",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1"
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
