@@ -299,6 +299,7 @@ tasks.jib.configure {
 
 // use different naming when building locally, to avoid confusion
 tasks.jibDockerBuild.configure {
+    dependsOn(checkJibDependencies)
     jib {
         from {
             platforms {
