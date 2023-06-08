@@ -6,8 +6,8 @@
     Recce doesn't use the H2 console so is not affected by these apparent vulnerabilities.
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
+    <cve>CVE-2018-14335</cve>
     <cve>CVE-2022-45868</cve>
-    <vulnerabilityName>CVE-2018-14335</vulnerabilityName>
   </suppress>
 
 </suppressions>
