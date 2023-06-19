@@ -122,7 +122,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("io.projectreactor:reactor-test")
 
-    testImplementation(platform("org.mockito:mockito-bom:5.3.1")) // Needs to be compatible with Micronaut BOM
+    testImplementation(platform("org.mockito:mockito-bom:5.4.0")) // Needs to be compatible with Micronaut BOM
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.0.0")
