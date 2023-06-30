@@ -1,12 +1,12 @@
 package recce.server.dataset
 
-import com.google.common.annotations.VisibleForTesting
 import io.micronaut.context.BeanLocator
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.data.r2dbc.operations.R2dbcOperations
 import io.micronaut.inject.qualifiers.Qualifiers
 import io.r2dbc.spi.Result
+import org.jetbrains.annotations.TestOnly
 import reactor.core.publisher.Flux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
@@ -58,7 +58,7 @@ class DataLoadDefinition
         .index()
         .map { (i, r) -> require(i == 0L) { "More than one query found." }; r }
 
-    @VisibleForTesting
+    @TestOnly
     fun resolveQueryStatement(): String = kotlin.runCatching {
         this.query.orElseGet {
             this.queryFile.orElseGet {

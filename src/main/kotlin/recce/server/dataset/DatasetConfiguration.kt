@@ -1,10 +1,10 @@
 package recce.server.dataset
 
-import com.google.common.annotations.VisibleForTesting
 import io.micronaut.context.BeanLocator
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.bind.annotation.Bindable
 import io.micronaut.scheduling.cron.CronExpression
+import org.jetbrains.annotations.TestOnly
 import recce.server.DefaultsProvider
 import recce.server.PostConstructable
 import java.time.ZonedDateTime
@@ -21,7 +21,7 @@ class DatasetConfiguration(
     lateinit var id: String
     lateinit var defaults: DefaultsProvider
 
-    @VisibleForTesting
+    @TestOnly
     constructor(source: DataLoadDefinition, target: DataLoadDefinition) : this(
         source,
         target,
