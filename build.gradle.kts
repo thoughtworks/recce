@@ -84,7 +84,12 @@ dependencies {
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("javax.annotation:javax.annotation-api")
-    implementation("com.google.guava:guava:32.0.1-jre")
+    implementation("com.google.guava:guava:32.1.0-jre") {
+        // see https://github.com/google/guava/pull/6606
+        exclude(module = "error_prone_annotations")
+        exclude(module = "checker-qual")
+        exclude(module = "jsr305")
+    }
     implementation("io.projectreactor:reactor-tools")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
