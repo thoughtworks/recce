@@ -190,7 +190,7 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 }
 
 detekt {
-    config = files("build-config/detekt.yml")
+    config.from(files("build-config/detekt.yml"))
     buildUponDefaultConfig = true
 }
 
