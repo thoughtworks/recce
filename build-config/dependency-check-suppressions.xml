@@ -10,4 +10,12 @@
     <cve>CVE-2022-45868</cve>
   </suppress>
 
+  <suppress>
+    <notes><![CDATA[
+    This is a false positive "noise" CVE: https://github.com/FasterXML/jackson-databind/issues/3972
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <cve>CVE-2023-35116</cve>
+  </suppress>
+
 </suppressions>
