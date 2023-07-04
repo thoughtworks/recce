@@ -33,6 +33,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Docker Hub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ env.DOCKER_HUB_ID }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
       - name: ASDF setup
         uses: asdf-vm/actions/setup@v2
 
@@ -82,4 +89,4 @@ jobs:
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
-          arguments: jib -x check
+          arguments: jibGitHubContainerRegistry jibDockerHub -x check

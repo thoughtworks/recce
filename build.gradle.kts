@@ -270,7 +270,6 @@ jib {
             .setNormalVersion(fullVersion.normalVersion)
             .setPreReleaseVersion(fullVersion.preReleaseVersion.split('.')[0])
             .build()
-        image = "ghcr.io/$githubRepoOwner/$containerRepoName"
         tags = setOf(tagVersion.toString(), "latest")
     }
     container {
@@ -297,9 +296,23 @@ val checkJibDependencies = tasks.register("checkJibDependencies") {
 }
 
 // Jib task pushes an image. Only do so after running all checks
-tasks.jib.configure {
+tasks.register<com.google.cloud.tools.jib.gradle.BuildImageTask>("jibGitHubContainerRegistry") {
     dependsOn(checkJibDependencies)
     dependsOn(tasks.check)
+    setJibExtension(project.extensions.getByName("jib") as com.google.cloud.tools.jib.gradle.JibExtension)
+    doFirst {
+        jib?.to?.image = "ghcr.io/$githubRepoOwner/$containerRepoName"
+    }
+}
+
+// Jib task pushes an image. Only do so after running all checks
+tasks.register<com.google.cloud.tools.jib.gradle.BuildImageTask>("jibDockerHub") {
+    dependsOn(checkJibDependencies)
+    dependsOn(tasks.check)
+    setJibExtension(project.extensions.getByName("jib") as com.google.cloud.tools.jib.gradle.JibExtension)
+    doFirst {
+        jib?.to?.image = "docker.io/recceteam/$containerRepoName"
+    }
 }
 
 // use different naming when building locally, to avoid confusion

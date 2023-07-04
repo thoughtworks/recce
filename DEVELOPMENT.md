@@ -143,5 +143,5 @@ Current release process looks like
     # Patch version (e.g 0.6.0 -> 0.6.1)   
     ./gradlew -Preckon.stage=final -Preckon.scope=patch reckonTagPush
     ```
-2. The tag push will trigger a build on [GitHub Actions](https://github.com/ThoughtWorks-SEA/recce/actions) and push to GHCR.
+2. The tag push will trigger a build on [GitHub Actions](https://github.com/ThoughtWorks-SEA/recce/actions) and push to both GHCR and Docker Hub.
 3. Create a new release on Github via https://github.com/ThoughtWorks-SEA/recce/releases linked to the tag
