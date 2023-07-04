@@ -46,13 +46,13 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 
 # Getting Started
 
-Recce is currently [published and available as a container image via GHCR](https://github.com/ThoughtWorks-SEA/recce/pkgs/container/recce-server).
+Recce is currently published and available as a container image [via GHCR](https://github.com/ThoughtWorks-SEA/recce/pkgs/container/recce-server) or [Docker Hub](https://hub.docker.com/r/recceteam/recce-server), built for both AMD64 and ARM64.
 
 However, it also
-* requires a Postgres database
+* requires its own Postgres database
 * ...and to be practically useful you will want to configure it with connectivity to some data sources you wish to reconcile.
 
-These options require only JDK 11+ and Docker installed locally.
+The below options require only JDK 11+ and Docker (or equivalent) installed locally.
 
 1. **Run Recce** locally
     * Either **Build** locally with an [example](./examples) source and target database (More info at [DEVELOPMENT.md](./DEVELOPMENT.md)).
