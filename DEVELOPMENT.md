@@ -21,7 +21,7 @@
 
 * Docker CLI
 * Docker Desktop, [Colima](https://github.com/abiosoft/colima) or some mechanism to run containers on your host
-* JDK 17 (if you use [ASDF](https://asdf-vm.com/) you can `asdf install` to install one using the [.tool-versions](./.tool-versions))
+* JDK 17 (if you use [RTX](https://github.com/jdxcode/rtx) or [ASDF](https://asdf-vm.com/) you can `rtx install` or `asdf install` to install one using the [.tool-versions](./.tool-versions))
 
 # Getting Started
 
