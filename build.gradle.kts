@@ -98,7 +98,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
 
     // Needs to be compatible with Micronaut's reactor-based BOM.
-    implementation(platform("io.projectreactor:reactor-bom:2022.0.8"))
+    implementation(platform("io.projectreactor:reactor-bom:2022.0.9"))
 
     // OpenAPI specification and interactive UI generated from code
     kapt("io.micronaut.openapi:micronaut-openapi")
