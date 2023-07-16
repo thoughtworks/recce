@@ -5,8 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.kapt") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
-    id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("io.micronaut.application") version "3.7.10"
+    id("io.micronaut.application") version "4.1.0"
     id("com.diffplug.spotless") version "6.21.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
     id("com.github.spotbugs") version "5.1.3"
@@ -22,12 +21,14 @@ group = "recce.server"
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
 val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.10.1",
+    "micronautPlatform" to "io.micronaut.platform:micronaut-platform:4.1.1",
+    "micronautCore" to "io.micronaut:micronaut-core-bom:4.1.5",
     "restAssured" to "io.rest-assured:rest-assured:4.5.1"
 )
 val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
     "javaMajor" to "17",
-    "reactorToolsVersionExpected" to "3.5.10"
+    "kotlin" to "1.9.0",
+    "reactorToolsExpected" to "3.5.10"
 )
 
 repositories {
@@ -42,10 +43,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     kotlinOptions {
         allWarningsAsErrors = true
     }
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
 
 micronaut {
-    version(depVersions["micronaut"])
+    version(depVersions["micronautPlatform"])
+    coreVersion.set(depVersions["micronautCore"])
+
     runtime("netty")
     testRuntime("junit5")
     processing {
@@ -77,15 +83,27 @@ configurations.all {
 }
 
 dependencies {
-    kapt("io.micronaut:micronaut-http-validation")
     kapt("io.micronaut.data:micronaut-data-processor")
-    implementation("io.micronaut:micronaut-runtime")
-    implementation("io.micronaut:micronaut-validation")
+    kapt("io.micronaut:micronaut-http-validation")
+    kapt("io.micronaut.serde:micronaut-serde-processor")
+
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${depVersions["kotlin"]}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${depVersions["kotlin"]}")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    runtimeOnly("org.yaml:snakeyaml")
+
+    kapt("io.micronaut.validation:micronaut-validation-processor")
+    implementation("io.micronaut.validation:micronaut-validation")
+    implementation("jakarta.validation:jakarta.validation-api")
+
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.security:micronaut-security-jwt")
-    implementation("javax.annotation:javax.annotation-api")
+    implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("com.google.guava:guava:32.1.2-jre") {
         // see https://github.com/google/guava/pull/6606
+        exclude(module = "listenablefuture")
         exclude(module = "error_prone_annotations")
         exclude(module = "checker-qual")
         exclude(module = "jsr305")
@@ -277,7 +295,7 @@ jib {
         ports = listOf("8080")
         environment = mapOf("version" to version.toString())
         labels.set(mapOf("org.opencontainers.image.source" to "https://github.com/$githubRepoOwner/recce"))
-        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-${depVersions["reactorToolsVersionExpected"]}.jar")
+        jvmFlags = listOf("-javaagent:/app/libs/reactor-tools-${depVersions["reactorToolsExpected"]}.jar")
     }
 }
 
@@ -286,10 +304,10 @@ val checkJibDependencies = tasks.register("checkJibDependencies") {
         val resolvedReactorToolsVersion =
             project.configurations.runtimeClasspath.get()
                 .resolvedConfiguration.resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
-        if (depVersions["reactorToolsVersionExpected"] != resolvedReactorToolsVersion) {
+        if (depVersions["reactorToolsExpected"] != resolvedReactorToolsVersion) {
             throw GradleException(
-                "Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found " +
-                    "[$resolvedReactorToolsVersion] in dependencies. Update reactorToolsVersionExpected!"
+                "Jib docker build expected reactor-tools [${depVersions["reactorToolsExpected"]}] but found " +
+                    "[$resolvedReactorToolsVersion] in dependencies. Update reactorToolsExpected!"
             )
         }
     }

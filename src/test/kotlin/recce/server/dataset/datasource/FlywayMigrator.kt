@@ -1,6 +1,6 @@
 package recce.server.dataset.datasource
 
-import io.micronaut.transaction.annotation.TransactionalAdvice
+import io.micronaut.transaction.annotation.Transactional
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import jakarta.inject.Singleton
@@ -9,7 +9,6 @@ import org.flywaydb.core.api.configuration.FluentConfiguration
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.sql.DataSource
-import javax.transaction.Transactional
 
 @Singleton
 open class FlywayMigrator {
@@ -36,8 +35,7 @@ open class FlywayMigrator {
     @field:Named("target-h2-sync")
     lateinit var targetDataSource: DataSource
 
-    @Transactional
-    @TransactionalAdvice(transactionManager = "source-h2-sync")
+    @Transactional(transactionManager = "source-h2-sync")
     open fun cleanMigrateSource(
         tempDir: Path,
         sql: String = createTable + (0..2).joinToString("\n", transform = insertUser)
@@ -45,8 +43,7 @@ open class FlywayMigrator {
         flywayCleanMigrate(tempDir, sql) { it.dataSource(sourceDataSource) }
     }
 
-    @Transactional
-    @TransactionalAdvice(transactionManager = "target-h2-sync")
+    @Transactional(transactionManager = "target-h2-sync")
     open fun cleanMigrateTarget(
         tempDir: Path,
         sql: String = createTable + ((0..1) + (3..4)).joinToString("\n", transform = insertUser)

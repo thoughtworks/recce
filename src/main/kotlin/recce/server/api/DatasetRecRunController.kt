@@ -10,6 +10,10 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.inject.Inject
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.PositiveOrZero
 import mu.KotlinLogging
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -18,10 +22,6 @@ import reactor.kotlin.core.util.function.component2
 import recce.server.dataset.DatasetRecRunner
 import recce.server.recrun.RecRecordRepository
 import recce.server.recrun.RecRunRepository
-import javax.validation.Valid
-import javax.validation.constraints.Max
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.PositiveOrZero
 
 private val logger = KotlinLogging.logger {}
 
@@ -38,7 +38,7 @@ class DatasetRecRunController(
     @Introspected
     data class IndividualRunQueryParams(
         @field:Schema(description = "The identifier of the reconciliation run to retrieve")
-        @field:PathVariable
+        @field:PathVariable("runId")
         val runId: Int,
 
         @field:Schema(
@@ -53,7 +53,6 @@ class DatasetRecRunController(
     )
 
     @Get(uri = "/{runId}{?includeSampleKeys}")
-    @Suppress("MnUnresolvedPathVariable")
     @Operation(
         summary = "Retrieve details of an individual run by ID for a dataset",
         tags = ["Reconciliation Runs"],
