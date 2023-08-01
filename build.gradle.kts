@@ -84,7 +84,7 @@ dependencies {
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("javax.annotation:javax.annotation-api")
-    implementation("com.google.guava:guava:32.1.1-jre") {
+    implementation("com.google.guava:guava:32.1.2-jre") {
         // see https://github.com/google/guava/pull/6606
         exclude(module = "error_prone_annotations")
         exclude(module = "checker-qual")
