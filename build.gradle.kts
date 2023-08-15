@@ -7,7 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
     id("io.micronaut.application") version "3.7.10"
-    id("com.diffplug.spotless") version "6.19.0"
+    id("com.diffplug.spotless") version "6.20.0"
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
     id("com.github.spotbugs") version "5.1.3"
     jacoco
