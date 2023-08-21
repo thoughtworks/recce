@@ -13,7 +13,7 @@ plugins {
     jacoco
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.google.cloud.tools.jib") version "3.3.2"
-    id("org.owasp.dependencycheck") version "8.3.1"
+    id("org.owasp.dependencycheck") version "8.4.0"
 }
 
 group = "recce.server"
