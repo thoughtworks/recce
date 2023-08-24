@@ -1,7 +1,7 @@
 # Background
 
 In legacy migration projects, data migration often has a huge role. In these projects we generally have a need to assure
-stakeholders that data has not been missed during the migration, and that the integrity of this data is in tact even
+stakeholders that data has not been missed during the migration, and that the integrity of this data is intact even
 where it includes sensitive or PII data which is unavailable for the development team, or indeed stakeholders to view.
 
 Furthermore, during such migrations it is common that
