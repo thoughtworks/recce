@@ -40,7 +40,10 @@ internal abstract class AbstractRecRecordRepository(private val operations: R2db
         }
             .toFlux()
             .flatMap { res -> res.map { row, _ -> matchStatusSetterFor(row) } }
-            .reduce(MatchStatus()) { status, propSet -> propSet(status); status }
+            .reduce(MatchStatus()) { status, propSet ->
+                propSet(status)
+                status
+            }
     }
 
     private fun matchStatusSetterFor(row: Row): (MatchStatus) -> Unit {

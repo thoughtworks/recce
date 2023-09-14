@@ -56,7 +56,10 @@ class DataLoadDefinition
         { it.close() }
     )
         .index()
-        .map { (i, r) -> require(i == 0L) { "More than one query found." }; r }
+        .map { (i, r) ->
+            require(i == 0L) { "More than one query found." }
+            r
+        }
 
     @TestOnly
     fun resolveQueryStatement(): String = kotlin.runCatching {
