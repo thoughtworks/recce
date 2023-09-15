@@ -30,12 +30,17 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         /**
          * Databases which we expect to produce matching hashes for values of similar types.
          */
-        private val databases: Map<String, JdbcDatabaseContainer<Nothing>> = mapOf(
-            "mssql" to MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense(),
-            "mysql" to MySQLContainer("mysql:8"),
-            "mariadb" to MariaDBContainer("mariadb:10"),
-            "postgres" to PostgreSQLContainer("postgres:14-alpine")
-        )
+        private val databases: Map<String, JdbcDatabaseContainer<Nothing>> = buildMap {
+            put("mysql", MySQLContainer("mysql:8"))
+            put("mariadb", MariaDBContainer("mariadb:10"))
+            put("postgres", PostgreSQLContainer("postgres:14-alpine"))
+            if (!System.getProperty("os.arch").contains(Regex("arm64|aarch64"))) {
+                put(
+                    "mssql",
+                    MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
+                )
+            }
+        }
 
         /**
          * Types we want to test for each database combination
