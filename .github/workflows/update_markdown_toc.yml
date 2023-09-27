@@ -15,7 +15,7 @@ jobs:
       contents: write
     timeout-minutes: 5
     env:
-      GITHUB_MARKDOWN_TOC_VERSION: 0.8.0
+      GITHUB_MARKDOWN_TOC_VERSION: 0.8.0 # See https://github.com/ekalinin/github-markdown-toc/releases
     steps:
       - uses: actions/checkout@v4
       - run: |
