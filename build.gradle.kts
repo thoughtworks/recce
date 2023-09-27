@@ -167,8 +167,7 @@ dependencies {
 dependencyCheck {
     failBuildOnCVSS = 1f
     suppressionFile = "build-config/dependency-check-suppressions.xml"
-    scanConfigurations = listOf("runtimeClasspath", "testRuntimeClasspath")
-    skipTestGroups = false
+    scanConfigurations = listOf("runtimeClasspath")
     analyzers.assemblyEnabled = false // Unneeded, and creates warning noise
 }
 

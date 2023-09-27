@@ -3,15 +3,6 @@
 
   <suppress>
     <notes><![CDATA[
-    Recce doesn't use the H2 console so is not affected by these apparent vulnerabilities.
-    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.h2database/h2@.*$</packageUrl>
-    <cve>CVE-2018-14335</cve>
-    <cve>CVE-2022-45868</cve>
-  </suppress>
-
-  <suppress>
-    <notes><![CDATA[
     This is a false positive "noise" CVE: https://github.com/FasterXML/jackson-databind/issues/3972
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
