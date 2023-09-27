@@ -1,2 +1,2 @@
-# Version definitions for ASDF https://asdf-vm.com/
-java temurin-17.0.7+7
+# Tool version definitions for RTX https://github.com/jdx/rtx or ASDF https://asdf-vm.com/
+java temurin-17.0.8+101
