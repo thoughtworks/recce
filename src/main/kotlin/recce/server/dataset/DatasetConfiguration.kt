@@ -4,12 +4,12 @@ import io.micronaut.context.BeanLocator
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.bind.annotation.Bindable
 import io.micronaut.scheduling.cron.CronExpression
+import jakarta.validation.constraints.NotNull
 import org.jetbrains.annotations.TestOnly
 import recce.server.DefaultsProvider
 import recce.server.PostConstructable
 import java.time.ZonedDateTime
 import java.util.*
-import javax.validation.constraints.NotNull
 
 class DatasetConfiguration(
     @NotNull val source: DataLoadDefinition,

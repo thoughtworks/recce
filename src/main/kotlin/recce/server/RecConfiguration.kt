@@ -5,11 +5,11 @@ import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.ConfigurationProperties
 import io.micronaut.context.annotation.Context
 import io.micronaut.core.bind.annotation.Bindable
+import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import recce.server.dataset.DatasetConfiguration
 import recce.server.dataset.HashingStrategy
 import java.nio.file.Path
-import javax.annotation.PostConstruct
 import kotlin.io.path.Path
 
 private val logger = KotlinLogging.logger {}

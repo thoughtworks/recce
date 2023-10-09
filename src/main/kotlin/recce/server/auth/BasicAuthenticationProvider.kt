@@ -11,7 +11,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 
 @Singleton
-class BasicAuthenticationProvider(private val authConfiguration: AuthConfiguration) : AuthenticationProvider {
+class BasicAuthenticationProvider(private val authConfiguration: AuthConfiguration) :
+    AuthenticationProvider<HttpRequest<*>> {
     override fun authenticate(
         httpRequest: HttpRequest<*>?,
         authenticationRequest: AuthenticationRequest<*, *>

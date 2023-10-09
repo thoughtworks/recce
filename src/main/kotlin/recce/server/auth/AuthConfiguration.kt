@@ -3,7 +3,7 @@ package recce.server.auth
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.ConfigurationProperties
 import jakarta.inject.Singleton
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 @Singleton
 @ConfigurationProperties("auth")
