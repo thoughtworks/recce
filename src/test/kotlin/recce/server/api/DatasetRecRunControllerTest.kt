@@ -40,38 +40,41 @@ private const val SAMPLE_KEYS_LIMIT = 3
 private const val NOT_FOUND_ID = 0
 private const val TEST_DATASET_ID = "testDataset"
 private val TEST_COMPLETED_DURATION = Duration.ofMinutes(3).plusNanos(234)
-private val TEST_RESULTS = RecRun(
-    id = 12,
-    datasetId = TEST_DATASET_ID,
-    createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC)
-).apply {
-    completedTime = createdTime?.plusNanos(TEST_COMPLETED_DURATION.toNanos())
-    status = RunStatus.Successful
-    updatedTime = completedTime?.plusSeconds(10)
-    sourceMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
-    targetMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
-    summary = MatchStatus(1, 2, 3, 4)
-    metadata = mapOf("sourceQuery" to "mockQuery", "targetQuery" to "mockQuery")
-}
+private val TEST_RESULTS =
+    RecRun(
+        id = 12,
+        datasetId = TEST_DATASET_ID,
+        createdTime = LocalDateTime.of(2021, 10, 25, 16, 16, 16).toInstant(ZoneOffset.UTC)
+    ).apply {
+        completedTime = createdTime?.plusNanos(TEST_COMPLETED_DURATION.toNanos())
+        status = RunStatus.Successful
+        updatedTime = completedTime?.plusSeconds(10)
+        sourceMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
+        targetMeta = DatasetMeta(listOf(recce.server.recrun.ColMeta("test1", "String")))
+        summary = MatchStatus(1, 2, 3, 4)
+        metadata = mapOf("sourceQuery" to "mockQuery", "targetQuery" to "mockQuery")
+    }
 
-private fun mockService() = mock<DatasetRecRunner> {
-    on { runFor(eq(TEST_DATASET_ID)) } doReturn Mono.just(TEST_RESULTS)
-}
+private fun mockService() =
+    mock<DatasetRecRunner> { on { runFor(eq(TEST_DATASET_ID)) } doReturn Mono.just(TEST_RESULTS) }
 
-private fun mockRunRepository() = mock<RecRunRepository> {
-    on { findById(TEST_RESULTS.id!!) } doReturn Mono.just(TEST_RESULTS)
-    on { existsById(TEST_RESULTS.id!!) } doReturn Mono.just(true)
-    on { findById(NOT_FOUND_ID) } doReturn Mono.empty()
-    on { existsById(NOT_FOUND_ID) } doReturn Mono.just(false)
-    on { findTop10ByDatasetIdOrderByCompletedTimeDesc(TEST_DATASET_ID) } doReturn Flux.just(TEST_RESULTS, TEST_RESULTS)
-}
+private fun mockRunRepository() =
+    mock<RecRunRepository> {
+        on { findById(TEST_RESULTS.id!!) } doReturn Mono.just(TEST_RESULTS)
+        on { existsById(TEST_RESULTS.id!!) } doReturn Mono.just(true)
+        on { findById(NOT_FOUND_ID) } doReturn Mono.empty()
+        on { existsById(NOT_FOUND_ID) } doReturn Mono.just(false)
+        on { findTop10ByDatasetIdOrderByCompletedTimeDesc(TEST_DATASET_ID) } doReturn
+            Flux.just(TEST_RESULTS, TEST_RESULTS)
+    }
 
-private fun mockRecordRepository(sampleRecords: List<RecRecord>) = mock<RecRecordRepository> {
-    on { findFirstByRecRunIdSplitByMatchStatus(TEST_RESULTS.id!!, SAMPLE_KEYS_LIMIT) } doReturn Flux.fromIterable(
-        sampleRecords
-    )
-    on { findFirstByRecRunIdSplitByMatchStatus(NOT_FOUND_ID, SAMPLE_KEYS_LIMIT) } doReturn Flux.empty()
-}
+private fun mockRecordRepository(sampleRecords: List<RecRecord>) =
+    mock<RecRecordRepository> {
+        on { findFirstByRecRunIdSplitByMatchStatus(TEST_RESULTS.id!!, SAMPLE_KEYS_LIMIT) } doReturn
+            Flux.fromIterable(sampleRecords)
+        on { findFirstByRecRunIdSplitByMatchStatus(NOT_FOUND_ID, SAMPLE_KEYS_LIMIT) } doReturn
+            Flux.empty()
+    }
 
 internal class DatasetRecRunControllerTest {
     private val sampleRows =
@@ -157,11 +160,12 @@ internal class DatasetRecRunControllerTest {
     @Test
     fun `failed run should return with cause`() {
         val failureCause = DataLoadException("Could not load data", IllegalArgumentException("Root Cause"))
-        val failedRun = RecRun(
-            id = TEST_RESULTS.id,
-            datasetId = TEST_DATASET_ID,
-            createdTime = TEST_RESULTS.createdTime
-        ).asFailed(failureCause)
+        val failedRun =
+            RecRun(
+                id = TEST_RESULTS.id,
+                datasetId = TEST_DATASET_ID,
+                createdTime = TEST_RESULTS.createdTime
+            ).asFailed(failureCause)
 
         whenever(service.runFor(TEST_DATASET_ID)).doReturn(Mono.just(failedRun))
 
@@ -182,7 +186,6 @@ internal class DatasetRecRunControllerTest {
 
 @MicronautTest(transactional = false)
 internal class DatasetRecRunControllerApiTest {
-
     private val sampleRows =
         List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "source-$it"), sourceData = "set") } +
             List(1) { RecRecord(RecRecordKey(TEST_RESULTS.id!!, "target-$it"), targetData = "set") } +

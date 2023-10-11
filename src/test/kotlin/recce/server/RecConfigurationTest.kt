@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
     transactional = false
 )
 internal class RecConfigurationTest {
-
     @Inject
     lateinit var config: RecConfiguration
 

@@ -16,40 +16,47 @@ import java.util.function.BiFunction
 
 internal class DatasetRecServiceTest {
     private val testDataset = "test-dataset"
-    private val recRun = RecRun(1, testDataset)
+    private val run = RecRun(1, testDataset)
 
-    private val runService = mock<RecRunService> {
-        on { start(eq(testDataset), any()) } doReturn Mono.just(recRun)
-        on { successful(recRun) } doReturn Mono.just(recRun).map { recRun.asSuccessful(MatchStatus()) }
-        on { failed(eq(recRun), any()) } doReturn Mono.just(recRun).map { recRun.asFailed(IllegalArgumentException()) }
-    }
+    private val runService =
+        mock<RecRunService> {
+            on { start(eq(testDataset), any()) } doReturn Mono.just(run)
+            on { successful(run) } doReturn Mono.just(run).map { run.asSuccessful(MatchStatus()) }
+            on { failed(eq(run), any()) } doReturn Mono.just(run).map { run.asFailed(IllegalArgumentException()) }
+        }
 
-    private val emptyRowResult = mock<io.r2dbc.spi.Result> {
-        on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.empty()
-    }
+    private val emptyRowResult =
+        mock<io.r2dbc.spi.Result> {
+            on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.empty()
+        }
 
-    private val emptyDataLoad = mock<DataLoadDefinition> {
-        on { runQuery() } doReturn Flux.just(emptyRowResult)
-    }
+    private val emptyDataLoad =
+        mock<DataLoadDefinition> {
+            on { runQuery() } doReturn Flux.just(emptyRowResult)
+        }
 
     private val testMeta = listOf(FakeColumnMetadata("col1", String::class.java))
 
-    private val singleRowResult = mock<io.r2dbc.spi.Result> {
-        on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn Flux.just(HashedRow("abc", "def", testMeta))
-    }
+    private val singleRowResult =
+        mock<io.r2dbc.spi.Result> {
+            on { map(any<BiFunction<Row, RowMetadata, HashedRow>>()) } doReturn
+                Flux.just(HashedRow("abc", "def", testMeta))
+        }
 
-    private val singleRowDataLoad = mock<DataLoadDefinition> {
-        on { runQuery() } doReturn Flux.just(singleRowResult)
-    }
+    private val singleRowDataLoad =
+        mock<DataLoadDefinition> {
+            on { runQuery() } doReturn Flux.just(singleRowResult)
+        }
 
     private val testRecordKey = RecRecordKey(1, "abc")
     private val testRecord = RecRecord(key = testRecordKey)
-    private val recordRepository = mock<RecRecordRepository> {
-        on { save(any()) } doReturn Mono.just(testRecord)
-        on { saveAll(anyList()) } doReturn Flux.just(testRecord)
-        on { findByRecRunIdAndMigrationKeyIn(eq(testRecordKey.recRunId), anyList()) } doReturn Flux.just(testRecord)
-        on { updateAll(anyList()) } doReturn Flux.just(testRecord)
-    }
+    private val recordRepository =
+        mock<RecRecordRepository> {
+            on { save(any()) } doReturn Mono.just(testRecord)
+            on { saveAll(anyList()) } doReturn Flux.just(testRecord)
+            on { findByRecRunIdAndMigrationKeyIn(eq(testRecordKey.recRunId), anyList()) } doReturn Flux.just(testRecord)
+            on { updateAll(anyList()) } doReturn Flux.just(testRecord)
+        }
 
     @Test
     fun `should throw on missing dataset`() {
@@ -60,13 +67,14 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `mono should return failed run on failed data load`() {
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            mock()
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                mock()
+            )
 
         val rootCause = IllegalArgumentException("Could not connect to database")
         whenever(emptyDataLoad.runQuery()).thenReturn(Flux.error(rootCause))
@@ -79,7 +87,7 @@ internal class DatasetRecServiceTest {
             .verifyComplete()
 
         val errorCaptor = argumentCaptor<Throwable>()
-        verify(runService).failed(eq(recRun), errorCaptor.capture())
+        verify(runService).failed(eq(run), errorCaptor.capture())
 
         assertThat(errorCaptor.firstValue)
             .isInstanceOf(DataLoadException::class.java)
@@ -90,13 +98,14 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `mono should error on failed initial save`() {
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            mock()
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                mock()
+            )
 
         whenever(runService.start(any(), any())).thenReturn(Mono.error(IllegalArgumentException("failed!")))
 
@@ -112,13 +121,14 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `mono should error on failed save of failed run`() {
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            mock()
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                mock()
+            )
 
         val rootCause = IllegalArgumentException("Could not connect to database")
         whenever(emptyDataLoad.runQuery()).thenReturn(Flux.error(rootCause))
@@ -137,13 +147,14 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `should reconcile empty datasets without error`() {
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            mock()
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, emptyDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                mock()
+            )
         service.runFor(testDataset)
             .test()
             .assertNext {
@@ -158,13 +169,14 @@ internal class DatasetRecServiceTest {
 
     @Test
     fun `should reconcile source with empty target`() {
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            recordRepository
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, emptyDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                recordRepository
+            )
 
         service.runFor(testDataset)
             .test()
@@ -177,7 +189,7 @@ internal class DatasetRecServiceTest {
 
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, sourceData = "def")))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).successful(recRun)
+        verify(runService).successful(run)
     }
 
     @Test
@@ -189,13 +201,14 @@ internal class DatasetRecServiceTest {
             )
         ).doReturn(Flux.empty())
 
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            recordRepository
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(emptyDataLoad, singleRowDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                recordRepository
+            )
 
         service.runFor(testDataset)
             .test()
@@ -212,7 +225,7 @@ internal class DatasetRecServiceTest {
         )
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, targetData = "def")))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).successful(recRun)
+        verify(runService).successful(run)
     }
 
     @Test
@@ -226,13 +239,14 @@ internal class DatasetRecServiceTest {
             )
         ).doReturn(Flux.empty())
 
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            recordRepository
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                recordRepository
+            )
 
         service.runFor(testDataset)
             .test()
@@ -250,7 +264,7 @@ internal class DatasetRecServiceTest {
         )
         verify(recordRepository).saveAll(listOf(RecRecord(key = testRecordKey, targetData = "def")))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).successful(recRun)
+        verify(runService).successful(run)
     }
 
     @Test
@@ -262,13 +276,14 @@ internal class DatasetRecServiceTest {
             )
         ).doReturn(Flux.just(testRecord))
 
-        val service = DatasetRecService(
-            RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
-            mock(),
-            mock(),
-            runService,
-            recordRepository
-        )
+        val service =
+            DatasetRecService(
+                RecConfiguration(mapOf(testDataset to DatasetConfiguration(singleRowDataLoad, singleRowDataLoad))),
+                mock(),
+                mock(),
+                runService,
+                recordRepository
+            )
 
         service.runFor(testDataset)
             .test()
@@ -286,7 +301,7 @@ internal class DatasetRecServiceTest {
         )
         verify(recordRepository).updateAll(listOf(testRecord))
         verifyNoMoreInteractions(recordRepository)
-        verify(runService).successful(recRun)
+        verify(runService).successful(run)
     }
 
     @Test

@@ -16,8 +16,9 @@ class TestConfig {
     @Singleton
     fun restAssuredSpec(server: EmbeddedServer): RequestSpecification {
         // Yes, this is static configuration; seems no other way to do it with RestAssured
-        RestAssured.config = RestAssured.config()
-            .jsonConfig(JsonConfig.jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE))
+        RestAssured.config =
+            RestAssured.config()
+                .jsonConfig(JsonConfig.jsonConfig().numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE))
 
         return RequestSpecBuilder()
             .setContentType(ContentType.JSON)

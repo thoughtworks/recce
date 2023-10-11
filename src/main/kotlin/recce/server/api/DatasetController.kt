@@ -16,7 +16,6 @@ import recce.server.dataset.DatasetConfigProvider
 class DatasetController(
     @Inject private val configProvider: DatasetConfigProvider
 ) {
-
     @Get
     @Operation(
         summary = "Retrieve pre-configured datasets",
@@ -24,7 +23,8 @@ class DatasetController(
         tags = ["Datasets"],
         responses = [ApiResponse(responseCode = "200", description = "Dataset configurations found")]
     )
-    fun getDatasets() = configProvider.availableDataSets
-        .map { DatasetApiModel(it) }
-        .sortedBy { it.id }
+    fun getDatasets() =
+        configProvider.availableDataSets
+            .map { DatasetApiModel(it) }
+            .sortedBy { it.id }
 }

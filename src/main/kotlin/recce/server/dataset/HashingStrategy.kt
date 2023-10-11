@@ -5,14 +5,19 @@ import com.google.common.hash.Hashing
 import io.r2dbc.spi.ColumnMetadata
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
-import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
+import recce.server.dataset.DataLoadDefinition.Companion.MIGRATION_KEY_COLUMN_NAME
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 
 @Suppress("UnstableApiUsage")
 enum class HashingStrategy {
     TypeLenient {
-        override fun hashCol(hasher: Hasher, index: Int, colMeta: ColumnMetadata, col: Any?) {
+        override fun hashCol(
+            hasher: Hasher,
+            index: Int,
+            colMeta: ColumnMetadata,
+            col: Any?
+        ) {
             when (col) {
                 null -> {}
                 is Boolean -> hasher.putLong(if (col) 1 else 0)
@@ -36,7 +41,12 @@ enum class HashingStrategy {
         }
     },
     TypeStrict {
-        override fun hashCol(hasher: Hasher, index: Int, colMeta: ColumnMetadata, col: Any?) {
+        override fun hashCol(
+            hasher: Hasher,
+            index: Int,
+            colMeta: ColumnMetadata,
+            col: Any?
+        ) {
             when (col) {
                 null -> hasher.putString("${colMeta.javaType.simpleName}(NULL)", Charsets.UTF_8)
                 is Boolean -> hasher.putBoolean(col)
@@ -60,19 +70,27 @@ enum class HashingStrategy {
         }
     };
 
-    protected abstract fun hashCol(hasher: Hasher, index: Int, colMeta: ColumnMetadata, col: Any?)
+    protected abstract fun hashCol(
+        hasher: Hasher,
+        index: Int,
+        colMeta: ColumnMetadata,
+        col: Any?
+    )
 
-    fun hash(row: Row, meta: RowMetadata): HashedRow {
+    fun hash(
+        row: Row,
+        meta: RowMetadata
+    ): HashedRow {
         var migrationKey: String? = null
         val hasher = Hashing.sha256().newHasher()
 
         fun trySetMigrationKey(col: Any?) {
             when {
                 col == null -> throw IllegalArgumentException(
-                    "$migrationKeyColumnName has null value somewhere in dataset"
+                    "$MIGRATION_KEY_COLUMN_NAME has null value somewhere in dataset"
                 )
                 migrationKey != null -> throw IllegalArgumentException(
-                    "More than one column named $migrationKeyColumnName found in dataset"
+                    "More than one column named $MIGRATION_KEY_COLUMN_NAME found in dataset"
                 )
                 else -> migrationKey = col.toString()
             }
@@ -80,7 +98,7 @@ enum class HashingStrategy {
 
         meta.columnMetadatas
             .forEachIndexed { i, colMeta ->
-                if (colMeta.name.equals(migrationKeyColumnName, ignoreCase = true)) {
+                if (colMeta.name.equals(MIGRATION_KEY_COLUMN_NAME, ignoreCase = true)) {
                     trySetMigrationKey(row[i])
                 } else {
                     hashCol(hasher, i, colMeta, row[i])
@@ -91,7 +109,7 @@ enum class HashingStrategy {
 
         return HashedRow(
             migrationKey ?: throw IllegalArgumentException(
-                "No column named $migrationKeyColumnName found in dataset"
+                "No column named $MIGRATION_KEY_COLUMN_NAME found in dataset"
             ),
             hasher.hash().toString(),
             meta.columnMetadatas

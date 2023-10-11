@@ -4,14 +4,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class ThrowableUtilsTest {
-
     private val rootCause = IllegalArgumentException("root")
     private val causedByRoot = IllegalArgumentException("causedByRoot", rootCause)
-    private val causedByCausedBy = IllegalArgumentException(
-        "causedByCausedByRoot" +
-            "",
-        causedByRoot
-    )
+    private val causedByCausedBy =
+        IllegalArgumentException(
+            "causedByCausedByRoot" +
+                "",
+            causedByRoot
+        )
 
     @Test
     fun `should return just message for throwable with no cause`() {

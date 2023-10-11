@@ -19,7 +19,6 @@ class DatasetRecScheduler(
     private val runner: DatasetRecRunner,
     @param:Named(TaskExecutors.SCHEDULED) private val scheduler: TaskScheduler
 ) : ApplicationEventListener<ServerStartupEvent> {
-
     override fun onApplicationEvent(event: ServerStartupEvent?) {
         logger.info { "Scheduling regular recs..." }
         config.datasets.values.forEach(::schedule)

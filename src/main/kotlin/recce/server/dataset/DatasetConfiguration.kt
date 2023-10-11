@@ -17,7 +17,6 @@ class DatasetConfiguration(
     @Bindable(defaultValue = "") val schedule: Schedule = Schedule(),
     @Nullable val hashingStrategy: Optional<HashingStrategy> = Optional.empty()
 ) : PostConstructable {
-
     lateinit var id: String
     lateinit var defaults: DefaultsProvider
 

@@ -34,8 +34,9 @@ open class DatasetRecService(
     override val availableDataSets = recConfig.datasets.values
 
     override fun runFor(datasetId: String): Mono<RecRun> {
-        val datasetConfig = recConfig.datasets[datasetId]
-            ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
+        val datasetConfig =
+            recConfig.datasets[datasetId]
+                ?: throw IllegalArgumentException("Dataset definition [$datasetId] not found!")
 
         logger.info { "Starting reconciliation run for [$datasetId]..." }
 
@@ -69,7 +70,10 @@ open class DatasetRecService(
             .map { meta -> meta() }
             .doOnNext { logger.info { "Load from ${def.datasourceDescriptor} completed" } }
 
-    private fun saveSourceBatch(rows: List<HashedRow>, run: RecRun): Flux<LazyDatasetMeta> {
+    private fun saveSourceBatch(
+        rows: List<HashedRow>,
+        run: RecRun
+    ): Flux<LazyDatasetMeta> {
         val records = rows.map { RecRecord(key = RecRecordKey(run.id!!, it.migrationKey), sourceData = it.hashedValue) }
         return recordRepository
             .saveAll(records)
@@ -77,36 +81,41 @@ open class DatasetRecService(
             .map { (i, _) -> rows[i.toInt()].lazyMeta() }
     }
 
-    private fun saveTargetBatch(rows: List<HashedRow>, run: RecRun): Flux<LazyDatasetMeta> {
+    private fun saveTargetBatch(
+        rows: List<HashedRow>,
+        run: RecRun
+    ): Flux<LazyDatasetMeta> {
         val toPersist = rows.associateByTo(mutableMapOf()) { it.migrationKey }
-        val updateExistingRecords = recordRepository
-            .findByRecRunIdAndMigrationKeyIn(run.id!!, rows.map { it.migrationKey })
-            .map { it.apply { targetData = toPersist.remove(it.migrationKey)!!.hashedValue } }
-            .collectList()
-            .toFlux()
-            .flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.updateAll(it) }
-        val saveNewRecords = Flux
-            .defer { Mono.just(toPersist.values) }
-            .map { hashedRows ->
-                hashedRows.map { row ->
-                    RecRecord(
-                        recRunId = run.id,
-                        migrationKey = row.migrationKey,
-                        targetData = row.hashedValue
-                    )
-                }
-            }.flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.saveAll(it) }
+        val updateExistingRecords =
+            recordRepository
+                .findByRecRunIdAndMigrationKeyIn(run.id!!, rows.map { it.migrationKey })
+                .map { it.apply { targetData = toPersist.remove(it.migrationKey)!!.hashedValue } }
+                .collectList()
+                .toFlux()
+                .flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.updateAll(it) }
+        val saveNewRecords =
+            Flux.defer { Mono.just(toPersist.values) }
+                .map { hashedRows ->
+                    hashedRows.map { row ->
+                        RecRecord(
+                            recRunId = run.id,
+                            migrationKey = row.migrationKey,
+                            targetData = row.hashedValue
+                        )
+                    }
+                }.flatMap { if (it.isEmpty()) Flux.empty() else recordRepository.saveAll(it) }
 
         return updateExistingRecords.concatWith(saveNewRecords).map { rows.first().lazyMeta() }
     }
 
-    private fun generateMetadata(datasetConfig: DatasetConfiguration): Map<String, String> = mapOf(
-        "sourceQuery" to datasetConfig.source.queryStatement,
-        "targetQuery" to datasetConfig.target.queryStatement,
-        "sourceUrl" to r2dbcConfig.getUrl(datasetConfig.source.datasourceRef),
-        "targetUrl" to r2dbcConfig.getUrl(datasetConfig.target.datasourceRef),
-        "version" to buildConfig.version
-    )
+    private fun generateMetadata(datasetConfig: DatasetConfiguration): Map<String, String> =
+        mapOf(
+            "sourceQuery" to datasetConfig.source.queryStatement,
+            "targetQuery" to datasetConfig.target.queryStatement,
+            "sourceUrl" to r2dbcConfig.getUrl(datasetConfig.source.datasourceRef),
+            "targetUrl" to r2dbcConfig.getUrl(datasetConfig.target.datasourceRef),
+            "version" to buildConfig.version
+        )
 }
 
 class DataLoadException(message: String, cause: Throwable) : Exception(message, cause)

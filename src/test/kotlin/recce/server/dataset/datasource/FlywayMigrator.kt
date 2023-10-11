@@ -13,18 +13,18 @@ import javax.transaction.Transactional
 
 @Singleton
 open class FlywayMigrator {
-
-    private val createTable = """
+    private val createTable =
+        """
             CREATE TABLE TestData (
                 name VARCHAR(255) PRIMARY KEY NOT NULL,
                 val VARCHAR(255) NOT NULL
             );
-    """.trimMargin()
+        """.trimMargin()
 
     private val insertUser: (Int) -> String = { i ->
         """
-            INSERT INTO TestData (name, val) 
-            VALUES ('Test$i', 'User$i');
+        INSERT INTO TestData (name, val) 
+        VALUES ('Test$i', 'User$i');
         """.trimIndent()
     }
 
@@ -55,10 +55,17 @@ open class FlywayMigrator {
     }
 }
 
-fun flywayCleanMigrate(temporaryDir: Path, sql: String, db: DbDescriptor) =
-    flywayCleanMigrate(temporaryDir, sql) { it.dataSource(db.jdbcUrl, db.username, db.password) }
+fun flywayCleanMigrate(
+    temporaryDir: Path,
+    sql: String,
+    db: DbDescriptor
+) = flywayCleanMigrate(temporaryDir, sql) { it.dataSource(db.jdbcUrl, db.username, db.password) }
 
-private fun flywayCleanMigrate(temporaryDir: Path, sql: String, configureHook: (FluentConfiguration) -> Unit) {
+private fun flywayCleanMigrate(
+    temporaryDir: Path,
+    sql: String,
+    configureHook: (FluentConfiguration) -> Unit
+) {
     val migrationsLoc = Files.createTempDirectory(temporaryDir, "scenario-")
     Files.writeString(migrationsLoc.resolve("V1__SETUP_TEST.sql"), sql)
     Flyway.configure()

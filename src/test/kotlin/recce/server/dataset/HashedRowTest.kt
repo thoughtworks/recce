@@ -11,12 +11,13 @@ internal class HashedRowTest {
         val columnMetas = R2dbcFakeBuilder().withCol("test", String::class.java).buildColMetas()
         val row = HashedRow("test", "test", columnMetas)
 
-        val expectedMeta = DatasetMeta(
-            listOf(
-                ColMeta(DataLoadDefinition.migrationKeyColumnName, "String"),
-                ColMeta("test", "String")
+        val expectedMeta =
+            DatasetMeta(
+                listOf(
+                    ColMeta(DataLoadDefinition.MIGRATION_KEY_COLUMN_NAME, "String"),
+                    ColMeta("test", "String")
+                )
             )
-        )
         Assertions.assertThat(row.lazyMeta()()).usingRecursiveComparison().isEqualTo(expectedMeta)
     }
 }
