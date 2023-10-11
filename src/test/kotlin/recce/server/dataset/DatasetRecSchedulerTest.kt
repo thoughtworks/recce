@@ -19,9 +19,10 @@ import java.util.concurrent.TimeUnit
 internal class DatasetRecSchedulerTest {
     private val testDataset = "test-dataset"
 
-    private val runner = mock<DatasetRecRunner> {
-        on { runFor(testDataset) } doReturn Mono.just(RecRun(testDataset))
-    }
+    private val runner =
+        mock<DatasetRecRunner> {
+            on { runFor(testDataset) } doReturn Mono.just(RecRun(testDataset))
+        }
 
     private val scheduler = mock<TaskScheduler>()
 
@@ -35,10 +36,11 @@ internal class DatasetRecSchedulerTest {
     @Test
     fun `schedules a single run`() {
         val cronExpression = "0 0 * * *"
-        val datasetConfig = mock<DatasetConfiguration> {
-            on { id } doReturn testDataset
-            on { schedule } doReturn Schedule(cronExpression)
-        }
+        val datasetConfig =
+            mock<DatasetConfiguration> {
+                on { id } doReturn testDataset
+                on { schedule } doReturn Schedule(cronExpression)
+            }
 
         val config = RecConfiguration(mapOf(testDataset to datasetConfig))
 
@@ -54,15 +56,15 @@ internal class DatasetRecSchedulerTest {
 }
 
 internal class DatasetRecSchedulerIntegrationTest {
-
     private val everySecond = "* * * * * *"
-    private val items = mutableMapOf<String, Any>(
-        "reconciliation.datasets.test-dataset.schedule.cronExpression" to everySecond,
-        "reconciliation.datasets.test-dataset.source.datasourceRef" to "default",
-        "reconciliation.datasets.test-dataset.source.query" to "SELECT id AS MigrationKey FROM reconciliation_run",
-        "reconciliation.datasets.test-dataset.target.datasourceRef" to "default",
-        "reconciliation.datasets.test-dataset.target.query" to "SELECT id AS MigrationKey FROM reconciliation_run"
-    )
+    private val items =
+        mutableMapOf<String, Any>(
+            "reconciliation.datasets.test-dataset.schedule.cronExpression" to everySecond,
+            "reconciliation.datasets.test-dataset.source.datasourceRef" to "default",
+            "reconciliation.datasets.test-dataset.source.query" to "SELECT id AS MigrationKey FROM reconciliation_run",
+            "reconciliation.datasets.test-dataset.target.datasourceRef" to "default",
+            "reconciliation.datasets.test-dataset.target.query" to "SELECT id AS MigrationKey FROM reconciliation_run"
+        )
 
     private lateinit var ctx: ApplicationContext
 

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import java.util.*
 
 internal class DatasetConfigurationTest {
-
     private val conf =
         DatasetConfiguration(
             DataLoadDefinition("source", Optional.of("blah")),

@@ -28,7 +28,6 @@ import java.nio.file.Path
     transactional = false
 )
 open class DatasetRecServiceIntegrationTest {
-
     @TempDir lateinit var tempDir: Path
 
     @Inject lateinit var migrator: FlywayMigrator
@@ -111,13 +110,14 @@ open class DatasetRecServiceIntegrationTest {
         val sourceR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("source-h2"))
         val targetR2dbcConfig = ctx.getBean(R2dbcDatasource::class.java, Qualifiers.byName("target-h2"))
 
-        val expectedMeta = mapOf(
-            "sourceQuery" to datasetConfig?.source?.queryStatement,
-            "targetQuery" to datasetConfig?.target?.queryStatement,
-            "sourceUrl" to sourceR2dbcConfig.url,
-            "targetUrl" to targetR2dbcConfig.url,
-            "version" to buildConfig.version
-        )
+        val expectedMeta =
+            mapOf(
+                "sourceQuery" to datasetConfig?.source?.queryStatement,
+                "targetQuery" to datasetConfig?.target?.queryStatement,
+                "sourceUrl" to sourceR2dbcConfig.url,
+                "targetUrl" to targetR2dbcConfig.url,
+                "version" to buildConfig.version
+            )
 
         SoftAssertions.assertSoftly { softly ->
             softly.assertThat(run.id).isNotNull
@@ -134,13 +134,14 @@ open class DatasetRecServiceIntegrationTest {
             softly.assertThat(run.status).isEqualTo(RunStatus.Successful)
             softly.assertThat(run.failureCause).isNull()
             softly.assertThat(run.summary).isEqualTo(MatchStatus(1, 2, 2, 0))
-            val expectedMeta = DatasetMeta(
-                listOf(
-                    ColMeta("MIGRATIONKEY", "String"),
-                    ColMeta("NAME", "String"),
-                    ColMeta("VAL", "String")
+            val expectedMeta =
+                DatasetMeta(
+                    listOf(
+                        ColMeta("MIGRATIONKEY", "String"),
+                        ColMeta("NAME", "String"),
+                        ColMeta("VAL", "String")
+                    )
                 )
-            )
             softly.assertThat(run.sourceMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
             softly.assertThat(run.targetMeta).usingRecursiveComparison().isEqualTo(expectedMeta)
         }

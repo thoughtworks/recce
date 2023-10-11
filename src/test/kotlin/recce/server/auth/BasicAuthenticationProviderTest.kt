@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 
 @MicronautTest(transactional = false)
 class BasicAuthenticationProviderTest {
-
     @Inject
     lateinit var spec: RequestSpecification
 

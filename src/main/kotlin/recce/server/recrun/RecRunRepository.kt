@@ -46,7 +46,10 @@ data class RecRun(
     @field:TypeDef(type = DataType.JSON)
     var metadata: Map<String, String> = emptyMap()
 
-    fun withMetaData(source: DatasetMeta, target: DatasetMeta): RecRun {
+    fun withMetaData(
+        source: DatasetMeta,
+        target: DatasetMeta
+    ): RecRun {
         sourceMeta = source
         targetMeta = target
         return this
@@ -115,11 +118,17 @@ data class ColMeta(val name: String, val javaType: String)
 class ColsConverter : AttributeConverter<List<ColMeta>, String?> {
     private val objectMapper = jacksonObjectMapper()
 
-    override fun convertToPersistedValue(entityValue: List<ColMeta>?, context: ConversionContext): String? {
+    override fun convertToPersistedValue(
+        entityValue: List<ColMeta>?,
+        context: ConversionContext
+    ): String? {
         return objectMapper.writeValueAsString(entityValue ?: emptyList<ColMeta>())
     }
 
-    override fun convertToEntityValue(persistedValue: String?, context: ConversionContext): List<ColMeta>? {
+    override fun convertToEntityValue(
+        persistedValue: String?,
+        context: ConversionContext
+    ): List<ColMeta>? {
         return if (persistedValue == null) emptyList() else objectMapper.readValue(persistedValue)
     }
 }

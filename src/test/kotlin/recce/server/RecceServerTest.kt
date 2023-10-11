@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 
 @MicronautTest(transactional = false)
 class RecceServerTest {
-
     @Inject
     lateinit var application: EmbeddedApplication<*>
 

@@ -14,18 +14,18 @@ import kotlin.io.path.Path
 // Faster tests that do not load the full configuration and are quicker to iterate on when testing
 // configuration binding
 internal class RecConfigurationPropertiesTest {
-
-    private val properties = mutableMapOf<String, Any>(
-        "flyway.datasources.default.enabled" to "false",
-        "r2dbc.datasources.source.url" to "r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
-        "r2dbc.datasources.target.url" to "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
-        "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
-        "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
-        "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
-        "reconciliation.datasets.test-dataset.source.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
-        "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
-        "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata"
-    )
+    private val properties =
+        mutableMapOf<String, Any>(
+            "flyway.datasources.default.enabled" to "false",
+            "r2dbc.datasources.source.url" to "r2dbc:h2:mem:///sourceDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
+            "r2dbc.datasources.target.url" to "r2dbc:h2:mem:///targetDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
+            "reconciliation.datasets.test-dataset.hashingStrategy" to "TypeStrict",
+            "reconciliation.datasets.test-dataset.schedule.cronExpression" to "0 0 0 ? * *",
+            "reconciliation.datasets.test-dataset.source.datasourceRef" to "source",
+            "reconciliation.datasets.test-dataset.source.query" to "SELECT count(*) AS sourcedatacount FROM testdata",
+            "reconciliation.datasets.test-dataset.target.datasourceRef" to "target",
+            "reconciliation.datasets.test-dataset.target.query" to "SELECT count(*) AS targetdatacount FROM testdata"
+        )
 
     @Test
     fun `can override defaults from config`() {

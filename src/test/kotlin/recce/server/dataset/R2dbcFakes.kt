@@ -7,18 +7,23 @@ import io.r2dbc.spi.Type
 
 data class FakeColumnMetadata(private val name: String, private val javaType: Class<*>) : ColumnMetadata {
     override fun getName() = name
+
     override fun getJavaType() = type.javaType
+
     override fun getType() = FakeType(javaType)
 }
 
 data class FakeType(private val javaType: Class<*>) : Type {
     override fun getJavaType() = javaType
+
     override fun getName(): String = javaType.name
 }
 
 class FakeRowMetadata(private val cols: List<ColumnMetadata>) : RowMetadata {
     override fun getColumnMetadata(index: Int) = cols[index]
+
     override fun getColumnMetadata(name: String) = cols.first { it.name == name }
+
     override fun getColumnMetadatas() = cols
 }
 
@@ -26,13 +31,19 @@ class FakeRow(private val meta: RowMetadata, private val values: List<Pair<Strin
     private val valuesByColName = values.toMap()
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> get(index: Int, type: Class<T>): T? {
+    override fun <T> get(
+        index: Int,
+        type: Class<T>
+    ): T? {
         require(type == Object::class.java) { "Only support generic Object type returns" }
         return values[index].second as T
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> get(name: String, type: Class<T>): T? {
+    override fun <T> get(
+        name: String,
+        type: Class<T>
+    ): T? {
         require(type == Object::class.java) { "Only support generic Object type returns" }
         return valuesByColName[name] as T
     }
@@ -41,9 +52,10 @@ class FakeRow(private val meta: RowMetadata, private val values: List<Pair<Strin
 }
 
 class R2dbcFakeBuilder {
-    private val cols = mutableListOf<ColumnMetadata>(
-        FakeColumnMetadata(DataLoadDefinition.migrationKeyColumnName, String::class.java)
-    )
+    private val cols =
+        mutableListOf<ColumnMetadata>(
+            FakeColumnMetadata(DataLoadDefinition.MIGRATION_KEY_COLUMN_NAME, String::class.java)
+        )
     private var hasMigrationKey: Boolean = true
 
     private lateinit var rowValues: List<Pair<String, Any?>>
@@ -59,7 +71,10 @@ class R2dbcFakeBuilder {
         return this
     }
 
-    fun withCol(name: String, javaType: Class<*>): R2dbcFakeBuilder {
+    fun withCol(
+        name: String,
+        javaType: Class<*>
+    ): R2dbcFakeBuilder {
         return withCol(FakeColumnMetadata(name, javaType))
     }
 

@@ -21,14 +21,17 @@ group = "recce.server"
 // Workaround to allow dependabot to update versions of libraries together, since dependabot doesn't understand
 // the Gradle DSL properly. Here we pick one of the versions where multiple artifacts are released at the same time
 // and use this to bump the others consistently.
-val depDescriptors = mapOf(
-    "micronaut" to "io.micronaut:micronaut-core:3.10.1",
-    "restAssured" to "io.rest-assured:rest-assured:4.5.1"
-)
-val depVersions = depDescriptors.mapValues { (_, v) -> v.split(':').last() } + mapOf(
-    "javaMajor" to "17",
-    "reactorToolsVersionExpected" to "3.5.11"
-)
+val depDescriptors =
+    mapOf(
+        "micronaut" to "io.micronaut:micronaut-core:3.10.1",
+        "restAssured" to "io.rest-assured:rest-assured:4.5.1"
+    )
+val depVersions =
+    depDescriptors.mapValues { (_, v) -> v.split(':').last() } +
+        mapOf(
+            "javaMajor" to "17",
+            "reactorToolsVersionExpected" to "3.5.11"
+        )
 
 repositories {
     mavenCentral()
@@ -56,11 +59,7 @@ micronaut {
 
 kapt {
     arguments {
-        val props = mapOf(
-            "rapidoc.enabled" to true,
-            "rapidoc.theme" to "dark",
-            "rapidoc.render-style" to "view"
-        )
+        val props = mapOf("rapidoc.enabled" to true, "rapidoc.theme" to "dark", "rapidoc.render-style" to "view")
         arg("micronaut.openapi.views.spec", props.entries.joinToString(",") { "${it.key}=${it.value}" })
     }
 }
@@ -265,10 +264,11 @@ jib {
     }
     to {
         val fullVersion = com.github.zafarkhaja.semver.Version.valueOf(project.version.toString())
-        val tagVersion = com.github.zafarkhaja.semver.Version.Builder()
-            .setNormalVersion(fullVersion.normalVersion)
-            .setPreReleaseVersion(fullVersion.preReleaseVersion.split('.')[0])
-            .build()
+        val tagVersion =
+            com.github.zafarkhaja.semver.Version.Builder()
+                .setNormalVersion(fullVersion.normalVersion)
+                .setPreReleaseVersion(fullVersion.preReleaseVersion.split('.')[0])
+                .build()
         tags = setOf(tagVersion.toString(), "latest")
     }
     container {
@@ -280,19 +280,23 @@ jib {
     }
 }
 
-val checkJibDependencies = tasks.register("checkJibDependencies") {
-    doFirst {
-        val resolvedReactorToolsVersion =
-            project.configurations.runtimeClasspath.get()
-                .resolvedConfiguration.resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
-        if (depVersions["reactorToolsVersionExpected"] != resolvedReactorToolsVersion) {
-            throw GradleException(
-                "Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but found " +
-                    "[$resolvedReactorToolsVersion] in dependencies. Update reactorToolsVersionExpected!"
-            )
+val checkJibDependencies =
+    tasks.register("checkJibDependencies") {
+        doFirst {
+            val resolvedReactorToolsVersion =
+                project.configurations
+                    .runtimeClasspath
+                    .get()
+                    .resolvedConfiguration
+                    .resolvedArtifacts.find { it.name == "reactor-tools" }?.moduleVersion?.id?.version
+            if (depVersions["reactorToolsVersionExpected"] != resolvedReactorToolsVersion) {
+                throw GradleException(
+                    "Jib docker build expected reactor-tools [${depVersions["reactorToolsVersionExpected"]}] but " +
+                        "found [$resolvedReactorToolsVersion] in dependencies. Update reactorToolsVersionExpected!"
+                )
+            }
         }
     }
-}
 
 // Jib task pushes an image. Only do so after running all checks
 tasks.register<com.google.cloud.tools.jib.gradle.BuildImageTask>("jibGitHubContainerRegistry") {

@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import org.junit.jupiter.params.provider.EnumSource
-import recce.server.dataset.DataLoadDefinition.Companion.migrationKeyColumnName
+import recce.server.dataset.DataLoadDefinition.Companion.MIGRATION_KEY_COLUMN_NAME
 import java.math.BigDecimal
 import java.nio.ByteBuffer
 import java.time.Instant
@@ -30,15 +30,17 @@ private fun isHexSha256Hash(value: String): Boolean {
 }
 
 internal class HashingStrategyTest {
-    private val rowMetaWithTestCol = R2dbcFakeBuilder()
-        .withCol("test", String::class.java)
+    private val rowMetaWithTestCol =
+        R2dbcFakeBuilder()
+            .withCol("test", String::class.java)
 
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
     fun `should throw on null migration key`(strat: HashingStrategy) {
-        val row = rowMetaWithTestCol
-            .withRowValues(null, "test-val")
-            .build()
+        val row =
+            rowMetaWithTestCol
+                .withRowValues(null, "test-val")
+                .build()
 
         assertThatThrownBy { strat.hash(row, row.metadata) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
@@ -48,11 +50,12 @@ internal class HashingStrategyTest {
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
     fun `should throw on missing migration key column`(strat: HashingStrategy) {
-        val row = R2dbcFakeBuilder()
-            .noMigrationKey()
-            .withCol("test", String::class.java)
-            .withRowValues("test-val")
-            .build()
+        val row =
+            R2dbcFakeBuilder()
+                .noMigrationKey()
+                .withCol("test", String::class.java)
+                .withRowValues("test-val")
+                .build()
 
         assertThatThrownBy { strat.hash(row, row.metadata) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
@@ -62,10 +65,11 @@ internal class HashingStrategyTest {
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
     fun `should throw on duplicate migration key column`(strat: HashingStrategy) {
-        val row = rowMetaWithTestCol
-            .withCol(migrationKeyColumnName, String::class.java)
-            .withRowValues("key", "test-val", "key")
-            .build()
+        val row =
+            rowMetaWithTestCol
+                .withCol(MIGRATION_KEY_COLUMN_NAME, String::class.java)
+                .withRowValues("key", "test-val", "key")
+                .build()
 
         assertThatThrownBy { strat.hash(row, row.metadata) }
             .isExactlyInstanceOf(IllegalArgumentException::class.java)
@@ -85,17 +89,19 @@ internal class HashingStrategyTest {
     @ParameterizedTest
     @EnumSource(HashingStrategy::class)
     fun `consecutive fields should always lead to different hashes`(strat: HashingStrategy) {
-        val row = R2dbcFakeBuilder()
-            .withCol("first", String::class.java)
-            .withCol("second", String::class.java)
-            .withRowValues(1, "abc", "def")
-            .build()
+        val row =
+            R2dbcFakeBuilder()
+                .withCol("first", String::class.java)
+                .withCol("second", String::class.java)
+                .withRowValues(1, "abc", "def")
+                .build()
 
-        val row2 = R2dbcFakeBuilder()
-            .withCol("first", String::class.java)
-            .withCol("second", String::class.java)
-            .withRowValues(1, "ab", "cdef")
-            .build()
+        val row2 =
+            R2dbcFakeBuilder()
+                .withCol("first", String::class.java)
+                .withCol("second", String::class.java)
+                .withRowValues(1, "ab", "cdef")
+                .build()
 
         assertThat(strat.hash(row, row.metadata).hashedValue)
             .isNotEqualTo(strat.hash(row2, row2.metadata).hashedValue)
@@ -106,15 +112,17 @@ internal class HashingStrategyTest {
     fun `strategy should dictate whether nulls of different defined column java types should be considered unequal `(
         strat: HashingStrategy
     ) {
-        val stringRow = R2dbcFakeBuilder()
-            .withCol("test", String::class.java)
-            .withRowValues("key", null)
-            .build()
+        val stringRow =
+            R2dbcFakeBuilder()
+                .withCol("test", String::class.java)
+                .withRowValues("key", null)
+                .build()
 
-        val intRow = R2dbcFakeBuilder()
-            .withCol("test", Integer::class.java)
-            .withRowValues("key", null)
-            .build()
+        val intRow =
+            R2dbcFakeBuilder()
+                .withCol("test", Integer::class.java)
+                .withRowValues("key", null)
+                .build()
 
         val stringTypeRow = strat.hash(stringRow, stringRow.metadata)
         val intTypeRow = strat.hash(intRow, intRow.metadata)
@@ -127,16 +135,21 @@ internal class HashingStrategyTest {
 
     @ParameterizedTest
     @ArgumentsSource(EquivalentTypeExamples::class)
-    fun `lenient type equivalence strategy should consider similar types equal`(first: Any, second: Any) {
-        val row = R2dbcFakeBuilder()
-            .withCol("test", first.javaClass)
-            .withRowValues("key", first)
-            .build()
+    fun `lenient type equivalence strategy should consider similar types equal`(
+        first: Any,
+        second: Any
+    ) {
+        val row =
+            R2dbcFakeBuilder()
+                .withCol("test", first.javaClass)
+                .withRowValues("key", first)
+                .build()
 
-        val row2 = R2dbcFakeBuilder()
-            .withCol("test", second.javaClass)
-            .withRowValues("key", second)
-            .build()
+        val row2 =
+            R2dbcFakeBuilder()
+                .withCol("test", second.javaClass)
+                .withRowValues("key", second)
+                .build()
 
         assertThat(HashingStrategy.TypeLenient.hash(row, row.metadata).hashedValue)
             .describedAs(
@@ -165,18 +178,20 @@ internal class HashingStrategyTest {
         expectedStrictHash: String,
         expectedLenientHash: Optional<String>
     ) {
-        val row = R2dbcFakeBuilder()
-            .withCol("test", type)
-            .withRowValues("key", inputSupplier())
-            .build()
+        val row =
+            R2dbcFakeBuilder()
+                .withCol("test", type)
+                .withRowValues("key", inputSupplier())
+                .build()
         assertThat(HashingStrategy.TypeStrict.hash(row, row.metadata))
             .describedAs("strict hash not as expected")
             .isEqualTo(HashedRow("key", expectedStrictHash, row.metadata.columnMetadatas))
 
-        val row2 = R2dbcFakeBuilder()
-            .withCol("test", type)
-            .withRowValues("key", inputSupplier())
-            .build()
+        val row2 =
+            R2dbcFakeBuilder()
+                .withCol("test", type)
+                .withRowValues("key", inputSupplier())
+                .build()
         assertThat(HashingStrategy.TypeLenient.hash(row2, row2.metadata))
             .describedAs("lenient hash not as expected")
             .isEqualTo(HashedRow("key", expectedLenientHash.orElse(expectedStrictHash), row2.metadata.columnMetadatas))

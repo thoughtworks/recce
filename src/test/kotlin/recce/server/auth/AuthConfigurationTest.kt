@@ -6,11 +6,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 internal class AuthConfigurationTest {
-
-    private val properties = mutableMapOf<String, Any>(
-        "auth.username" to "test-user",
-        "auth.password" to "test-password"
-    )
+    private val properties =
+        mutableMapOf<String, Any>("auth.username" to "test-user", "auth.password" to "test-password")
 
     @Test
     fun `can override defaults from config`() {

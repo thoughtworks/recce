@@ -26,22 +26,31 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-val configProvider = mock<DatasetConfigProvider> {
-    on { availableDataSets } doReturn setOf(
-        DatasetConfiguration(
-            DataLoadDefinition("source1", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")),
-            DataLoadDefinition("target1", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata"))
-        ).apply { id = "two" },
-        DatasetConfiguration(
-            DataLoadDefinition("source2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")),
-            DataLoadDefinition("target2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")),
-            Schedule("0 0 0 ? * *")
-        ).apply { id = "datasets" }
-    )
-}
+val configProvider =
+    mock<DatasetConfigProvider> {
+        on { availableDataSets } doReturn
+            setOf(
+                DatasetConfiguration(
+                    DataLoadDefinition(
+                        "source1", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                    ),
+                    DataLoadDefinition(
+                        "target1", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                    )
+                ).apply { id = "two" },
+                DatasetConfiguration(
+                    DataLoadDefinition(
+                        "source2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                    ),
+                    DataLoadDefinition(
+                        "target2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                    ),
+                    Schedule("0 0 0 ? * *")
+                ).apply { id = "datasets" }
+            )
+    }
 
 internal class DatasetControllerTest {
-
     @Test
     fun `should retrieve empty dataset Ids`() {
         assertThat(DatasetController(mock()).getDatasets())
@@ -80,7 +89,6 @@ internal class DatasetControllerTest {
 
 @MicronautTest(transactional = false)
 internal class DatasetControllerApiTest {
-
     @Inject
     lateinit var spec: RequestSpecification
 

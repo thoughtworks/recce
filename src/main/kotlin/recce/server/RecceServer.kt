@@ -16,11 +16,12 @@ private const val GITHUB_PROJECT = "https://github.com/thoughtworks-sea/recce"
 private val logger = KotlinLogging.logger {}
 
 @OpenAPIDefinition(
-    info = Info(
-        title = "Recce Server",
-        description = "Server-based database reconciliation tool for developers",
-        contact = Contact(name = "Recce Community", url = "$GITHUB_PROJECT/issues")
-    ),
+    info =
+        Info(
+            title = "Recce Server",
+            description = "Server-based database reconciliation tool for developers",
+            contact = Contact(name = "Recce Community", url = "$GITHUB_PROJECT/issues")
+        ),
     externalDocs = ExternalDocumentation(description = "Server Docs", url = "$GITHUB_PROJECT/README.md"),
     security = [SecurityRequirement(name = "basicAuth")]
 )
@@ -33,7 +34,6 @@ private val logger = KotlinLogging.logger {}
     )
 )
 object RecceServer {
-
     @JvmStatic
     @Suppress("SpreadOperator")
     fun main(args: Array<String>) {

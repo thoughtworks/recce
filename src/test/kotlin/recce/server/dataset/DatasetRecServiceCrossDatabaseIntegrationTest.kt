@@ -30,37 +30,40 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         /**
          * Databases which we expect to produce matching hashes for values of similar types.
          */
-        private val databases: Map<String, JdbcDatabaseContainer<Nothing>> = buildMap {
-            put("mysql", MySQLContainer("mysql:8"))
-            put("mariadb", MariaDBContainer("mariadb:10"))
-            put("postgres", PostgreSQLContainer("postgres:14-alpine"))
-            if (!System.getProperty("os.arch").contains(Regex("arm64|aarch64"))) {
-                put(
-                    "mssql",
-                    MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
-                )
+        private val databases: Map<String, JdbcDatabaseContainer<Nothing>> =
+            buildMap {
+                put("mysql", MySQLContainer("mysql:8"))
+                put("mariadb", MariaDBContainer("mariadb:10"))
+                put("postgres", PostgreSQLContainer("postgres:14-alpine"))
+                if (!System.getProperty("os.arch").contains(Regex("arm64|aarch64"))) {
+                    put(
+                        "mssql",
+                        MSSQLServerContainer<Nothing>("mcr.microsoft.com/mssql/server:2019-latest").acceptLicense()
+                    )
+                }
             }
-        }
 
         /**
          * Types we want to test for each database combination
          */
-        private val sqlTypesToValues = listOf(
-            "SMALLINT" to "1",
-            "INTEGER" to "1",
-            "BIGINT" to "1",
-            "VARCHAR(4)" to "'text'",
-            "TEXT" to "'text'"
-        )
+        private val sqlTypesToValues =
+            listOf(
+                "SMALLINT" to "1",
+                "INTEGER" to "1",
+                "BIGINT" to "1",
+                "VARCHAR(4)" to "'text'",
+                "TEXT" to "'text'"
+            )
 
         /**
          * Create pairs of databases to test against. We don't have to test against all possibly combinations
          * because we can reasonably conclude that the matching is transitive, i.e if A==B and B==C then A==C.
          */
-        private val databaseCombinations = IntStream
-            .range(1, databases.keys.size)
-            .mapToObj { databases.keys.toList()[it - 1] to databases.keys.toList()[it] }
-            .toList()
+        private val databaseCombinations =
+            IntStream
+                .range(1, databases.keys.size)
+                .mapToObj { databases.keys.toList()[it - 1] to databases.keys.toList()[it] }
+                .toList()
 
         private fun containerFor(name: String) =
             databases[name] ?: throw IllegalArgumentException("Cannot find db type [$name].")
@@ -76,26 +79,28 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         @JvmStatic
         @BeforeAll
         fun startApplication() {
-            val datasources = databases.flatMap { (name, container) ->
-                listOf(
-                    "r2dbc.datasources.$name.url" to r2dbcUrl(container.jdbcUrl),
-                    "r2dbc.datasources.$name.username" to container.username,
-                    "r2dbc.datasources.$name.password" to container.password
-                )
-            }.toMap()
+            val datasources =
+                databases.flatMap { (name, container) ->
+                    listOf(
+                        "r2dbc.datasources.$name.url" to r2dbcUrl(container.jdbcUrl),
+                        "r2dbc.datasources.$name.username" to container.username,
+                        "r2dbc.datasources.$name.password" to container.password
+                    )
+                }.toMap()
 
-            val datasets = databaseCombinations.flatMap { (source, target) ->
-                listOf(
-                    "reconciliation.datasets.$source-to-$target.source.datasourceRef"
-                        to source,
-                    "reconciliation.datasets.$source-to-$target.source.query"
-                        to "SELECT id AS MigrationKey, value FROM TestData",
-                    "reconciliation.datasets.$source-to-$target.target.datasourceRef"
-                        to target,
-                    "reconciliation.datasets.$source-to-$target.target.query"
-                        to "SELECT id AS MigrationKey, value FROM TestData"
-                )
-            }.toMap()
+            val datasets =
+                databaseCombinations.flatMap { (source, target) ->
+                    listOf(
+                        "reconciliation.datasets.$source-to-$target.source.datasourceRef"
+                            to source,
+                        "reconciliation.datasets.$source-to-$target.source.query"
+                            to "SELECT id AS MigrationKey, value FROM TestData",
+                        "reconciliation.datasets.$source-to-$target.target.datasourceRef"
+                            to target,
+                        "reconciliation.datasets.$source-to-$target.target.query"
+                            to "SELECT id AS MigrationKey, value FROM TestData"
+                    )
+                }.toMap()
 
             ctx = ApplicationContext.run(datasources + datasets)
         }
@@ -156,7 +161,10 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
 
     @ParameterizedTest
     @ArgumentsSource(TestScenarios::class)
-    fun `rows match between source and target`(source: ScenarioConfig, target: ScenarioConfig) {
+    fun `rows match between source and target`(
+        source: ScenarioConfig,
+        target: ScenarioConfig
+    ) {
         allOf(
             runAsync { createTestData(source) },
             runAsync { createTestData(target) }

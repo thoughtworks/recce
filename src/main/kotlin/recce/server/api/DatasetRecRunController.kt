@@ -40,10 +40,10 @@ class DatasetRecRunController(
         @field:Schema(description = "The identifier of the reconciliation run to retrieve")
         @field:PathVariable
         val runId: Int,
-
         @field:Schema(
-            description = "How many sample mismatched migration keys of each type (only in source, only in " +
-                "target, mismatched data) in the results"
+            description =
+                "How many sample mismatched migration keys of each type (only in source, only in target, " +
+                    "mismatched data) in the results"
         )
         @field:QueryValue(defaultValue = "0")
         @field:Nullable
@@ -65,18 +65,19 @@ class DatasetRecRunController(
     ): Mono<RunApiModel> {
         logger.info { "Finding $params" }
 
-        val findSampleRows = if (params.includeSampleKeys == 0) {
-            Mono.just(emptyMap())
-        } else {
-            recordRepository.findFirstByRecRunIdSplitByMatchStatus(params.runId, params.includeSampleKeys)
-                .map { it.matchStatus to it.migrationKey }
-                .collectList()
-                .defaultIfEmpty(emptyList())
-                .map { records ->
-                    records.groupBy { it.first }
-                        .mapValues { entry -> entry.value.map { pair -> pair.second } }
-                }
-        }
+        val findSampleRows =
+            if (params.includeSampleKeys == 0) {
+                Mono.just(emptyMap())
+            } else {
+                recordRepository.findFirstByRecRunIdSplitByMatchStatus(params.runId, params.includeSampleKeys)
+                    .map { it.matchStatus to it.migrationKey }
+                    .collectList()
+                    .defaultIfEmpty(emptyList())
+                    .map { records ->
+                        records.groupBy { it.first }
+                            .mapValues { entry -> entry.value.map { pair -> pair.second } }
+                    }
+            }
 
         return runRepository
             .findById(params.runId)

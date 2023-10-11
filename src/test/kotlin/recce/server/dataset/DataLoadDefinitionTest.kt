@@ -32,9 +32,10 @@ internal class DataLoadDefinitionTest {
 
     private lateinit var definitionQuery: DataLoadDefinition
 
-    private val mockConnection: Connection = mock {
-        on { close() } doReturn Mono.empty()
-    }
+    private val mockConnection: Connection =
+        mock {
+            on { close() } doReturn Mono.empty()
+        }
 
     @BeforeEach
     fun setUp() {
@@ -51,10 +52,13 @@ internal class DataLoadDefinitionTest {
         val defaultsProvider = mock<DefaultsProvider>()
         whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
 
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
-        }
+        val beanLocator =
+            mock<BeanLocator> {
+                on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn
+                    Optional.of(operations)
+                on { findBean(DefaultsProvider::class.java) } doReturn
+                    Optional.of(defaultsProvider)
+            }
 
         definitionQuery.populate(beanLocator)
 
@@ -71,10 +75,13 @@ internal class DataLoadDefinitionTest {
         val defaultsProvider = mock<DefaultsProvider>()
         whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
 
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
-        }
+        val beanLocator =
+            mock<BeanLocator> {
+                on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn
+                    Optional.of(operations)
+                on { findBean(DefaultsProvider::class.java) } doReturn
+                    Optional.of(defaultsProvider)
+            }
 
         definitionQuery.populate(beanLocator)
 
@@ -92,10 +99,13 @@ internal class DataLoadDefinitionTest {
         val defaultsProvider = mock<DefaultsProvider>()
         whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
 
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
-        }
+        val beanLocator =
+            mock<BeanLocator> {
+                on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn
+                    Optional.of(operations)
+                on { findBean(DefaultsProvider::class.java) } doReturn
+                    Optional.of(defaultsProvider)
+            }
 
         definitionQuery.populate(beanLocator)
 
@@ -124,10 +134,13 @@ internal class DataLoadDefinitionTest {
         val defaultsProvider = mock<DefaultsProvider>()
         whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path("blah"))
 
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
-        }
+        val beanLocator =
+            mock<BeanLocator> {
+                on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn
+                    Optional.of(operations)
+                on { findBean(DefaultsProvider::class.java) } doReturn
+                    Optional.of(defaultsProvider)
+            }
 
         assertThatThrownBy { definitionQuery.populate(beanLocator) }
             .isExactlyInstanceOf(ConfigurationException::class.java)
@@ -140,10 +153,13 @@ internal class DataLoadDefinitionTest {
         val defaultsProvider = mock<DefaultsProvider>()
         whenever(defaultsProvider.queryFileBaseDir).thenReturn(Path(testQueryFileBaseDir))
 
-        val beanLocator = mock<BeanLocator> {
-            on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn Optional.of(operations)
-            on { findBean(DefaultsProvider::class.java) } doReturn Optional.of(defaultsProvider)
-        }
+        val beanLocator =
+            mock<BeanLocator> {
+                on { findBean(any<Class<Any>>(), eq(Qualifiers.byName(testSourceName))) } doReturn
+                    Optional.of(operations)
+                on { findBean(DefaultsProvider::class.java) } doReturn
+                    Optional.of(defaultsProvider)
+            }
 
         definitionQuery.populate(beanLocator)
 
@@ -167,13 +183,15 @@ internal class DataLoadDefinitionTest {
     fun `should stream rows from query`() {
         val result = mock<Result>()
 
-        val statement: Statement = mock {
-            on { execute() } doReturn Mono.just(result)
-        }
+        val statement: Statement =
+            mock {
+                on { execute() } doReturn Mono.just(result)
+            }
 
-        definitionQuery.dbOperations = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
-            on { connectionFactory().create() } doReturn Mono.just(mockConnection)
-        }
+        definitionQuery.dbOperations =
+            mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
+                on { connectionFactory().create() } doReturn Mono.just(mockConnection)
+            }
 
         definitionQuery.queryStatement = testQuery
 
@@ -193,9 +211,10 @@ internal class DataLoadDefinitionTest {
 
     @Test
     fun `should close connection after failed query`() {
-        definitionQuery.dbOperations = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
-            on { connectionFactory().create() } doReturn Mono.just(mockConnection)
-        }
+        definitionQuery.dbOperations =
+            mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
+                on { connectionFactory().create() } doReturn Mono.just(mockConnection)
+            }
 
         definitionQuery.queryStatement = testQuery
 
@@ -218,13 +237,15 @@ internal class DataLoadDefinitionTest {
     fun `should fail on query with more than one statement`() {
         val result = mock<Result>()
 
-        val statement: Statement = mock {
-            on { execute() } doReturn Flux.just(result, result)
-        }
+        val statement: Statement =
+            mock {
+                on { execute() } doReturn Flux.just(result, result)
+            }
 
-        definitionQuery.dbOperations = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
-            on { connectionFactory().create() } doReturn Mono.just(mockConnection)
-        }
+        definitionQuery.dbOperations =
+            mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
+                on { connectionFactory().create() } doReturn Mono.just(mockConnection)
+            }
 
         definitionQuery.queryStatement = testQuery
 

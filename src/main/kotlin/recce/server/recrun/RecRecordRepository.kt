@@ -15,7 +15,11 @@ import kotlin.reflect.KMutableProperty1
 // Declared as an interface to make it possible to replace the bean with a mock in tests
 // The replacement doesn't seem to work with Micronaut Test with an abstract class
 interface RecRecordRepository : ReactorCrudRepository<RecRecord, Int> {
-    fun findByRecRunIdAndMigrationKeyIn(recRunId: Int, migrationKeys: List<String>): Flux<RecRecord>
+    fun findByRecRunIdAndMigrationKeyIn(
+        recRunId: Int,
+        migrationKeys: List<String>
+    ): Flux<RecRecord>
+
     fun findByRecRunId(recRunId: Int): Flux<RecRecord>
 
     @Query(
@@ -27,13 +31,16 @@ interface RecRecordRepository : ReactorCrudRepository<RecRecord, Int> {
         (SELECT * FROM reconciliation_record r WHERE r.reconciliation_run_id = :recRunId AND r.source_data <> r.target_data LIMIT :limit)
         """
     )
-    fun findFirstByRecRunIdSplitByMatchStatus(recRunId: Int, limit: Int = 10): Flux<RecRecord>
+    fun findFirstByRecRunIdSplitByMatchStatus(
+        recRunId: Int,
+        limit: Int = 10
+    ): Flux<RecRecord>
+
     fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus>
 }
 
 @R2dbcRepository(dialect = Dialect.POSTGRES)
 internal abstract class AbstractRecRecordRepository(private val operations: R2dbcOperations) : RecRecordRepository {
-
     override fun countMatchedByKeyRecRunId(recRunId: Int): Mono<MatchStatus> {
         return operations.withConnection {
             it.createStatement(countRecordsByStatus).bind("$1", recRunId).execute()
@@ -47,37 +54,39 @@ internal abstract class AbstractRecRecordRepository(private val operations: R2db
     }
 
     private fun matchStatusSetterFor(row: Row): (MatchStatus) -> Unit {
-        val count = row.get(countColumnName, Number::class.java)?.toInt()
-            ?: throw IllegalArgumentException("Missing [$countColumnName] column!")
+        val count =
+            row.get(COUNT_COLUMN_NAME, Number::class.java)?.toInt()
+                ?: throw IllegalArgumentException("Missing [$COUNT_COLUMN_NAME] column!")
 
-        val recordMatchStatus = RecordMatchStatus.valueOf(
-            row.get(statusColumnName, String::class.java)
-                ?: throw IllegalArgumentException("Missing [$statusColumnName] column!")
-        )
+        val recordMatchStatus =
+            RecordMatchStatus.valueOf(
+                row.get(STATUS_COLUMN_NAME, String::class.java)
+                    ?: throw IllegalArgumentException("Missing [$STATUS_COLUMN_NAME] column!")
+            )
         return { st ->
             recordMatchStatus.setter(st, count)
         }
     }
 
     companion object {
-        private const val statusColumnName = "match_status"
-        private const val countColumnName = "count"
+        private const val STATUS_COLUMN_NAME = "match_status"
+        private const val COUNT_COLUMN_NAME = "count"
 
         private val countRecordsByStatus =
             """
-                WITH matching_data AS 
-                    (SELECT migration_key,
-                        CASE 
-                            WHEN target_data IS NULL       THEN '${RecordMatchStatus.SourceOnly}'
-                            WHEN source_data IS NULL       THEN '${RecordMatchStatus.TargetOnly}'
-                            WHEN source_data = target_data THEN '${RecordMatchStatus.BothMatched}'
-                            ELSE                                '${RecordMatchStatus.BothMismatched}'
-                        END AS $statusColumnName
-                    FROM reconciliation_record
-                    WHERE reconciliation_run_id = $1)
-                SELECT $statusColumnName, count(*) AS "$countColumnName"
-                FROM matching_data
-                GROUP BY $statusColumnName;
+            WITH matching_data AS 
+                (SELECT migration_key,
+                    CASE 
+                        WHEN target_data IS NULL       THEN '${RecordMatchStatus.SourceOnly}'
+                        WHEN source_data IS NULL       THEN '${RecordMatchStatus.TargetOnly}'
+                        WHEN source_data = target_data THEN '${RecordMatchStatus.BothMatched}'
+                        ELSE                                '${RecordMatchStatus.BothMismatched}'
+                    END AS $STATUS_COLUMN_NAME
+                FROM reconciliation_record
+                WHERE reconciliation_run_id = $1)
+            SELECT $STATUS_COLUMN_NAME, count(*) AS "$COUNT_COLUMN_NAME"
+            FROM matching_data
+            GROUP BY $STATUS_COLUMN_NAME;
             """.trimIndent()
     }
 }
@@ -110,12 +119,13 @@ enum class RecordMatchStatus(val setter: KMutableProperty1.Setter<MatchStatus, I
     BothMismatched(MatchStatus::bothMismatched.setter);
 
     companion object {
-        fun from(record: RecRecord) = when {
-            record.targetData == null -> SourceOnly
-            record.sourceData == null -> TargetOnly
-            record.sourceData == record.targetData -> BothMatched
-            else -> BothMismatched
-        }
+        fun from(record: RecRecord) =
+            when {
+                record.targetData == null -> SourceOnly
+                record.sourceData == null -> TargetOnly
+                record.sourceData == record.targetData -> BothMatched
+                else -> BothMismatched
+            }
     }
 }
 
