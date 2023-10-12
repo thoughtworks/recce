@@ -11,7 +11,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.1"
     id("com.github.spotbugs") version "5.1.4"
     jacoco
-    id("com.adarshr.test-logger") version "3.2.0"
+    id("com.adarshr.test-logger") version "4.0.0"
     id("com.google.cloud.tools.jib") version "3.4.0"
     id("org.owasp.dependencycheck") version "8.4.0"
 }
