@@ -9,7 +9,7 @@
     <Bug category="BAD_PRACTICE"/>
     <Or>
       <Bug pattern="SE_BAD_FIELD"/>
-      <Bug pattern="SE_BAD_FIELD"/>
+      <Bug pattern="PA_PUBLIC_PRIMITIVE_ATTRIBUTE"/>
     </Or>
   </Match>
   <Match>
