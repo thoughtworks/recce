@@ -159,7 +159,7 @@ dependencies {
         exclude("io.projectreactor", "reactor-core")
     }
 
-    spotbugs("com.github.spotbugs:spotbugs:4.7.3")
+    spotbugs("com.github.spotbugs:spotbugs:4.8.1")
     spotbugsPlugins("com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0")
 }
 
