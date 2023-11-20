@@ -30,7 +30,7 @@ val depVersions =
     depDescriptors.mapValues { (_, v) -> v.split(':').last() } +
         mapOf(
             "javaMajor" to "17",
-            "reactorToolsVersionExpected" to "3.5.11"
+            "reactorToolsVersionExpected" to "3.6.0"
         )
 
 repositories {
