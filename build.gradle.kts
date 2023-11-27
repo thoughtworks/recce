@@ -308,16 +308,6 @@ tasks.register<com.google.cloud.tools.jib.gradle.BuildImageTask>("jibGitHubConta
     }
 }
 
-// Jib task pushes an image. Only do so after running all checks
-tasks.register<com.google.cloud.tools.jib.gradle.BuildImageTask>("jibDockerHub") {
-    dependsOn(checkJibDependencies)
-    dependsOn(tasks.check)
-    setJibExtension(project.extensions.getByName("jib") as com.google.cloud.tools.jib.gradle.JibExtension)
-    doFirst {
-        jib?.to?.image = "docker.io/recceteam/$containerRepoName"
-    }
-}
-
 // use different naming when building locally, to avoid confusion
 tasks.jibDockerBuild.configure {
     dependsOn(checkJibDependencies)

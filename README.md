@@ -46,7 +46,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 
 # Getting Started
 
-Recce is currently published and available as a container image [via GHCR](https://github.com/ThoughtWorks-SEA/recce/pkgs/container/recce-server) or [Docker Hub](https://hub.docker.com/r/recceteam/recce-server), built for both AMD64 and ARM64.
+Recce is currently [published and available as a container image via GHCR](https://github.com/ThoughtWorks-SEA/recce/pkgs/container/recce-server).
 
 However, it also
 * requires its own Postgres database
