@@ -13,7 +13,7 @@ plugins {
     jacoco
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.google.cloud.tools.jib") version "3.4.0"
-    id("org.owasp.dependencycheck") version "8.4.3"
+    id("org.owasp.dependencycheck") version "9.0.2"
 }
 
 group = "recce.server"
@@ -168,6 +168,7 @@ dependencyCheck {
     suppressionFile = "build-config/dependency-check-suppressions.xml"
     scanConfigurations = listOf("runtimeClasspath")
     analyzers.assemblyEnabled = false // Unneeded, and creates warning noise
+    nvd.apiKey = System.getenv("NVD_API_KEY") ?: ""
 }
 
 application {
