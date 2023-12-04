@@ -37,10 +37,6 @@ repositories {
     mavenCentral()
 }
 
-kotlin {
-    jvmToolchain(depVersions["javaMajor"]!!.toInt())
-}
-
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         allWarningsAsErrors = true
@@ -213,7 +209,7 @@ spotbugs {
 tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
     reports.create("html") {
         required.set(true)
-        outputLocation.set(file("$buildDir/reports/${this@configureEach.name}.html"))
+        outputLocation.set(file("${layout.buildDirectory.get()}/reports/${this@configureEach.name}.html"))
         setStylesheet("fancy-hist.xsl")
     }
 }
@@ -229,7 +225,7 @@ tasks.jacocoTestReport {
 
 tasks.register("cleanLeaveBuildDir") {
     doLast {
-        project.delete(files("$buildDir/*"))
+        project.delete(files("${layout.buildDirectory.get()}/*"))
     }
 }
 
