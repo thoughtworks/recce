@@ -33,10 +33,11 @@
 
   <!-- Test exclusions -->
   <Match>
-    <Class name="~.*Test"/>
+    <Class name="~.*Test(\$.*)?"/>
     <Or>
       <Bug pattern="HARD_CODE_PASSWORD"/>
       <Bug pattern="PATH_TRAVERSAL_IN"/>
+      <Bug pattern="CT_CONSTRUCTOR_THROW"/>
     </Or>
   </Match>
 </FindBugsFilter>
