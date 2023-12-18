@@ -30,7 +30,7 @@ val depVersions =
     depDescriptors.mapValues { (_, v) -> v.split(':').last() } +
         mapOf(
             "javaMajor" to "17",
-            "reactorToolsVersionExpected" to "3.6.0"
+            "reactorToolsVersionExpected" to "3.6.1"
         )
 
 repositories {
@@ -93,7 +93,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
 
     // Needs to be compatible with Micronaut's reactor-based BOM.
-    implementation(platform("io.projectreactor:reactor-bom:2023.0.0"))
+    implementation(platform("io.projectreactor:reactor-bom:2023.0.1"))
 
     // OpenAPI specification and interactive UI generated from code
     kapt("io.micronaut.openapi:micronaut-openapi")
