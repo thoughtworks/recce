@@ -32,18 +32,22 @@ val configProvider =
             setOf(
                 DatasetConfiguration(
                     DataLoadDefinition(
-                        "source1", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                        "source1",
+                        Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
                     ),
                     DataLoadDefinition(
-                        "target1", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                        "target1",
+                        Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
                     )
                 ).apply { id = "two" },
                 DatasetConfiguration(
                     DataLoadDefinition(
-                        "source2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                        "source2",
+                        Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
                     ),
                     DataLoadDefinition(
-                        "target2", Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
+                        "target2",
+                        Optional.of("SELECT name AS MigrationKey, name, value FROM testdata")
                     ),
                     Schedule("0 0 0 ? * *")
                 ).apply { id = "datasets" }
