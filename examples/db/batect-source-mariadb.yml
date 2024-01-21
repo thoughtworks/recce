@@ -1,6 +1,6 @@
 containers:
   source-db:
-    image: mariadb:10
+    image: mariadb:11
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: "true"
       MARIADB_DATABASE: <{db-name}

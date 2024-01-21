@@ -33,7 +33,7 @@ internal open class DatasetRecServiceCrossDatabaseIntegrationTest {
         private val databases: Map<String, JdbcDatabaseContainer<Nothing>> =
             buildMap {
                 put("mysql", MySQLContainer("mysql:8.0"))
-                put("mariadb", MariaDBContainer("mariadb:10"))
+                put("mariadb", MariaDBContainer("mariadb:11"))
                 put("postgres", PostgreSQLContainer("postgres:16-alpine"))
                 if (!System.getProperty("os.arch").contains(Regex("arm64|aarch64"))) {
                     put(
