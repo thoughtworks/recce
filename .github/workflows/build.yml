@@ -32,7 +32,7 @@ jobs:
           java-version: 17
 
       - name: Gradle Build, Lint, Test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: build
           gradle-home-cache-cleanup: true
@@ -48,7 +48,7 @@ jobs:
         uses: codecov/codecov-action@v3.1.4
 
       - name: Gradle Local Docker Trial Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         if: ${{ !endsWith(github.ref, '/master') && !startsWith(github.ref, 'refs/tags/') }}
         env:
           JAVA_HOME: ${{ env.JAVA_HOME }}
@@ -65,6 +65,6 @@ jobs:
 
       - if: ${{ endsWith(github.ref, '/master') || startsWith(github.ref, 'refs/tags/') }}
         name: Gradle Official Docker Build & Push
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: jibGitHubContainerRegistry -x check
