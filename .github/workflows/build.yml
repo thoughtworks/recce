@@ -21,8 +21,15 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        if: ${{ endsWith(github.ref, '/master') || startsWith(github.ref, 'refs/tags/') }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -31,11 +38,12 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Gradle Build, Lint, Test
-        uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: build
           gradle-home-cache-cleanup: true
+
+      - name: Gradle Build
+        run: ./gradlew build
 
       - name: Save test results artifact
         if: always()
@@ -48,23 +56,9 @@ jobs:
         uses: codecov/codecov-action@v3.1.5
 
       - name: Gradle Local Docker Trial Build
-        uses: gradle/actions/setup-gradle@v3
         if: ${{ !endsWith(github.ref, '/master') && !startsWith(github.ref, 'refs/tags/') }}
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME }}
-        with:
-          arguments: jibDockerBuild -x check
+        run: ./gradlew jibDockerBuild -x check
 
-      - if: ${{ endsWith(github.ref, '/master') || startsWith(github.ref, 'refs/tags/') }}
-        name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - if: ${{ endsWith(github.ref, '/master') || startsWith(github.ref, 'refs/tags/') }}
-        name: Gradle Official Docker Build & Push
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: jibGitHubContainerRegistry -x check
+      - name: Gradle Official Docker Build & Push
+        if: ${{ endsWith(github.ref, '/master') || startsWith(github.ref, 'refs/tags/') }}
+        run: ./gradlew jibGitHubContainerRegistry -x check
