@@ -53,6 +53,7 @@ jobs:
           path: build/reports/tests/test
 
       - name: Upload coverage to codecov.io
+        if: ${{ endsWith(github.ref, '/master') || startsWith(github.ref, 'refs/tags/') }}
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
