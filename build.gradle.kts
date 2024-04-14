@@ -129,7 +129,7 @@ dependencies {
 
     testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
     testImplementation("io.rest-assured:kotlin-extensions:${depVersions["restAssured"]}")
-    testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
+    testImplementation("org.awaitility:awaitility-kotlin:4.2.1")
 
     // Database testing infra
     testImplementation("org.testcontainers:testcontainers")
