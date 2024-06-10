@@ -12,7 +12,7 @@ plugins {
     id("com.github.spotbugs") version "6.0.13"
     jacoco
     id("com.adarshr.test-logger") version "4.0.0"
-    id("com.google.cloud.tools.jib") version "3.4.2"
+    id("com.google.cloud.tools.jib") version "3.4.3"
     id("org.owasp.dependencycheck") version "9.2.0"
 }
 
