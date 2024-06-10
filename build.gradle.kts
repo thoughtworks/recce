@@ -260,12 +260,14 @@ jib {
         }
     }
     to {
-        val fullVersion = com.github.zafarkhaja.semver.Version.valueOf(project.version.toString())
+        val fullVersion = com.github.zafarkhaja.semver.Version.parse(project.version.toString())
         val tagVersion =
-            com.github.zafarkhaja.semver.Version.Builder()
-                .setNormalVersion(fullVersion.normalVersion)
-                .setPreReleaseVersion(fullVersion.preReleaseVersion.split('.')[0])
-                .build()
+            com.github.zafarkhaja.semver.Version.of(
+                fullVersion.majorVersion(),
+                fullVersion.minorVersion(),
+                fullVersion.patchVersion(),
+                fullVersion.preReleaseVersion().map { it.split('.')[0] }.orElseThrow()
+            )
         tags = setOf(tagVersion.toString(), "latest")
     }
     container {
