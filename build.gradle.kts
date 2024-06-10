@@ -266,7 +266,7 @@ jib {
                 fullVersion.majorVersion(),
                 fullVersion.minorVersion(),
                 fullVersion.patchVersion(),
-                fullVersion.preReleaseVersion().map { it.split('.')[0] }.orElseThrow()
+                fullVersion.preReleaseVersion().map { it.split('.')[0] }.orElse(null)
             )
         tags = setOf(tagVersion.toString(), "latest")
     }
