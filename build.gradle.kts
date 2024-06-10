@@ -78,6 +78,11 @@ dependencies {
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.security:micronaut-security-jwt")
+    constraints {
+        implementation("com.nimbusds:nimbus-jose-jwt:9.40")
+            .because("micronaut-security-jwt:3.11.1 uses an outdated version with a CVE")
+    }
+
     implementation("javax.annotation:javax.annotation-api")
     implementation("com.google.guava:guava:33.2.1-jre") {
         // see https://github.com/google/guava/pull/6606
@@ -90,7 +95,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
-    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("ch.qos.logback:logback-classic:1.4.14") // Remove fixed version when micronaut has updated to 1.4.13+
 
     // Needs to be compatible with Micronaut's reactor-based BOM.
     implementation(platform("io.projectreactor:reactor-bom:2023.0.6"))
@@ -106,7 +111,7 @@ dependencies {
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:postgresql:42.7.3") // Remove fixed version when micronaut has updated to 42.5.5+
 
     // R2BDC data access (for use by all data sources)
     implementation("io.micronaut.data:micronaut-data-r2dbc")
