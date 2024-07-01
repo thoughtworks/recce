@@ -95,7 +95,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.13") // Remove fixed version when micronaut has updated to 1.3+
+    runtimeOnly("ch.qos.logback:logback-classic:1.4.14") // Remove fixed version when micronaut has updated to 1.3+
 
     // Needs to be compatible with Micronaut's reactor-based BOM.
     implementation(platform("io.projectreactor:reactor-bom:2023.0.7"))
