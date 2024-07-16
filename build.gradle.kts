@@ -130,7 +130,7 @@ dependencies {
     testImplementation(platform("org.mockito:mockito-bom:5.12.0")) // Needs to be compatible with Micronaut BOM
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
     testImplementation("io.rest-assured:rest-assured:${depVersions["restAssured"]}")
     testImplementation("io.rest-assured:kotlin-extensions:${depVersions["restAssured"]}")
