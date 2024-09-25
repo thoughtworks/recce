@@ -40,7 +40,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          cache-cleanup: true
+          cache-cleanup: on-success
 
       - name: Gradle Build
         run: ./gradlew build
