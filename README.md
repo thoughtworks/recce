@@ -22,26 +22,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 ## Table of contents
 <!-- ToC auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
-* [Recce Server](README.md#recce-server)
-   * [Features](README.md#features)
-   * [Table of contents](README.md#table-of-contents)
-* [Getting Started](README.md#getting-started)
-* [Configuration](README.md#configuration)
-   * [Configuring Recce itself](README.md#configuring-recce-itself)
-   * [Database configuration conveniences](README.md#database-configuration-conveniences)
-   * [Adding additional configuration files](README.md#adding-additional-configuration-files)
-   * [Configuring authentication](README.md#configuring-authentication)
-   * [Configuring datasources](README.md#configuring-datasources)
-      * [Driver/database specific configuration](README.md#driverdatabase-specific-configuration)
-      * [Customising datasource pooling](README.md#customising-datasource-pooling)
-   * [Configuring datasets](README.md#configuring-datasets)
-   * [Writing dataset queries](README.md#writing-dataset-queries)
-      * [The MigrationKey](README.md#the-migrationkey)
-      * [Ordering of columns](README.md#ordering-of-columns)
-      * [Handling differences](README.md#handling-differences)
-      * [Huge datasets and aggregates](README.md#huge-datasets-and-aggregates)
-* [Development](README.md#development)
-* [FAQ](README.md#faq)
+
 <!--te-->
 
 # Getting Started
