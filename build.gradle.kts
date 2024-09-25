@@ -1,7 +1,7 @@
 @file:Suppress("GradlePackageUpdate")
 
 plugins {
-    val kotlinVersion = "1.9.25"
+    val kotlinVersion = "2.0.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.kapt") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.allopen") version kotlinVersion
