@@ -1,8 +1,8 @@
 # Recce Server
 
-[![Build Status](https://github.com/thoughtworks-sea/recce/actions/workflows/build.yml/badge.svg)](https://github.com/thoughtworks-sea/recce/actions/workflows/build.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/thoughtworks-sea/recce.svg)](https://codecov.io/gh/thoughtworks-sea/recce)
-[![License](https://img.shields.io/github/license/thoughtworks-sea/recce.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://github.com/thoughtworks/recce/actions/workflows/build.yml/badge.svg)](https://github.com/thoughtworks/recce/actions/workflows/build.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/thoughtworks/recce.svg)](https://codecov.io/gh/thoughtworks/recce)
+[![License](https://img.shields.io/github/license/thoughtworks/recce.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Recce (_rek-ee_) is a database reconciliation tool **_for developers_**.
 
@@ -46,7 +46,7 @@ You can read more about the ideas behind Recce at [DESIGN.md](docs/DESIGN.md) or
 
 # Getting Started
 
-Recce is currently [published and available as a container image via GHCR](https://github.com/ThoughtWorks-SEA/recce/pkgs/container/recce-server).
+Recce is currently [published and available as a container image via GHCR](https://github.com/thoughtworks/recce/pkgs/container/recce-server).
 
 However, it also
 * requires its own Postgres database
@@ -72,7 +72,7 @@ The below options require only JDK 11+ and Docker (or equivalent) installed loca
       -e DATABASE_HOST=host.docker.internal \
       -e R2DBC_DATASOURCES_SOURCE_URL=r2dbc:pool:mariadb://host.docker.internal:8000/db \
       -e R2DBC_DATASOURCES_TARGET_URL=r2dbc:pool:mariadb://host.docker.internal:8001/db \
-      ghcr.io/thoughtworks-sea/recce-server:latest
+      ghcr.io/thoughtworks/recce-server:latest
     ```
     
 2. **Explore** and trigger runs via Recce's APIs, accessible via interactive UI at http://localhost:8080/rapidoc/. 
@@ -190,7 +190,7 @@ touch my-dataset-configs/config1.yml my-dataset-configs/config2.yml
 docker run -p 8080:8080 \
   -v $(pwd)/my-dataset-configs:/config \
   -e MICRONAUT_CONFIG_FILES=/config/config1.yml,/config/config2.yml \
-  ghcr.io/thoughtworks-sea/recce-server:latest
+  ghcr.io/thoughtworks/recce-server:latest
 ```
 
 ## Configuring authentication

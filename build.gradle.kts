@@ -179,7 +179,7 @@ application {
 tasks.run.configure {
     doFirst { environment("version", "$version") }
 
-    // Workaround https://github.com/thoughtworks-sea/recce/issues/155
+    // Workaround https://github.com/thoughtworks/recce/issues/155
     jvmArgs("-XX:+StartAttachListener")
     environment.computeIfAbsent("AUTH_USERNAME") { "admin" }
     environment.computeIfAbsent("AUTH_PASSWORD") { "admin" }
@@ -248,7 +248,7 @@ tasks.register<Test>("fastTests") {
     }
 }
 
-val githubRepoOwner = "thoughtworks-sea"
+val githubRepoOwner = "thoughtworks"
 val containerRepoName = "recce-server"
 jib {
     from {

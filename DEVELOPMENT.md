@@ -128,8 +128,6 @@ If you're running on MacOS using Colima or Docker Desktop, the default VM create
 
 # For maintainers
 
-Currently, core maintainer privileges are only available to Thoughtworkers. A setup guide is available [here (internal only)](https://docs.google.com/document/d/1r56rDyGOnRQAAMyHtUHflML1szdvQJMi8p3bzMNB_8A/edit#).
-
 ## Releasing
 
 Needs to be more automated. Current we are experimenting with using [Reckon](https://github.com/ajoberstar/reckon) to determine versions from flags.
@@ -143,5 +141,5 @@ Current release process looks like
     # Patch version (e.g 0.6.0 -> 0.6.1)   
     ./gradlew -Preckon.stage=final -Preckon.scope=patch reckonTagPush
     ```
-2. The tag push will trigger a build on [GitHub Actions](https://github.com/ThoughtWorks-SEA/recce/actions) and push to GHCR.
-3. Create a new release on Github via https://github.com/ThoughtWorks-SEA/recce/releases linked to the tag
+2. The tag push will trigger a build on [GitHub Actions](https://github.com/thoughtworks/recce/actions) and push to GHCR.
+3. Create a new release on Github via https://github.com/thoughtworks/recce/releases linked to the tag

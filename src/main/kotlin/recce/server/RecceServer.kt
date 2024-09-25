@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecuritySchemes
 import mu.KotlinLogging
 import reactor.tools.agent.ReactorDebugAgent
 
-private const val GITHUB_PROJECT = "https://github.com/thoughtworks-sea/recce"
+private const val GITHUB_PROJECT = "https://github.com/thoughtworks/recce"
 private val logger = KotlinLogging.logger {}
 
 @OpenAPIDefinition(
