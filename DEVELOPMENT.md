@@ -1,20 +1,6 @@
 <!-- ToC auto-populated via https://github.com/ekalinin/github-markdown-toc -->
 <!--ts-->
-* [Pre-requisites](DEVELOPMENT.md#pre-requisites)
-* [Getting Started](DEVELOPMENT.md#getting-started)
-* [IDE Setup](DEVELOPMENT.md#ide-setup)
-* [Technical Overview](DEVELOPMENT.md#technical-overview)
-   * [Recce Database](DEVELOPMENT.md#recce-database)
-   * [External data sources for Reconciliation](DEVELOPMENT.md#external-data-sources-for-reconciliation)
-   * [Build](DEVELOPMENT.md#build)
-   * [Testing](DEVELOPMENT.md#testing)
-      * [Testing conventions](DEVELOPMENT.md#testing-conventions)
-      * [Micronaut Tests](DEVELOPMENT.md#micronaut-tests)
-* [Common problems](DEVELOPMENT.md#common-problems)
-   * [Running tests via Colima](DEVELOPMENT.md#running-tests-via-colima)
-   * [Out of Memory errors running within containers](DEVELOPMENT.md#out-of-memory-errors-running-within-containers)
-* [For maintainers](DEVELOPMENT.md#for-maintainers)
-   * [Releasing](DEVELOPMENT.md#releasing)
+
 <!--te-->
 
 # Pre-requisites
