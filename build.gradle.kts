@@ -79,7 +79,7 @@ dependencies {
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.security:micronaut-security-jwt")
     constraints {
-        implementation("com.nimbusds:nimbus-jose-jwt:9.41.2")
+        implementation("com.nimbusds:nimbus-jose-jwt:9.44")
             .because("micronaut-security-jwt:3.11.1 uses an outdated version with a CVE")
     }
 
