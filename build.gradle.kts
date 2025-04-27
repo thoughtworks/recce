@@ -161,7 +161,7 @@ dependencies {
     }
 
     spotbugs("com.github.spotbugs:spotbugs:4.9.3")
-    spotbugsPlugins("com.h3xstream.findsecbugs:findsecbugs-plugin:1.13.0")
+    spotbugsPlugins("com.h3xstream.findsecbugs:findsecbugs-plugin:1.14.0")
 }
 
 dependencyCheck {
