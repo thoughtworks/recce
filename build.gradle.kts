@@ -84,7 +84,7 @@ dependencies {
     }
 
     implementation("javax.annotation:javax.annotation-api")
-    implementation("com.google.guava:guava:33.4.0-jre") {
+    implementation("com.google.guava:guava:33.4.8-jre") {
         // see https://github.com/google/guava/pull/6606
         exclude(module = "error_prone_annotations")
         exclude(module = "checker-qual")
