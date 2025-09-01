@@ -17,7 +17,7 @@ jobs:
     env:
       GITHUB_MARKDOWN_TOC_VERSION: 0.10.0 # See https://github.com/ekalinin/github-markdown-toc/releases
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           curl https://raw.githubusercontent.com/ekalinin/github-markdown-toc/${GITHUB_MARKDOWN_TOC_VERSION}/gh-md-toc -o gh-md-toc
           chmod a+x gh-md-toc
