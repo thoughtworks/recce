@@ -47,7 +47,7 @@ jobs:
 
       - name: Save test results artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-report
           path: build/reports/tests/test
